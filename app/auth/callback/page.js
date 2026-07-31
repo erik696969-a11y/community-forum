@@ -12,15 +12,50 @@ export default function AuthCallback() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let handled = false;
+
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && !handled) {
+        handled = true;
+        router.replace('/');
+      }
+    });
+
     async function run() {
-      const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
-      if (error) {
-        setError(t(lang, 'linkInvalid'));
+      // Give the Supabase client a moment to auto-detect the session from the URL hash
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        if (!handled) {
+          handled = true;
+          router.replace('/');
+        }
         return;
       }
-      router.replace('/');
+
+      // Fallback for PKCE-style links that use a "code" query parameter
+      if (window.location.href.includes('code=')) {
+        const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
+        if (!error) {
+          if (!handled) {
+            handled = true;
+            router.replace('/');
+          }
+          return;
+        }
+      }
+
+      if (!handled) {
+        setError(t(lang, 'linkInvalid'));
+      }
     }
+
     run();
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
