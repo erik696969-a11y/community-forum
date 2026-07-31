@@ -3,10 +3,14 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfile } from '../../lib/useProfile';
+import { useLanguage } from '../../lib/useLanguage';
+import { t } from '../../lib/i18n';
 import { supabase } from '../../lib/supabaseClient';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function PendingPage() {
   const { loading, session, profile } = useProfile();
+  const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export default function PendingPage() {
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-harbor">Načítava sa…</p>
+        <p className="text-harbor">{t(lang, 'loading')}</p>
       </main>
     );
   }
@@ -38,25 +42,22 @@ export default function PendingPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <div className="card max-w-md w-full p-8 text-center">
+        <div className="flex justify-end mb-2">
+          <LanguageSwitcher lang={lang} onChange={setLang} />
+        </div>
         {isRejected ? (
           <>
-            <h1 className="font-display text-2xl text-harbor mb-3">Žiadosť nebola schválená</h1>
-            <p className="text-ink">
-              Vaša registrácia nebola potvrdená. Ak si myslíte, že ide o omyl, kontaktujte
-              prosím výbor komunity priamo.
-            </p>
+            <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'rejectedTitle')}</h1>
+            <p className="text-ink">{t(lang, 'rejectedText')}</p>
           </>
         ) : (
           <>
-            <h1 className="font-display text-2xl text-harbor mb-3">Žiadosť sa spracúva</h1>
-            <p className="text-ink">
-              Ďakujeme za registráciu! Výbor komunity teraz overuje, či ste majiteľom
-              apartmánu. Keď bude vaša žiadosť schválená, budete môcť fórum používať.
-            </p>
+            <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'pendingTitle')}</h1>
+            <p className="text-ink">{t(lang, 'pendingText')}</p>
           </>
         )}
         <button onClick={handleSignOut} className="btn-secondary mt-6">
-          Odhlásiť sa
+          {t(lang, 'signOut')}
         </button>
       </div>
     </main>

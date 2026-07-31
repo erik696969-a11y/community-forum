@@ -4,17 +4,27 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../../../lib/useProfile';
+import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
+import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
 
-const ISSUE_LABELS = {
-  new: { label: 'Nové', color: 'bg-red-100 text-red-700' },
-  in_progress: { label: 'Rieši sa', color: 'bg-amber-100 text-amber-700' },
-  resolved: { label: 'Vyriešené', color: 'bg-green-100 text-green-700' },
+const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
+const ISSUE_COLORS = {
+  new: 'bg-red-100 text-red-700',
+  in_progress: 'bg-amber-100 text-amber-700',
+  resolved: 'bg-green-100 text-green-700',
 };
+
+function localizedField(item, field, lang) {
+  if (item.original_lang === lang) return item[field];
+  const translations = item[`${field}_translations`];
+  return translations?.[lang] || item[field];
+}
 
 export default function PostDetailPage() {
   const { loading, session, profile } = useProfile();
+  const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
   const params = useParams();
 
@@ -68,10 +78,33 @@ export default function PostDetailPage() {
     if (!newComment.trim()) return;
     setSubmitting(true);
 
+    const text = newComment.trim();
+    let originalLang = lang;
+    let contentTranslations = {};
+
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts: [text] }),
+      });
+      const data = await res.json();
+      if (data.translations) {
+        originalLang = data.originalLang;
+        Object.entries(data.translations).forEach(([langCode, arr]) => {
+          contentTranslations[langCode] = arr[0];
+        });
+      }
+    } catch (translationError) {
+      originalLang = lang;
+    }
+
     const { error } = await supabase.from('comments').insert({
       post_id: params.id,
       author_id: session.user.id,
-      content: newComment.trim(),
+      content: text,
+      original_lang: originalLang,
+      content_translations: contentTranslations,
     });
 
     setSubmitting(false);
@@ -85,7 +118,7 @@ export default function PostDetailPage() {
   if (loading || !profile || loadingData) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-harbor">Načítava sa…</p>
+        <p className="text-harbor">{t(lang, 'loading')}</p>
       </main>
     );
   }
@@ -93,38 +126,41 @@ export default function PostDetailPage() {
   if (!post) {
     return (
       <main className="min-h-screen">
-        <Header profile={profile} />
+        <Header profile={profile} lang={lang} onLanguageChange={setLang} />
         <div className="max-w-2xl mx-auto px-4 py-8">
-          <p className="text-ink">Príspevok sa nenašiel.</p>
+          <p className="text-ink">{t(lang, 'postNotFound')}</p>
         </div>
       </main>
     );
   }
 
+  const postTranslated = post.original_lang && post.original_lang !== lang;
+
   return (
     <main className="min-h-screen">
-      <Header profile={profile} />
+      <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
         {category && (
           <Link href={`/dashboard/${category.slug}`} className="text-sm text-harbor/70 hover:text-harbor">
-            ← Späť na {category.name}
+            {t(lang, 'backToCategories')}
           </Link>
         )}
 
         <div className="card p-6 mt-3">
           <div className="flex items-center justify-between gap-3">
-            <h1 className="font-display text-2xl text-harbor">{post.title}</h1>
+            <h1 className="font-display text-2xl text-harbor">{localizedField(post, 'title', lang)}</h1>
             {post.issue_status && (
-              <span className={`text-xs font-semibold px-2 py-1 rounded ${ISSUE_LABELS[post.issue_status]?.color}`}>
-                {ISSUE_LABELS[post.issue_status]?.label}
+              <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}>
+                {t(lang, ISSUE_KEYS[post.issue_status])}
               </span>
             )}
           </div>
           <p className="text-xs text-ink/50 mt-1 mb-4">
-            {post.author?.full_name} · apartmán {post.author?.apartment_number} ·{' '}
-            {new Date(post.created_at).toLocaleDateString('sk-SK')}
+            {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
+            {new Date(post.created_at).toLocaleDateString()}
+            {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
           </p>
-          <p className="text-ink whitespace-pre-wrap">{post.content}</p>
+          <p className="text-ink whitespace-pre-wrap">{localizedField(post, 'content', lang)}</p>
           {post.image_url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.image_url} alt="" className="mt-4 rounded-lg max-w-full" />
@@ -132,22 +168,24 @@ export default function PostDetailPage() {
         </div>
 
         <h2 className="font-display text-lg text-harbor mt-8 mb-3">
-          Komentáre ({comments.length})
+          {t(lang, 'comments')} ({comments.length})
         </h2>
 
         <div className="space-y-3 mb-6">
-          {comments.map((c) => (
-            <div key={c.id} className="card p-4">
-              <p className="text-ink text-sm">{c.content}</p>
-              <p className="text-xs text-ink/50 mt-1">
-                {c.author?.full_name} · apartmán {c.author?.apartment_number} ·{' '}
-                {new Date(c.created_at).toLocaleDateString('sk-SK')}
-              </p>
-            </div>
-          ))}
-          {comments.length === 0 && (
-            <p className="text-ink/60 text-sm">Zatiaľ žiadne komentáre. Buďte prvý!</p>
-          )}
+          {comments.map((c) => {
+            const isTranslated = c.original_lang && c.original_lang !== lang;
+            return (
+              <div key={c.id} className="card p-4">
+                <p className="text-ink text-sm">{localizedField(c, 'content', lang)}</p>
+                <p className="text-xs text-ink/50 mt-1">
+                  {c.author?.full_name} · {c.author?.apartment_number} ·{' '}
+                  {new Date(c.created_at).toLocaleDateString()}
+                  {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+                </p>
+              </div>
+            );
+          })}
+          {comments.length === 0 && <p className="text-ink/60 text-sm">{t(lang, 'noCommentsYet')}</p>}
         </div>
 
         <form onSubmit={handleAddComment} className="flex gap-2">
@@ -156,10 +194,10 @@ export default function PostDetailPage() {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             className="input-field"
-            placeholder="Napíšte komentár…"
+            placeholder={t(lang, 'commentPlaceholder')}
           />
           <button type="submit" disabled={submitting} className="btn-primary whitespace-nowrap">
-            Odoslať
+            {t(lang, 'send')}
           </button>
         </form>
       </div>

@@ -4,17 +4,27 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../../lib/useProfile';
+import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
+import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
 
-const ISSUE_LABELS = {
-  new: { label: 'Nové', color: 'bg-red-100 text-red-700' },
-  in_progress: { label: 'Rieši sa', color: 'bg-amber-100 text-amber-700' },
-  resolved: { label: 'Vyriešené', color: 'bg-green-100 text-green-700' },
+const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
+const ISSUE_COLORS = {
+  new: 'bg-red-100 text-red-700',
+  in_progress: 'bg-amber-100 text-amber-700',
+  resolved: 'bg-green-100 text-green-700',
 };
+
+function localizedField(post, field, lang) {
+  if (post.original_lang === lang) return post[field];
+  const translations = post[`${field}_translations`];
+  return translations?.[lang] || post[field];
+}
 
 export default function CategoryPage() {
   const { loading, session, profile } = useProfile();
+  const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
   const params = useParams();
   const [category, setCategory] = useState(null);
@@ -54,57 +64,65 @@ export default function CategoryPage() {
   if (loading || !profile) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-harbor">Načítava sa…</p>
+        <p className="text-harbor">{t(lang, 'loading')}</p>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen">
-      <Header profile={profile} />
+      <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-4xl mx-auto px-4 py-8">
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor">
-          ← Späť na kategórie
+          {t(lang, 'backToCategories')}
         </Link>
 
-        <div className="flex items-center justify-between mt-3 mb-6">
+        <div className="flex items-center justify-between mt-3 mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">
-            {category ? category.name : 'Kategória'}
+            {category ? category[`name_${lang}`] || category.name : ''}
           </h1>
           <Link href={`/dashboard/new-post?category=${params.slug}`} className="btn-primary">
-            + Nový príspevok
+            {t(lang, 'newPost')}
           </Link>
         </div>
 
         {loadingPosts ? (
-          <p className="text-ink/60">Načítavam príspevky…</p>
+          <p className="text-ink/60">{t(lang, 'loadingPosts')}</p>
         ) : posts.length === 0 ? (
-          <p className="text-ink/60">V tejto kategórii ešte nie sú žiadne príspevky. Buďte prvý!</p>
+          <p className="text-ink/60">{t(lang, 'noPostsYet')}</p>
         ) : (
           <div className="space-y-3">
-            {posts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/dashboard/post/${post.id}`}
-                className="card p-5 block hover:border-ochre transition-colors"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-display text-lg text-harbor">{post.title}</h2>
-                  {post.issue_status && (
-                    <span
-                      className={`text-xs font-semibold px-2 py-1 rounded ${ISSUE_LABELS[post.issue_status]?.color}`}
-                    >
-                      {ISSUE_LABELS[post.issue_status]?.label}
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-ink/70 mt-1 line-clamp-2">{post.content}</p>
-                <p className="text-xs text-ink/50 mt-2">
-                  {post.author?.full_name} · apartmán {post.author?.apartment_number} ·{' '}
-                  {new Date(post.created_at).toLocaleDateString('sk-SK')}
-                </p>
-              </Link>
-            ))}
+            {posts.map((post) => {
+              const isTranslated = post.original_lang && post.original_lang !== lang;
+              return (
+                <Link
+                  key={post.id}
+                  href={`/dashboard/post/${post.id}`}
+                  className="card p-5 block hover:border-ochre transition-colors"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="font-display text-lg text-harbor">
+                      {localizedField(post, 'title', lang)}
+                    </h2>
+                    {post.issue_status && (
+                      <span
+                        className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}
+                      >
+                        {t(lang, ISSUE_KEYS[post.issue_status])}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-ink/70 mt-1 line-clamp-2">
+                    {localizedField(post, 'content', lang)}
+                  </p>
+                  <p className="text-xs text-ink/50 mt-2">
+                    {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
+                    {new Date(post.created_at).toLocaleDateString()}
+                    {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>

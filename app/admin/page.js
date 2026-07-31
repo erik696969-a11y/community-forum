@@ -3,11 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfile } from '../../lib/useProfile';
+import { useLanguage } from '../../lib/useLanguage';
 import { supabase } from '../../lib/supabaseClient';
+import { t } from '../../lib/i18n';
 import Header from '../components/Header';
 
 export default function AdminPage() {
   const { loading, session, profile } = useProfile();
+  const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
   const [pending, setPending] = useState([]);
   const [approved, setApproved] = useState([]);
@@ -56,44 +59,38 @@ export default function AdminPage() {
   if (loading || !profile || profile.role !== 'board') {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-harbor">Načítava sa…</p>
+        <p className="text-harbor">{t(lang, 'loading')}</p>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen">
-      <Header profile={profile} />
+      <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl text-harbor mb-6">Správa registrácií</h1>
+        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'managementTitle')}</h1>
 
         <h2 className="font-display text-lg text-harbor mb-3">
-          Čakajúce žiadosti ({pending.length})
+          {t(lang, 'pendingRequests')} ({pending.length})
         </h2>
         {loadingData ? (
-          <p className="text-ink/60">Načítavam…</p>
+          <p className="text-ink/60">{t(lang, 'loading')}</p>
         ) : pending.length === 0 ? (
-          <p className="text-ink/60 mb-8">Žiadne čakajúce žiadosti.</p>
+          <p className="text-ink/60 mb-8">{t(lang, 'noPendingRequests')}</p>
         ) : (
           <div className="space-y-3 mb-8">
             {pending.map((p) => (
-              <div key={p.id} className="card p-4 flex items-center justify-between gap-4">
+              <div key={p.id} className="card p-4 flex items-center justify-between gap-4 flex-wrap">
                 <div>
                   <p className="font-semibold text-ink">{p.full_name}</p>
-                  <p className="text-sm text-ink/60">Apartmán: {p.apartment_number}</p>
+                  <p className="text-sm text-ink/60">{t(lang, 'apartment')}: {p.apartment_number}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => updateStatus(p.id, 'approved')}
-                    className="btn-primary text-sm"
-                  >
-                    Schváliť
+                  <button onClick={() => updateStatus(p.id, 'approved')} className="btn-primary text-sm">
+                    {t(lang, 'approve')}
                   </button>
-                  <button
-                    onClick={() => updateStatus(p.id, 'rejected')}
-                    className="btn-secondary text-sm"
-                  >
-                    Zamietnuť
+                  <button onClick={() => updateStatus(p.id, 'rejected')} className="btn-secondary text-sm">
+                    {t(lang, 'reject')}
                   </button>
                 </div>
               </div>
@@ -102,17 +99,15 @@ export default function AdminPage() {
         )}
 
         <h2 className="font-display text-lg text-harbor mb-3">
-          Schválení majitelia ({approved.length})
+          {t(lang, 'approvedOwners')} ({approved.length})
         </h2>
         <div className="space-y-2">
           {approved.map((p) => (
             <div key={p.id} className="card p-3 flex items-center justify-between">
               <p className="text-sm text-ink">
-                {p.full_name} · apartmán {p.apartment_number}
+                {p.full_name} · {p.apartment_number}
               </p>
-              {p.role === 'board' && (
-                <span className="text-xs font-semibold text-ochre">Výbor</span>
-              )}
+              {p.role === 'board' && <span className="text-xs font-semibold text-ochre">{t(lang, 'board')}</span>}
             </div>
           ))}
         </div>

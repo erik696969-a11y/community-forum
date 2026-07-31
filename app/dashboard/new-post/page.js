@@ -3,7 +3,9 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useProfile } from '../../../lib/useProfile';
+import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
+import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
 
 export default function NewPostPage() {
@@ -16,6 +18,7 @@ export default function NewPostPage() {
 
 function NewPostForm() {
   const { loading, session, profile } = useProfile();
+  const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -75,7 +78,7 @@ function NewPostForm() {
         .upload(filePath, imageFile);
 
       if (uploadError) {
-        setError('Obrázok sa nepodarilo nahrať, skúste príspevok bez neho.');
+        setError(t(lang, 'imageUploadError'));
         setSubmitting(false);
         return;
       }
@@ -84,6 +87,30 @@ function NewPostForm() {
         .from('post-images')
         .getPublicUrl(filePath);
       imageUrl = publicUrlData.publicUrl;
+    }
+
+    // Automatic translation via DeepL (server-side)
+    let originalLang = lang;
+    let titleTranslations = {};
+    let contentTranslations = {};
+
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts: [title, content] }),
+      });
+      const data = await res.json();
+      if (data.translations) {
+        originalLang = data.originalLang;
+        Object.entries(data.translations).forEach(([langCode, arr]) => {
+          titleTranslations[langCode] = arr[0];
+          contentTranslations[langCode] = arr[1];
+        });
+      }
+    } catch (translationError) {
+      // If translation fails, we still publish the post in its original language only
+      originalLang = lang;
     }
 
     const { data: newPost, error: insertError } = await supabase
@@ -95,6 +122,9 @@ function NewPostForm() {
         content,
         image_url: imageUrl,
         issue_status: selectedType === 'issue' ? issueStatus : null,
+        original_lang: originalLang,
+        title_translations: titleTranslations,
+        content_translations: contentTranslations,
       })
       .select()
       .single();
@@ -102,7 +132,7 @@ function NewPostForm() {
     setSubmitting(false);
 
     if (insertError) {
-      setError('Príspevok sa nepodarilo uložiť. Skúste to znova.');
+      setError(t(lang, 'postSaveError'));
       return;
     }
 
@@ -112,20 +142,20 @@ function NewPostForm() {
   if (loading || !profile) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-harbor">Načítava sa…</p>
+        <p className="text-harbor">{t(lang, 'loading')}</p>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen">
-      <Header profile={profile} />
+      <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl text-harbor mb-6">Nový príspevok</h1>
+        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'newPostTitle')}</h1>
 
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">Kategória</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'category')}</label>
             <select
               value={categoryId}
               onChange={(e) => handleCategoryChange(e.target.value)}
@@ -133,55 +163,53 @@ function NewPostForm() {
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name}
+                  {c[`name_${lang}`] || c.name}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">Názov</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'titleLabel')}</label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="input-field"
-              placeholder="Stručný a výstižný názov"
+              placeholder={t(lang, 'titlePlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">Popis</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'descriptionLabel')}</label>
             <textarea
               required
               rows={5}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="input-field"
-              placeholder="Podrobný popis…"
+              placeholder={t(lang, 'descriptionPlaceholder')}
             />
           </div>
 
           {selectedType === 'issue' && (
             <div>
-              <label className="block text-sm font-semibold text-harbor mb-1">Stav</label>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'statusLabel')}</label>
               <select
                 value={issueStatus}
                 onChange={(e) => setIssueStatus(e.target.value)}
                 className="input-field"
               >
-                <option value="new">Nové</option>
-                <option value="in_progress">Rieši sa</option>
-                <option value="resolved">Vyriešené</option>
+                <option value="new">{t(lang, 'issueNew')}</option>
+                <option value="in_progress">{t(lang, 'issueInProgress')}</option>
+                <option value="resolved">{t(lang, 'issueResolved')}</option>
               </select>
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">
-              Fotka (nepovinné)
-            </label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'photoLabel')}</label>
             <input
               type="file"
               accept="image/*"
@@ -193,7 +221,7 @@ function NewPostForm() {
           {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <button type="submit" disabled={submitting} className="btn-primary w-full">
-            {submitting ? 'Ukladám…' : 'Zverejniť príspevok'}
+            {submitting ? t(lang, 'saving') : t(lang, 'publishPost')}
           </button>
         </form>
       </div>

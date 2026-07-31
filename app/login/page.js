@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import { useLanguage } from '../../lib/useLanguage';
+import { t } from '../../lib/i18n';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function LoginPage() {
+  const [lang, setLang] = useLanguage(null);
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [apartmentNumber, setApartmentNumber] = useState('');
@@ -17,7 +21,7 @@ export default function LoginPage() {
     setError('');
 
     if (!consent) {
-      setError('Musíte súhlasiť so spracovaním osobných údajov.');
+      setError(t(lang, 'consentRequired'));
       return;
     }
 
@@ -29,6 +33,7 @@ export default function LoginPage() {
         data: {
           full_name: fullName,
           apartment_number: apartmentNumber,
+          language: lang,
         },
         emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -37,7 +42,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (error) {
-      setError('Nepodarilo sa odoslať prihlasovací e-mail. Skúste to znova.');
+      setError(t(lang, 'emailSendError'));
       return;
     }
 
@@ -48,10 +53,9 @@ export default function LoginPage() {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
         <div className="card max-w-md w-full p-8 text-center">
-          <h1 className="font-display text-2xl text-harbor mb-3">Skontrolujte e-mail</h1>
+          <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'checkEmailTitle')}</h1>
           <p className="text-ink">
-            Poslali sme prihlasovací odkaz na adresu <strong>{email}</strong>. Otvorte e-mail
-            a kliknite na odkaz, aby ste sa prihlásili do fóra.
+            {t(lang, 'checkEmailText')} <strong>{email}</strong>. {t(lang, 'checkEmailText2')}
           </p>
         </div>
       </main>
@@ -61,43 +65,46 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-10">
       <div className="card max-w-md w-full p-8">
-        <h1 className="font-display text-3xl text-harbor mb-1">Fórum komunity</h1>
-        <p className="text-ink/70 mb-6">Prihlásenie alebo registrácia majiteľov apartmánov</p>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="font-display text-3xl text-harbor">{t(lang, 'appName')}</h1>
+          <LanguageSwitcher lang={lang} onChange={setLang} />
+        </div>
+        <p className="text-ink/70 mb-6">{t(lang, 'loginSubtitle')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">Meno a priezvisko</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'fullName')}</label>
             <input
               type="text"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               className="input-field"
-              placeholder="Ján Novák"
+              placeholder={t(lang, 'fullNamePlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">Číslo apartmánu</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'apartmentNumber')}</label>
             <input
               type="text"
               required
               value={apartmentNumber}
               onChange={(e) => setApartmentNumber(e.target.value)}
               className="input-field"
-              placeholder="napr. 24B"
+              placeholder={t(lang, 'apartmentPlaceholder')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">E-mail</label>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'email')}</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="input-field"
-              placeholder="vas@email.com"
+              placeholder="you@email.com"
             />
           </div>
 
@@ -108,23 +115,17 @@ export default function LoginPage() {
               onChange={(e) => setConsent(e.target.checked)}
               className="mt-1"
             />
-            <span>
-              Súhlasím so spracovaním mojich osobných údajov (meno, e-mail, číslo apartmánu)
-              za účelom overenia členstva a fungovania komunitného fóra.
-            </span>
+            <span>{t(lang, 'consentText')}</span>
           </label>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? 'Odosielam…' : 'Prihlásiť sa / Registrovať'}
+            {loading ? t(lang, 'sending') : t(lang, 'signInRegister')}
           </button>
         </form>
 
-        <p className="text-xs text-ink/50 mt-6">
-          Nová registrácia musí byť schválená výborom komunity. Po prihlásení uvidíte stav
-          vašej žiadosti.
-        </p>
+        <p className="text-xs text-ink/50 mt-6">{t(lang, 'loginFooter')}</p>
       </div>
     </main>
   );

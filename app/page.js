@@ -3,9 +3,12 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useProfile } from '../lib/useProfile';
+import { useLanguage } from '../lib/useLanguage';
+import { t } from '../lib/i18n';
 
 export default function Home() {
   const { loading, session, profile } = useProfile();
+  const [lang] = useLanguage(profile);
   const router = useRouter();
 
   useEffect(() => {
@@ -31,7 +34,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex items-center justify-center">
-      <p className="text-harbor font-body">Načítava sa…</p>
+      <p className="text-harbor font-body">{t(lang, 'loading')}</p>
     </main>
   );
 }
