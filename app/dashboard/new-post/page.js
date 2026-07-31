@@ -1,12 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useProfile } from '../../../lib/useProfile';
 import { supabase } from '../../../lib/supabaseClient';
 import Header from '../../components/Header';
 
 export default function NewPostPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewPostForm />
+    </Suspense>
+  );
+}
+
+function NewPostForm() {
   const { loading, session, profile } = useProfile();
   const router = useRouter();
   const searchParams = useSearchParams();
