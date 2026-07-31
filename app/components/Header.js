@@ -21,6 +21,12 @@ export default function Header({ profile, lang, onLanguageChange }) {
           {t(lang, 'appName')}
         </Link>
         <nav className="flex items-center gap-4 text-sm flex-wrap">
+          <Link href="/dashboard/contacts" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'contacts')}
+          </Link>
+          <Link href="/dashboard/messages" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'messages')}
+          </Link>
           {profile?.role === 'board' && (
             <Link href="/admin" className="hover:text-ochre whitespace-nowrap">
               {t(lang, 'admin')}

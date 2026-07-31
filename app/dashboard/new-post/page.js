@@ -185,7 +185,7 @@ function NewPostForm() {
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'descriptionLabel')}</label>
             <textarea
               required
-              rows={5}
+              rows={10}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="input-field"

@@ -1,13 +1,14 @@
 import './globals.css';
+import Footer from './components/Footer';
 
 export const metadata = {
-  title: 'Fórum komunity',
-  description: 'Komunitné fórum pre majiteľov apartmánov',
+  title: 'Community Forum',
+  description: 'Hacienda del Señorío de Cifuentes — community forum for owners',
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="sk">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -16,7 +17,10 @@ export default function RootLayout({ children }) {
           rel="stylesheet"
         />
       </head>
-      <body className="font-body min-h-screen">{children}</body>
+      <body className="font-body min-h-screen">
+        {children}
+        <Footer />
+      </body>
     </html>
   );
 }

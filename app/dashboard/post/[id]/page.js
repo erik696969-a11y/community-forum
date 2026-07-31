@@ -16,6 +16,10 @@ const ISSUE_COLORS = {
   resolved: 'bg-green-100 text-green-700',
 };
 
+// Posts longer than this switch to a spacious, full-width "reading mode",
+// similar to reading a long email, instead of the compact card layout.
+const LONG_POST_THRESHOLD = 500;
+
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
   const translations = item[`${field}_translations`];
@@ -135,20 +139,29 @@ export default function PostDetailPage() {
   }
 
   const postTranslated = post.original_lang && post.original_lang !== lang;
+  const postContent = localizedField(post, 'content', lang);
+  const isLongPost = postContent && postContent.length > LONG_POST_THRESHOLD;
+
+  const outerWidth = isLongPost ? 'max-w-3xl' : 'max-w-2xl';
+  const cardPadding = isLongPost ? 'p-8 md:p-12' : 'p-6';
+  const contentTextClass = isLongPost
+    ? 'text-ink text-lg leading-relaxed whitespace-pre-wrap'
+    : 'text-ink whitespace-pre-wrap';
+  const titleClass = isLongPost ? 'font-display text-3xl text-harbor' : 'font-display text-2xl text-harbor';
 
   return (
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className={`${outerWidth} mx-auto px-4 py-8`}>
         {category && (
           <Link href={`/dashboard/${category.slug}`} className="text-sm text-harbor/70 hover:text-harbor">
             {t(lang, 'backToCategories')}
           </Link>
         )}
 
-        <div className="card p-6 mt-3">
+        <div className={`card ${cardPadding} mt-3`}>
           <div className="flex items-center justify-between gap-3">
-            <h1 className="font-display text-2xl text-harbor">{localizedField(post, 'title', lang)}</h1>
+            <h1 className={titleClass}>{localizedField(post, 'title', lang)}</h1>
             {post.issue_status && (
               <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}>
                 {t(lang, ISSUE_KEYS[post.issue_status])}
@@ -160,7 +173,7 @@ export default function PostDetailPage() {
             {new Date(post.created_at).toLocaleDateString()}
             {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
           </p>
-          <p className="text-ink whitespace-pre-wrap">{localizedField(post, 'content', lang)}</p>
+          <p className={contentTextClass}>{postContent}</p>
           {post.image_url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.image_url} alt="" className="mt-4 rounded-lg max-w-full" />
