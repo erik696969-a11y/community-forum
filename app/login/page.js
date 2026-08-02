@@ -91,7 +91,7 @@ export default function LoginPage() {
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className="input-field text-center text-2xl tracking-widest"
-              placeholder="123456"
+              placeholder="12345678"
             />
             {error && <p className="text-red-600 text-sm">{error}</p>}
             <button type="submit" disabled={verifying} className="btn-primary w-full">
