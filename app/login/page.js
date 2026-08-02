@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/useLanguage';
@@ -19,6 +19,13 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedEmail = window.localStorage.getItem('lastEmail');
+      if (savedEmail) setEmail(savedEmail);
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -51,6 +58,9 @@ export default function LoginPage() {
     }
 
     setSent(true);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('lastEmail', email);
+    }
   }
 
   async function handleVerifyCode(e) {
@@ -87,6 +97,7 @@ export default function LoginPage() {
             <input
               type="text"
               inputMode="numeric"
+              autoComplete="one-time-code"
               required
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -151,6 +162,15 @@ export default function LoginPage() {
             />
           </div>
 
+          <div className="bg-sand-dark/60 border border-harbor/10 rounded-lg p-3 text-xs text-ink/80 space-y-1.5">
+            <p className="font-semibold text-harbor">{t(lang, 'consentInfoTitle')}</p>
+            <ul className="list-disc list-outside pl-4 space-y-1">
+              <li>{t(lang, 'consentBullet1')}</li>
+              <li>{t(lang, 'consentBullet2')}</li>
+              <li>{t(lang, 'consentBullet3')}</li>
+            </ul>
+          </div>
+
           <label className="flex items-start gap-2 text-sm text-ink/80">
             <input
               type="checkbox"
@@ -159,10 +179,11 @@ export default function LoginPage() {
               className="mt-1"
             />
             <span>
-              {t(lang, 'consentText')}{' '}
+              {t(lang, 'consentAgree')}{' '}
               <a href="/privacy" target="_blank" className="underline hover:text-ochre">
                 {t(lang, 'privacyPolicyLink')}
               </a>
+              .
             </span>
           </label>
 
