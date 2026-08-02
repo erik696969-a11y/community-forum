@@ -1,20 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../../lib/supabaseClient';
 import { t } from '../../lib/i18n';
 import { useUnreadMessages } from '../../lib/useUnreadMessages';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header({ profile, lang, onLanguageChange }) {
-  const router = useRouter();
   const { count, soundEnabled, toggleSound } = useUnreadMessages(profile);
-
-  async function handleSignOut() {
-    await supabase.auth.signOut();
-    router.replace('/login');
-  }
 
   return (
     <header className="bg-harbor text-sand">
@@ -56,9 +48,6 @@ export default function Header({ profile, lang, onLanguageChange }) {
           <span className="text-sand/70 hidden sm:inline whitespace-nowrap">
             {profile?.full_name} · {profile?.apartment_number}
           </span>
-          <button onClick={handleSignOut} className="hover:text-ochre whitespace-nowrap">
-            {t(lang, 'signOut')}
-          </button>
         </nav>
       </div>
     </header>

@@ -23,6 +23,13 @@ export default function SettingsPage() {
     if (!session) router.replace('/login');
   }, [loading, session, router]);
 
+  async function handleSignOut() {
+    const confirmed = window.confirm(t(lang, 'confirmSignOut'));
+    if (!confirmed) return;
+    await supabase.auth.signOut();
+    router.replace('/login');
+  }
+
   async function handleDelete() {
     setDeleting(true);
     setError('');
@@ -72,6 +79,14 @@ export default function SettingsPage() {
               {t(lang, 'privacyPolicyLink')}
             </Link>
           </p>
+        </div>
+
+        <div className="card p-6 mb-6">
+          <h2 className="font-display text-lg text-harbor mb-2">{t(lang, 'signOut')}</h2>
+          <p className="text-sm text-ink/70 mb-4">{t(lang, 'signOutNote')}</p>
+          <button onClick={handleSignOut} className="btn-secondary">
+            {t(lang, 'signOut')}
+          </button>
         </div>
 
         <div className="card p-6 border-red-200">
