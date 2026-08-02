@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/useLanguage';
 import { t } from '../../lib/i18n';
@@ -13,8 +14,11 @@ export default function LoginPage() {
   const [apartmentNumber, setApartmentNumber] = useState('');
   const [consent, setConsent] = useState(false);
   const [sent, setSent] = useState(false);
+  const [code, setCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -49,14 +53,54 @@ export default function LoginPage() {
     setSent(true);
   }
 
+  async function handleVerifyCode(e) {
+    e.preventDefault();
+    setError('');
+    setVerifying(true);
+
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: 'email',
+    });
+
+    setVerifying(false);
+
+    if (error) {
+      setError(t(lang, 'codeInvalid'));
+      return;
+    }
+
+    router.replace('/');
+  }
+
   if (sent) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
         <div className="card max-w-md w-full p-8 text-center">
           <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'checkEmailTitle')}</h1>
-          <p className="text-ink">
-            {t(lang, 'checkEmailText')} <strong>{email}</strong>. {t(lang, 'checkEmailText2')}
+          <p className="text-ink mb-6">
+            {t(lang, 'checkEmailText')} <strong>{email}</strong>. {t(lang, 'enterCodeText')}
           </p>
+
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <input
+              type="text"
+              inputMode="numeric"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              className="input-field text-center text-2xl tracking-widest"
+              placeholder="123456"
+              maxLength={6}
+            />
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+            <button type="submit" disabled={verifying} className="btn-primary w-full">
+              {verifying ? t(lang, 'signingIn') : t(lang, 'verifyCode')}
+            </button>
+          </form>
+
+          <p className="text-xs text-ink/50 mt-6">{t(lang, 'orClickLink')}</p>
         </div>
       </main>
     );
