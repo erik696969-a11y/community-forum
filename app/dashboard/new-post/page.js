@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
@@ -151,7 +152,10 @@ function NewPostForm() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'newPostTitle')}</h1>
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor">
+          {t(lang, 'backToCategories')}
+        </Link>
+        <h1 className="font-display text-2xl text-harbor mb-6 mt-3">{t(lang, 'newPostTitle')}</h1>
 
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <div>

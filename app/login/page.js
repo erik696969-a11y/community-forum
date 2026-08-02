@@ -115,7 +115,12 @@ export default function LoginPage() {
               onChange={(e) => setConsent(e.target.checked)}
               className="mt-1"
             />
-            <span>{t(lang, 'consentText')}</span>
+            <span>
+              {t(lang, 'consentText')}{' '}
+              <a href="/privacy" target="_blank" className="underline hover:text-ochre">
+                {t(lang, 'privacyPolicyLink')}
+              </a>
+            </span>
           </label>
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
