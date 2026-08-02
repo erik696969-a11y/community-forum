@@ -125,7 +125,13 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-10">
-      <div className="card max-w-md w-full p-8">
+      <div className="max-w-md w-full">
+        <img
+          src="/images/hero-pool-sunset.jpg"
+          alt="Hacienda del Señorío de Cifuentes"
+          className="w-full h-40 sm:h-48 object-cover rounded-xl mb-4 shadow-sm"
+        />
+        <div className="card p-8">
         <div className="flex items-center justify-between mb-1">
           <h1 className="font-display text-3xl text-harbor">{t(lang, 'appName')}</h1>
           <LanguageSwitcher lang={lang} onChange={setLang} />
@@ -202,6 +208,7 @@ export default function LoginPage() {
         </form>
 
         <p className="text-xs text-ink/50 mt-6">{t(lang, 'loginFooter')}</p>
+        </div>
       </div>
     </main>
   );

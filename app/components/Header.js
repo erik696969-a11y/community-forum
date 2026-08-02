@@ -23,6 +23,9 @@ export default function Header({ profile, lang, onLanguageChange }) {
           {t(lang, 'appName')}
         </Link>
         <nav className="flex items-center gap-4 text-sm flex-wrap">
+          <Link href="/dashboard/events" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'eventsTitle')}
+          </Link>
           <Link href="/dashboard/contacts" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'contacts')}
           </Link>
