@@ -60,6 +60,12 @@ export default function MessagesPage() {
     loadMessages();
   }
 
+  async function handleDelete(id) {
+    if (!window.confirm(t(lang, 'confirmDeleteMessage'))) return;
+    await supabase.from('messages').delete().eq('id', id);
+    loadMessages();
+  }
+
   if (loading || !profile || profile.status !== 'approved') {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -112,19 +118,30 @@ export default function MessagesPage() {
               >
                 {m.subject && <p className="font-semibold text-harbor">{m.subject}</p>}
                 <p className="text-sm text-ink whitespace-pre-wrap mt-1">{m.content}</p>
-                <p className="text-xs text-ink/50 mt-2">
-                  {tab === 'sent' || !isBoard ? (
-                    <>
-                      {t(lang, 'to')}: {m.recipient_id ? m.recipient?.full_name : t(lang, 'allBoardMembers')}
-                    </>
-                  ) : (
-                    <>
-                      {t(lang, 'from')}: {m.sender?.full_name} · {m.sender?.apartment_number}
-                    </>
-                  )}
-                  {' · '}
-                  {new Date(m.created_at).toLocaleDateString()}
-                </p>
+                <div className="flex items-center justify-between mt-2">
+                  <p className="text-xs text-ink/50">
+                    {tab === 'sent' || !isBoard ? (
+                      <>
+                        {t(lang, 'to')}: {m.recipient_id ? m.recipient?.full_name : t(lang, 'allBoardMembers')}
+                      </>
+                    ) : (
+                      <>
+                        {t(lang, 'from')}: {m.sender?.full_name} · {m.sender?.apartment_number}
+                      </>
+                    )}
+                    {' · '}
+                    {new Date(m.created_at).toLocaleDateString()}
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(m.id);
+                    }}
+                    className="text-xs text-red-500 hover:text-red-700 flex-shrink-0 ml-2"
+                  >
+                    {t(lang, 'delete')}
+                  </button>
+                </div>
               </div>
             ))}
           </div>

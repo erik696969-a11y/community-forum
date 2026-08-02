@@ -67,7 +67,7 @@ export default function DashboardPage() {
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/dashboard/${cat.slug}`}
+                href={cat.slug === 'aktivity' ? '/dashboard/groups' : `/dashboard/${cat.slug}`}
                 className="card p-5 hover:border-ochre transition-colors block"
               >
                 <h2 className="font-display text-lg text-harbor mb-1">

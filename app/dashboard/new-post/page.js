@@ -26,6 +26,8 @@ function NewPostForm() {
   const [categories, setCategories] = useState([]);
   const [categoryId, setCategoryId] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [groups, setGroups] = useState([]);
+  const [groupId, setGroupId] = useState('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [issueStatus, setIssueStatus] = useState('new');
@@ -56,6 +58,22 @@ function NewPostForm() {
       }
     }
     loadCategories();
+  }, [searchParams]);
+
+  useEffect(() => {
+    async function loadGroups() {
+      const { data } = await supabase.from('interest_groups').select('*').order('sort_order');
+      setGroups(data || []);
+
+      const preselectGroup = searchParams.get('group');
+      if (preselectGroup && data) {
+        const match = data.find((g) => g.slug === preselectGroup);
+        if (match) setGroupId(match.id);
+      } else if (data && data.length > 0) {
+        setGroupId(data[0].id);
+      }
+    }
+    loadGroups();
   }, [searchParams]);
 
   function handleCategoryChange(id) {
@@ -118,6 +136,7 @@ function NewPostForm() {
       .from('posts')
       .insert({
         category_id: categoryId,
+        interest_group_id: selectedType === 'interest' ? groupId : null,
         author_id: session.user.id,
         title,
         content,
@@ -196,6 +215,23 @@ function NewPostForm() {
               placeholder={t(lang, 'descriptionPlaceholder')}
             />
           </div>
+
+          {selectedType === 'interest' && (
+            <div>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'chooseGroup')}</label>
+              <select
+                value={groupId}
+                onChange={(e) => setGroupId(e.target.value)}
+                className="input-field"
+              >
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.icon} {g[`name_${lang}`] || g.name_en}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {selectedType === 'issue' && (
             <div>

@@ -61,6 +61,13 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('lastEmail', email);
     }
+
+    // Notify the board of a potential new registration (fails silently if not applicable)
+    fetch('/api/notify-new-registration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    }).catch(() => {});
   }
 
   async function handleVerifyCode(e) {
