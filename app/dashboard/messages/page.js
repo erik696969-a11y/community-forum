@@ -78,6 +78,9 @@ export default function MessagesPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'messages')}</h1>
           <Link href="/dashboard/messages/new" className="btn-primary">

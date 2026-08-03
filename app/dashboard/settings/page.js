@@ -70,6 +70,9 @@ export default function SettingsPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
         <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'settingsTitle')}</h1>
 
         <div className="card p-6 mb-6">

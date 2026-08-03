@@ -39,6 +39,14 @@ export default function DocumentsPage() {
     if (profile?.status === 'approved') loadDocs();
   }, [profile]);
 
+  async function handleDelete(id, title) {
+    const confirmed = window.confirm(t(lang, 'confirmDeleteDocument').replace('{title}', title));
+    if (!confirmed) return;
+    await supabase.from('documents').delete().eq('id', id);
+    const { data } = await supabase.from('documents').select('*').order('created_at', { ascending: false });
+    setDocuments(data || []);
+  }
+
   if (loading || !profile) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -52,19 +60,29 @@ export default function DocumentsPage() {
   const minutes = documents.filter((d) => d.category === 'minutes');
 
   function DocRow({ doc }) {
+    const ext = doc.file_url.split('.').pop().split('?')[0];
+    const downloadUrl = `/api/download-file?url=${encodeURIComponent(doc.file_url)}&filename=${encodeURIComponent(doc.title + '.' + ext)}`;
+
     return (
-      <a
-        href={doc.file_url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="card p-4 flex items-center justify-between gap-3 hover:border-ochre transition-colors block"
-      >
-        <div>
+      <div className="card p-4 flex items-center justify-between gap-3">
+        <a href={downloadUrl} className="flex-1 hover:opacity-80 transition-opacity">
           <p className="font-semibold text-harbor">{doc.title}</p>
           <p className="text-xs text-ink/50">{new Date(doc.created_at).toLocaleDateString()}</p>
+        </a>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <a href={downloadUrl} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
+            {t(lang, 'download')}
+          </a>
+          {isBoard && (
+            <button
+              onClick={() => handleDelete(doc.id, doc.title)}
+              className="text-xs text-red-500 hover:text-red-700 whitespace-nowrap"
+            >
+              {t(lang, 'delete')}
+            </button>
+          )}
         </div>
-        <span className="text-xs text-harbor/60 whitespace-nowrap">{t(lang, 'download')}</span>
-      </a>
+      </div>
     );
   }
 
@@ -72,6 +90,9 @@ export default function DocumentsPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'documentsTitle')}</h1>
           {isBoard && (

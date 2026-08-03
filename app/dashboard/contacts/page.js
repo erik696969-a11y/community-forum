@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
@@ -110,6 +111,9 @@ export default function ContactsPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'contacts')}</h1>
           {isBoard && !showForm && (
