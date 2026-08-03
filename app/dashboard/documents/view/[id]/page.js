@@ -8,6 +8,7 @@ import { useLanguage } from '../../../../../lib/useLanguage';
 import { supabase } from '../../../../../lib/supabaseClient';
 import { t } from '../../../../../lib/i18n';
 import Header from '../../../../components/Header';
+import PdfViewer from '../../../../components/PdfViewer';
 
 export default function ViewDocumentPage() {
   const { loading, session, profile } = useProfile();
@@ -65,12 +66,9 @@ export default function ViewDocumentPage() {
         <h1 className="font-display text-xl text-harbor mb-3">{doc.title}</h1>
 
         {isPdf ? (
-          <iframe
-            src={doc.file_url}
-            title={doc.title}
-            className="w-full flex-1 rounded-lg border border-harbor/10"
-            style={{ minHeight: '70vh' }}
-          />
+          <div className="overflow-y-auto flex-1 pb-8">
+            <PdfViewer fileUrl={downloadUrl} />
+          </div>
         ) : (
           <div className="card p-8 text-center">
             <p className="text-ink mb-4">{t(lang, 'cannotPreview')}</p>
