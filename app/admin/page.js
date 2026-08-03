@@ -56,6 +56,13 @@ export default function AdminPage() {
     loadProfiles();
   }
 
+  async function handleRemoveAccess(id, name) {
+    const confirmed = window.confirm(t(lang, 'removeAccessConfirm').replace('{name}', name));
+    if (!confirmed) return;
+    await supabase.from('profiles').update({ status: 'rejected' }).eq('id', id);
+    loadProfiles();
+  }
+
   if (loading || !profile || profile.role !== 'board') {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -103,11 +110,21 @@ export default function AdminPage() {
         </h2>
         <div className="space-y-2">
           {approved.map((p) => (
-            <div key={p.id} className="card p-3 flex items-center justify-between">
+            <div key={p.id} className="card p-3 flex items-center justify-between gap-3 flex-wrap">
               <p className="text-sm text-ink">
                 {p.full_name} · {p.apartment_number}
               </p>
-              {p.role === 'board' && <span className="text-xs font-semibold text-ochre">{t(lang, 'board')}</span>}
+              <div className="flex items-center gap-3 flex-shrink-0">
+                {p.role === 'board' && <span className="text-xs font-semibold text-ochre">{t(lang, 'board')}</span>}
+                {p.role !== 'board' && (
+                  <button
+                    onClick={() => handleRemoveAccess(p.id, p.full_name)}
+                    className="text-xs text-red-500 hover:text-red-700"
+                  >
+                    {t(lang, 'removeAccess')}
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

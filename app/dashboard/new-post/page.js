@@ -156,6 +156,14 @@ function NewPostForm() {
       return;
     }
 
+    if (selectedType === 'interest' && groupId) {
+      fetch('/api/notify-group-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupId, title, authorId: session.user.id }),
+      }).catch(() => {});
+    }
+
     router.push(`/dashboard/post/${newPost.id}`);
   }
 
