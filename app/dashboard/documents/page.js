@@ -65,12 +65,22 @@ export default function DocumentsPage() {
 
     return (
       <div className="card p-4 flex items-center justify-between gap-3">
-        <a href={downloadUrl} className="flex-1 hover:opacity-80 transition-opacity">
+        <a
+          href={downloadUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 hover:opacity-80 transition-opacity"
+        >
           <p className="font-semibold text-harbor">{doc.title}</p>
           <p className="text-xs text-ink/50">{new Date(doc.created_at).toLocaleDateString()}</p>
         </a>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <a href={downloadUrl} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap"
+          >
             {t(lang, 'download')}
           </a>
           {isBoard && (
