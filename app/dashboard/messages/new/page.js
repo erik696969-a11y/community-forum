@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
@@ -9,9 +10,21 @@ import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
 
 export default function NewMessagePage() {
+  return (
+    <Suspense fallback={null}>
+      <NewMessageForm />
+    </Suspense>
+  );
+}
+
+function NewMessageForm() {
   const { loading, session, profile } = useProfile();
   const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const directToId = searchParams.get('to');
+  const directToName = searchParams.get('name');
 
   const [boardMembers, setBoardMembers] = useState([]);
   const [recipientId, setRecipientId] = useState('all');
@@ -26,6 +39,10 @@ export default function NewMessagePage() {
   }, [loading, session, router]);
 
   useEffect(() => {
+    if (directToId) {
+      setRecipientId(directToId);
+      return;
+    }
     async function loadBoard() {
       const { data } = await supabase
         .from('profiles')
@@ -35,7 +52,7 @@ export default function NewMessagePage() {
       setBoardMembers(data || []);
     }
     if (profile?.status === 'approved') loadBoard();
-  }, [profile]);
+  }, [profile, directToId]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -78,24 +95,36 @@ export default function NewMessagePage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'contactBoard')}</h1>
+        <Link href="/dashboard/messages" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
+        <h1 className="font-display text-2xl text-harbor mb-6">
+          {directToId ? t(lang, 'replyPrivately') : t(lang, 'contactBoard')}
+        </h1>
 
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'recipient')}</label>
-            <select
-              value={recipientId}
-              onChange={(e) => setRecipientId(e.target.value)}
-              className="input-field"
-            >
-              <option value="all">{t(lang, 'allBoardMembers')}</option>
-              {boardMembers.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.full_name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {directToId ? (
+            <div>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'recipient')}</label>
+              <p className="input-field bg-sand/50">{directToName || '—'}</p>
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'recipient')}</label>
+              <select
+                value={recipientId}
+                onChange={(e) => setRecipientId(e.target.value)}
+                className="input-field"
+              >
+                <option value="all">{t(lang, 'allBoardMembers')}</option>
+                {boardMembers.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'subjectLabel')}</label>

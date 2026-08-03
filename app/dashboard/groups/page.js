@@ -75,6 +75,9 @@ export default function GroupsPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
+        </Link>
         <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'interestGroupsTitle')}</h1>
 
         {loadingData ? (

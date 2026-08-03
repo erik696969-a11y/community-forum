@@ -168,10 +168,20 @@ export default function PostDetailPage() {
               </span>
             )}
           </div>
-          <p className="text-xs text-ink/50 mt-1 mb-4">
-            {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
-            {new Date(post.created_at).toLocaleDateString()}
-            {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+          <p className="text-xs text-ink/50 mt-1 mb-4 flex items-center gap-2 flex-wrap">
+            <span>
+              {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
+              {new Date(post.created_at).toLocaleDateString()}
+              {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+            </span>
+            {post.author_id !== session.user.id && (
+              <Link
+                href={`/dashboard/messages/new?to=${post.author_id}&name=${encodeURIComponent(post.author?.full_name || '')}`}
+                className="text-harbor/60 hover:text-harbor underline whitespace-nowrap"
+              >
+                {t(lang, 'replyPrivately')}
+              </Link>
+            )}
           </p>
           <p className={contentTextClass}>{postContent}</p>
           {post.image_url && (
@@ -190,10 +200,20 @@ export default function PostDetailPage() {
             return (
               <div key={c.id} className="card p-4">
                 <p className="text-ink text-sm">{localizedField(c, 'content', lang)}</p>
-                <p className="text-xs text-ink/50 mt-1">
-                  {c.author?.full_name} · {c.author?.apartment_number} ·{' '}
-                  {new Date(c.created_at).toLocaleDateString()}
-                  {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+                <p className="text-xs text-ink/50 mt-1 flex items-center gap-2 flex-wrap">
+                  <span>
+                    {c.author?.full_name} · {c.author?.apartment_number} ·{' '}
+                    {new Date(c.created_at).toLocaleDateString()}
+                    {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
+                  </span>
+                  {c.author_id !== session.user.id && (
+                    <Link
+                      href={`/dashboard/messages/new?to=${c.author_id}&name=${encodeURIComponent(c.author?.full_name || '')}`}
+                      className="text-harbor/60 hover:text-harbor underline whitespace-nowrap"
+                    >
+                      {t(lang, 'replyPrivately')}
+                    </Link>
+                  )}
                 </p>
               </div>
             );
