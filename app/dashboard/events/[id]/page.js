@@ -23,6 +23,7 @@ export default function EventDetailPage() {
 
   const [event, setEvent] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [rsvps, setRsvps] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [uploading, setUploading] = useState(false);
 
@@ -41,6 +42,13 @@ export default function EventDetailPage() {
       .eq('event_id', params.id)
       .order('created_at', { ascending: false });
     setPhotos(photoData || []);
+
+    const { data: rsvpData } = await supabase
+      .from('event_rsvps')
+      .select('*, profile:profiles(full_name, apartment_number)')
+      .eq('event_id', params.id);
+    setRsvps(rsvpData || []);
+
     setLoadingData(false);
   }
 
@@ -70,6 +78,28 @@ export default function EventDetailPage() {
 
     setUploading(false);
     load();
+  }
+
+  async function handleRsvp(status) {
+    await supabase
+      .from('event_rsvps')
+      .upsert({ event_id: params.id, user_id: session.user.id, status }, { onConflict: 'event_id,user_id' });
+    load();
+  }
+
+  function exportRsvpCsv() {
+    const rows = [['Name', 'Apartment', 'Status']];
+    rsvps.forEach((r) => {
+      rows.push([r.profile?.full_name || '', r.profile?.apartment_number || '', r.status]);
+    });
+    const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'rsvp-list.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   if (loading || !profile || loadingData) {
@@ -116,12 +146,66 @@ export default function EventDetailPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-between mb-4">
+        {(() => {
+          const myRsvp = rsvps.find((r) => r.user_id === session.user.id);
+          const going = rsvps.filter((r) => r.status === 'going');
+          const maybe = rsvps.filter((r) => r.status === 'maybe');
+          const cantCome = rsvps.filter((r) => r.status === 'cant_come');
+          return (
+            <div className="card p-5 mb-8">
+              <div className="flex gap-2 flex-wrap mb-4">
+                <button
+                  onClick={() => handleRsvp('going')}
+                  className={myRsvp?.status === 'going' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+                >
+                  {t(lang, 'rsvpGoing')}
+                </button>
+                <button
+                  onClick={() => handleRsvp('maybe')}
+                  className={myRsvp?.status === 'maybe' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+                >
+                  {t(lang, 'rsvpMaybe')}
+                </button>
+                <button
+                  onClick={() => handleRsvp('cant_come')}
+                  className={myRsvp?.status === 'cant_come' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+                >
+                  {t(lang, 'rsvpCantCome')}
+                </button>
+              </div>
+              <p className="text-sm text-ink/70">
+                <strong>{going.length}</strong> {t(lang, 'rsvpGoingLabel').toLowerCase()}
+                {going.length > 0 && `: ${going.map((r) => r.profile?.full_name).filter(Boolean).join(', ')}`}
+              </p>
+              <p className="text-sm text-ink/50 mt-1">
+                {maybe.length} {t(lang, 'rsvpMaybeLabel').toLowerCase()} · {cantCome.length}{' '}
+                {t(lang, 'rsvpCantComeLabel').toLowerCase()}
+              </p>
+              {profile.role === 'board' && rsvps.length > 0 && (
+                <button onClick={exportRsvpCsv} className="text-xs text-harbor/60 hover:text-harbor underline mt-3">
+                  {t(lang, 'exportRsvpList')}
+                </button>
+              )}
+            </div>
+          );
+        })()}
+
+        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
           <h2 className="font-display text-lg text-harbor">{t(lang, 'photosLabel')}</h2>
-          <label className="btn-primary text-sm cursor-pointer">
-            {uploading ? t(lang, 'saving') : t(lang, 'uploadPhoto')}
-            <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
-          </label>
+          <div className="flex items-center gap-3">
+            {photos.length > 0 && (
+              <a
+                href={`/api/download-event-photos?eventId=${params.id}`}
+                className="text-xs text-harbor/60 hover:text-harbor underline whitespace-nowrap"
+              >
+                {t(lang, 'downloadAllPhotos')}
+              </a>
+            )}
+            <label className="btn-primary text-sm cursor-pointer">
+              {uploading ? t(lang, 'saving') : t(lang, 'uploadPhoto')}
+              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
+            </label>
+          </div>
         </div>
 
         {photos.length === 0 ? (

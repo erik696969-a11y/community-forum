@@ -18,10 +18,30 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [directoryVisible, setDirectoryVisible] = useState(false);
+  const [spokenLanguages, setSpokenLanguages] = useState([]);
 
   useEffect(() => {
-    if (profile) setNotificationsEnabled(profile.notifications_enabled !== false);
+    if (profile) {
+      setNotificationsEnabled(profile.notifications_enabled !== false);
+      setDirectoryVisible(profile.directory_visible === true);
+      setSpokenLanguages(profile.spoken_languages || []);
+    }
   }, [profile]);
+
+  async function handleToggleDirectory() {
+    const next = !directoryVisible;
+    setDirectoryVisible(next);
+    await supabase.from('profiles').update({ directory_visible: next }).eq('id', session.user.id);
+  }
+
+  async function toggleSpokenLanguage(code) {
+    const next = spokenLanguages.includes(code)
+      ? spokenLanguages.filter((l) => l !== code)
+      : [...spokenLanguages, code];
+    setSpokenLanguages(next);
+    await supabase.from('profiles').update({ spoken_languages: next }).eq('id', session.user.id);
+  }
 
   async function handleToggleNotifications() {
     const next = !notificationsEnabled;
@@ -93,6 +113,43 @@ export default function SettingsPage() {
               {t(lang, 'privacyPolicyLink')}
             </Link>
           </p>
+        </div>
+
+        <div className="card p-6 mb-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-lg text-harbor">{t(lang, 'directoryVisibleLabel')}</h2>
+              <p className="text-sm text-ink/70 mt-1">{t(lang, 'directoryVisibleNote')}</p>
+            </div>
+            <button
+              onClick={handleToggleDirectory}
+              className={`flex-shrink-0 w-12 h-7 rounded-full transition-colors relative ${
+                directoryVisible ? 'bg-ochre' : 'bg-ink/20'
+              }`}
+            >
+              <span
+                className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform ${
+                  directoryVisible ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+          {directoryVisible && (
+            <div className="mt-4 pt-4 border-t border-harbor/10">
+              <p className="text-sm font-semibold text-harbor mb-2">{t(lang, 'spokenLanguagesLabel')}</p>
+              <div className="flex gap-2 flex-wrap">
+                {['en', 'es', 'fr', 'de'].map((code) => (
+                  <button
+                    key={code}
+                    onClick={() => toggleSpokenLanguage(code)}
+                    className={spokenLanguages.includes(code) ? 'btn-primary text-xs' : 'btn-secondary text-xs'}
+                  >
+                    {code.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="card p-6 mb-6">
