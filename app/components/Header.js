@@ -15,6 +15,9 @@ export default function Header({ profile, lang, onLanguageChange }) {
           {t(lang, 'appName')}
         </Link>
         <nav className="flex items-center gap-4 text-sm flex-wrap">
+          <Link href="/dashboard/polls" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'pollsTitle')}
+          </Link>
           <Link href="/dashboard/documents" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'documentsTitle')}
           </Link>

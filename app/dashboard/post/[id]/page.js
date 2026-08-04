@@ -8,6 +8,7 @@ import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
+import ReactionBar from '../../../components/ReactionBar';
 
 const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
 const ISSUE_COLORS = {
@@ -35,6 +36,8 @@ export default function PostDetailPage() {
   const [post, setPost] = useState(null);
   const [category, setCategory] = useState(null);
   const [comments, setComments] = useState([]);
+  const [postReactions, setPostReactions] = useState([]);
+  const [commentReactions, setCommentReactions] = useState({});
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
@@ -67,6 +70,29 @@ export default function PostDetailPage() {
       .eq('post_id', params.id)
       .order('created_at', { ascending: true });
     setComments(commentsData || []);
+
+    const { data: postReacts } = await supabase
+      .from('post_reactions')
+      .select('*')
+      .eq('post_id', params.id);
+    setPostReactions(postReacts || []);
+
+    const commentIds = (commentsData || []).map((c) => c.id);
+    if (commentIds.length > 0) {
+      const { data: commentReacts } = await supabase
+        .from('comment_reactions')
+        .select('*')
+        .in('comment_id', commentIds);
+      const grouped = {};
+      (commentReacts || []).forEach((r) => {
+        if (!grouped[r.comment_id]) grouped[r.comment_id] = [];
+        grouped[r.comment_id].push(r);
+      });
+      setCommentReactions(grouped);
+    } else {
+      setCommentReactions({});
+    }
+
     setLoadingData(false);
   }
 
@@ -119,6 +145,20 @@ export default function PostDetailPage() {
     }
   }
 
+  async function handleDeletePost() {
+    if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
+    const { error } = await supabase.from('posts').delete().eq('id', params.id);
+    if (!error && category) {
+      router.push(`/dashboard/${category.slug}`);
+    }
+  }
+
+  async function handleDeleteComment(commentId) {
+    if (!window.confirm(t(lang, 'confirmDeleteComment'))) return;
+    await supabase.from('comments').delete().eq('id', commentId);
+    loadAll();
+  }
+
   if (loading || !profile || loadingData) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -149,6 +189,9 @@ export default function PostDetailPage() {
     : 'text-ink whitespace-pre-wrap';
   const titleClass = isLongPost ? 'font-display text-3xl text-harbor' : 'font-display text-2xl text-harbor';
 
+  const isPostAuthor = post.author_id === session.user.id;
+  const canDeletePost = isPostAuthor && comments.length === 0 && postReactions.length === 0;
+
   return (
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
@@ -174,7 +217,7 @@ export default function PostDetailPage() {
               {new Date(post.created_at).toLocaleDateString()}
               {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
             </span>
-            {post.author_id !== session.user.id && (
+            {!isPostAuthor && (
               <Link
                 href={`/dashboard/messages/new?to=${post.author_id}&name=${encodeURIComponent(post.author?.full_name || '')}`}
                 className="text-harbor/60 hover:text-harbor underline whitespace-nowrap"
@@ -182,12 +225,27 @@ export default function PostDetailPage() {
                 {t(lang, 'replyPrivately')}
               </Link>
             )}
+            {canDeletePost && (
+              <button onClick={handleDeletePost} className="text-red-500 hover:text-red-700 underline whitespace-nowrap">
+                {t(lang, 'deletePost')}
+              </button>
+            )}
           </p>
           <p className={contentTextClass}>{postContent}</p>
           {post.image_url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={post.image_url} alt="" className="mt-4 rounded-lg max-w-full" />
           )}
+          <div className="mt-4">
+            <ReactionBar
+              table="post_reactions"
+              idField="post_id"
+              targetId={post.id}
+              reactions={postReactions}
+              userId={session.user.id}
+              onChange={loadAll}
+            />
+          </div>
         </div>
 
         <h2 className="font-display text-lg text-harbor mt-8 mb-3">
@@ -197,6 +255,10 @@ export default function PostDetailPage() {
         <div className="space-y-3 mb-6">
           {comments.map((c) => {
             const isTranslated = c.original_lang && c.original_lang !== lang;
+            const isCommentAuthor = c.author_id === session.user.id;
+            const cReactions = commentReactions[c.id] || [];
+            const canDeleteComment = isCommentAuthor && cReactions.length === 0;
+
             return (
               <div key={c.id} className="card p-4">
                 <p className="text-ink text-sm">{localizedField(c, 'content', lang)}</p>
@@ -206,7 +268,7 @@ export default function PostDetailPage() {
                     {new Date(c.created_at).toLocaleDateString()}
                     {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
                   </span>
-                  {c.author_id !== session.user.id && (
+                  {!isCommentAuthor && (
                     <Link
                       href={`/dashboard/messages/new?to=${c.author_id}&name=${encodeURIComponent(c.author?.full_name || '')}`}
                       className="text-harbor/60 hover:text-harbor underline whitespace-nowrap"
@@ -214,7 +276,25 @@ export default function PostDetailPage() {
                       {t(lang, 'replyPrivately')}
                     </Link>
                   )}
+                  {canDeleteComment && (
+                    <button
+                      onClick={() => handleDeleteComment(c.id)}
+                      className="text-red-500 hover:text-red-700 underline whitespace-nowrap"
+                    >
+                      {t(lang, 'delete')}
+                    </button>
+                  )}
                 </p>
+                <div className="mt-2">
+                  <ReactionBar
+                    table="comment_reactions"
+                    idField="comment_id"
+                    targetId={c.id}
+                    reactions={cReactions}
+                    userId={session.user.id}
+                    onChange={loadAll}
+                  />
+                </div>
               </div>
             );
           })}
