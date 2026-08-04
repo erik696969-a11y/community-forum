@@ -38,6 +38,7 @@ export default function PendingPage() {
   }
 
   const isRejected = profile && profile.status === 'rejected';
+  const isSuspended = profile && profile.status === 'suspended';
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
@@ -45,7 +46,12 @@ export default function PendingPage() {
         <div className="flex justify-end mb-2">
           <LanguageSwitcher lang={lang} onChange={setLang} />
         </div>
-        {isRejected ? (
+        {isSuspended ? (
+          <>
+            <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'suspendUser')}</h1>
+            <p className="text-ink">{t(lang, 'suspendedMessage')}</p>
+          </>
+        ) : isRejected ? (
           <>
             <h1 className="font-display text-2xl text-harbor mb-3">{t(lang, 'rejectedTitle')}</h1>
             <p className="text-ink">{t(lang, 'rejectedText')}</p>

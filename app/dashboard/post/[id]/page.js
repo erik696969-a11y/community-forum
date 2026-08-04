@@ -159,9 +159,21 @@ export default function PostDetailPage() {
     loadAll();
   }
 
-  function reportLink(kind, title, content) {
-    const body = `${t(lang, 'reportBodyPrefix')}\n\n"${(content || '').slice(0, 300)}"\n\n${t(lang, 'reportReasonPrompt')} `;
-    return `/dashboard/messages/new?subject=${encodeURIComponent(t(lang, 'reportSubject'))}&body=${encodeURIComponent(body)}`;
+  async function handleReport(targetType, postId, commentId) {
+    const reason = window.prompt(t(lang, 'reportReasonPromptShort')) || '';
+    await supabase.from('reports').insert({
+      target_type: targetType,
+      post_id: postId,
+      comment_id: commentId,
+      reporter_id: session.user.id,
+      reason,
+    });
+    alert(t(lang, 'reportSubmitted'));
+  }
+
+  async function handleToggleLock() {
+    await supabase.from('posts').update({ locked: !post.locked }).eq('id', params.id);
+    loadAll();
   }
 
   async function handleDeleteComment(commentId) {
@@ -230,6 +242,11 @@ export default function PostDetailPage() {
                   {post.pinned ? t(lang, 'unpinPost') : t(lang, 'pinPost')}
                 </button>
               )}
+              {profile.role === 'board' && (
+                <button onClick={handleToggleLock} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
+                  {post.locked ? t(lang, 'unlockDiscussion') : t(lang, 'lockDiscussion')}
+                </button>
+              )}
             </div>
           </div>
           <p className="text-xs text-ink/50 mt-1 mb-4 flex items-center gap-2 flex-wrap">
@@ -247,12 +264,12 @@ export default function PostDetailPage() {
                 {t(lang, 'replyPrivately')}
               </Link>
             )}
-            <Link
-              href={reportLink('post', localizedField(post, 'title', lang), postContent)}
+            <button
+              onClick={() => handleReport('post', post.id, null)}
               className="text-ink/40 hover:text-red-500 underline whitespace-nowrap"
             >
               {t(lang, 'reportContent')}
-            </Link>
+            </button>
             {canDeletePost && (
               <button onClick={handleDeletePost} className="text-red-500 hover:text-red-700 underline whitespace-nowrap">
                 {t(lang, 'deletePost')}
@@ -305,12 +322,12 @@ export default function PostDetailPage() {
                       {t(lang, 'replyPrivately')}
                     </Link>
                   )}
-                  <Link
-                    href={reportLink('comment', '', localizedField(c, 'content', lang))}
+                  <button
+                    onClick={() => handleReport('comment', post.id, c.id)}
                     className="text-ink/40 hover:text-red-500 underline whitespace-nowrap"
                   >
                     {t(lang, 'reportContent')}
-                  </Link>
+                  </button>
                   {canDeleteComment && (
                     <button
                       onClick={() => handleDeleteComment(c.id)}
@@ -336,18 +353,26 @@ export default function PostDetailPage() {
           {comments.length === 0 && <p className="text-ink/60 text-sm">{t(lang, 'noCommentsYet')}</p>}
         </div>
 
-        <form onSubmit={handleAddComment} className="flex gap-2">
-          <input
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="input-field"
-            placeholder={t(lang, 'commentPlaceholder')}
-          />
-          <button type="submit" disabled={submitting} className="btn-primary whitespace-nowrap">
-            {t(lang, 'send')}
-          </button>
-        </form>
+        {post.locked ? (
+          <p className="text-sm text-ink/60 italic bg-sand-dark/60 rounded-lg p-3">
+            🔒 {t(lang, 'discussionLockedNote')}
+          </p>
+        ) : profile.muted ? (
+          <p className="text-sm text-ink/60 italic bg-sand-dark/60 rounded-lg p-3">{t(lang, 'mutedMessage')}</p>
+        ) : (
+          <form onSubmit={handleAddComment} className="flex gap-2">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="input-field"
+              placeholder={t(lang, 'commentPlaceholder')}
+            />
+            <button type="submit" disabled={submitting} className="btn-primary whitespace-nowrap">
+              {t(lang, 'send')}
+            </button>
+          </form>
+        )}
       </div>
     </main>
   );

@@ -186,6 +186,20 @@ function NewPostForm() {
     );
   }
 
+  if (profile.muted) {
+    return (
+      <main className="min-h-screen">
+        <Header profile={profile} lang={lang} onLanguageChange={setLang} />
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+            {t(lang, 'backToCategories')}
+          </Link>
+          <p className="text-sm text-ink/60 italic bg-sand-dark/60 rounded-lg p-4">{t(lang, 'mutedMessage')}</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />

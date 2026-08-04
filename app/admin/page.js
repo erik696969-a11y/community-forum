@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useProfile } from '../../lib/useProfile';
 import { useLanguage } from '../../lib/useLanguage';
 import { supabase } from '../../lib/supabaseClient';
@@ -39,7 +40,7 @@ export default function AdminPage() {
     const { data: approvedData } = await supabase
       .from('profiles')
       .select('*')
-      .eq('status', 'approved')
+      .in('status', ['approved', 'suspended'])
       .order('full_name', { ascending: true });
     setApproved(approvedData || []);
 
@@ -73,6 +74,35 @@ export default function AdminPage() {
     loadProfiles();
   }
 
+  async function logAudit(action, targetType, targetId, details) {
+    await supabase.from('admin_audit_log').insert({
+      admin_id: profile.id,
+      action,
+      target_type: targetType,
+      target_id: targetId,
+      details,
+    });
+  }
+
+  async function toggleMute(id, name, currentlyMuted) {
+    await supabase.from('profiles').update({ muted: !currentlyMuted }).eq('id', id);
+    logAudit(currentlyMuted ? 'unmute' : 'mute', 'profile', id, name);
+    loadProfiles();
+  }
+
+  async function toggleSuspend(id, name, currentlyApproved) {
+    if (currentlyApproved) {
+      const confirmed = window.confirm(t(lang, 'confirmSuspend').replace('{name}', name));
+      if (!confirmed) return;
+      await supabase.from('profiles').update({ status: 'suspended' }).eq('id', id);
+      logAudit('suspend', 'profile', id, name);
+    } else {
+      await supabase.from('profiles').update({ status: 'approved' }).eq('id', id);
+      logAudit('unsuspend', 'profile', id, name);
+    }
+    loadProfiles();
+  }
+
   if (loading || !profile || profile.role !== 'board') {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -85,7 +115,12 @@ export default function AdminPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'managementTitle')}</h1>
+        <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
+          <h1 className="font-display text-2xl text-harbor">{t(lang, 'managementTitle')}</h1>
+          <Link href="/admin/moderation" className="btn-secondary text-sm">
+            {t(lang, 'moderationTitle')}
+          </Link>
+        </div>
 
         <h2 className="font-display text-lg text-harbor mb-3">
           {t(lang, 'pendingRequests')} ({pending.length})
@@ -140,15 +175,33 @@ export default function AdminPage() {
                   ))}
                 </div>
               </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
                 {p.role === 'board' && <span className="text-xs font-semibold text-ochre">{t(lang, 'board')}</span>}
+                {p.status === 'suspended' && (
+                  <span className="text-xs font-semibold text-red-600">{t(lang, 'suspendUser')}</span>
+                )}
+                {p.muted && <span className="text-xs font-semibold text-red-500">{t(lang, 'mutedLabel')}</span>}
                 {p.role !== 'board' && (
-                  <button
-                    onClick={() => handleRemoveAccess(p.id, p.full_name)}
-                    className="text-xs text-red-500 hover:text-red-700"
-                  >
-                    {t(lang, 'removeAccess')}
-                  </button>
+                  <>
+                    <button
+                      onClick={() => toggleMute(p.id, p.full_name, p.muted)}
+                      className="text-xs text-harbor/60 hover:text-harbor"
+                    >
+                      {p.muted ? t(lang, 'unmuteUser') : t(lang, 'muteUser')}
+                    </button>
+                    <button
+                      onClick={() => toggleSuspend(p.id, p.full_name, p.status === 'approved')}
+                      className="text-xs text-harbor/60 hover:text-harbor"
+                    >
+                      {p.status === 'suspended' ? t(lang, 'unsuspendUser') : t(lang, 'suspendUser')}
+                    </button>
+                    <button
+                      onClick={() => handleRemoveAccess(p.id, p.full_name)}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      {t(lang, 'removeAccess')}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
