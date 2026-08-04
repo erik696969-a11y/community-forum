@@ -15,6 +15,15 @@ function localizedField(item, field, lang) {
   return translations?.[lang] || item[field];
 }
 
+function closingText(poll, lang) {
+  if (!poll.closes_at || poll.status === 'closed') return null;
+  const closesDate = new Date(poll.closes_at);
+  const today = new Date();
+  const diffDays = Math.ceil((closesDate - today) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 1) return t(lang, 'closesToday');
+  return t(lang, 'closesInDays').replace('{n}', diffDays);
+}
+
 export default function PollsPage() {
   const { loading, session, profile } = useProfile();
   const [lang, setLang] = useLanguage(profile);
@@ -37,7 +46,20 @@ export default function PollsPage() {
   useEffect(() => {
     async function loadPolls() {
       const { data } = await supabase.from('polls').select('*').order('created_at', { ascending: false });
-      setPolls(data || []);
+      let pollsData = data || [];
+
+      // Auto-close any open polls whose closing date has passed
+      const expired = pollsData.filter(
+        (p) => p.status === 'open' && p.closes_at && new Date(p.closes_at) < new Date()
+      );
+      if (expired.length > 0) {
+        await Promise.all(
+          expired.map((p) => supabase.from('polls').update({ status: 'closed' }).eq('id', p.id))
+        );
+        pollsData = pollsData.map((p) => (expired.some((e) => e.id === p.id) ? { ...p, status: 'closed' } : p));
+      }
+
+      setPolls(pollsData);
 
       const { data: totalsData } = await supabase.rpc('get_all_poll_totals');
       const map = {};
@@ -68,10 +90,16 @@ export default function PollsPage() {
       <Link href={`/dashboard/polls/${poll.id}`} className="card p-5 block hover:border-ochre transition-colors">
         <div className="flex items-center justify-between gap-3">
           <h3 className="font-display text-lg text-harbor">{localizedField(poll, 'question', lang)}</h3>
-          {poll.status === 'closed' && (
+          {poll.status === 'closed' ? (
             <span className="text-xs font-semibold px-2 py-1 rounded bg-harbor/10 text-harbor whitespace-nowrap">
               {t(lang, 'pollClosedLabel')}
             </span>
+          ) : (
+            closingText(poll, lang) && (
+              <span className="text-xs font-semibold px-2 py-1 rounded bg-ochre/10 text-ochre whitespace-nowrap">
+                {closingText(poll, lang)}
+              </span>
+            )
           )}
         </div>
         <p className="text-xs text-ink/50 mt-1">

@@ -23,6 +23,7 @@ export default function NewPollPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [closesAt, setClosesAt] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -73,6 +74,7 @@ export default function NewPollPage() {
         original_lang: originalLang,
         question_translations: titleTranslations,
         description_translations: descriptionTranslations,
+        closes_at: closesAt ? `${closesAt}T23:59:59` : null,
       })
       .select()
       .single();
@@ -143,6 +145,18 @@ export default function NewPollPage() {
               className="input-field"
               placeholder={t(lang, 'pollDescriptionPlaceholder')}
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'pollClosingDateLabel')}</label>
+            <input
+              type="date"
+              value={closesAt}
+              onChange={(e) => setClosesAt(e.target.value)}
+              min={new Date().toISOString().slice(0, 10)}
+              className="input-field"
+            />
+            <p className="text-xs text-ink/50 mt-1">{t(lang, 'pollClosingDateHint')}</p>
           </div>
 
           <div className="bg-sand-dark/60 rounded-lg p-3">

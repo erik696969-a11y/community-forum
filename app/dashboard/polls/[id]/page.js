@@ -19,6 +19,16 @@ function localizedOption(option, lang) {
   return option.label_translations?.[lang] || option.label;
 }
 
+function closingText(poll, lang) {
+  if (!poll.closes_at || poll.status === 'closed') return null;
+  const closesDate = new Date(poll.closes_at);
+  const today = new Date();
+  const diffDays = Math.ceil((closesDate - today) / (1000 * 60 * 60 * 24));
+  if (diffDays <= 0) return t(lang, 'closesToday');
+  if (diffDays === 1) return t(lang, 'closesToday');
+  return t(lang, 'closesInDays').replace('{n}', diffDays);
+}
+
 export default function PollDetailPage() {
   const { loading, session, profile } = useProfile();
   const [lang, setLang] = useLanguage(profile);
@@ -39,6 +49,13 @@ export default function PollDetailPage() {
 
   async function load() {
     const { data: pollData } = await supabase.from('polls').select('*').eq('id', params.id).single();
+
+    // Auto-close if the closing date has passed
+    if (pollData && pollData.status === 'open' && pollData.closes_at && new Date(pollData.closes_at) < new Date()) {
+      await supabase.from('polls').update({ status: 'closed' }).eq('id', pollData.id);
+      pollData.status = 'closed';
+    }
+
     setPoll(pollData);
 
     const { data: optionsData } = await supabase
@@ -129,10 +146,16 @@ export default function PollDetailPage() {
         <div className="card p-6 mt-3 mb-6">
           <div className="flex items-center justify-between gap-3 mb-1">
             <h1 className="font-display text-2xl text-harbor">{localizedField(poll, 'question', lang)}</h1>
-            {poll.status === 'closed' && (
+            {poll.status === 'closed' ? (
               <span className="text-xs font-semibold px-2 py-1 rounded bg-harbor/10 text-harbor whitespace-nowrap">
                 {t(lang, 'pollClosedLabel')}
               </span>
+            ) : (
+              closingText(poll, lang) && (
+                <span className="text-xs font-semibold px-2 py-1 rounded bg-ochre/10 text-ochre whitespace-nowrap">
+                  {closingText(poll, lang)}
+                </span>
+              )
             )}
           </div>
           {poll.description && (
