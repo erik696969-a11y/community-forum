@@ -9,6 +9,7 @@ import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
 import ReactionBar from '../../../components/ReactionBar';
+import AuthorBadges from '../../../components/AuthorBadges';
 
 const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
 const ISSUE_COLORS = {
@@ -50,7 +51,7 @@ export default function PostDetailPage() {
   async function loadAll() {
     const { data: postData } = await supabase
       .from('posts')
-      .select('*, author:profiles(full_name, apartment_number)')
+      .select('*, author:profiles(full_name, apartment_number, badges)')
       .eq('id', params.id)
       .single();
     setPost(postData);
@@ -66,7 +67,7 @@ export default function PostDetailPage() {
 
     const { data: commentsData } = await supabase
       .from('comments')
-      .select('*, author:profiles(full_name, apartment_number)')
+      .select('*, author:profiles(full_name, apartment_number, badges)')
       .eq('post_id', params.id)
       .order('created_at', { ascending: true });
     setComments(commentsData || []);
@@ -233,7 +234,8 @@ export default function PostDetailPage() {
           </div>
           <p className="text-xs text-ink/50 mt-1 mb-4 flex items-center gap-2 flex-wrap">
             <span>
-              {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
+              {post.author?.full_name}
+              <AuthorBadges badges={post.author?.badges} /> · {post.author?.apartment_number} ·{' '}
               {new Date(post.created_at).toLocaleDateString()}
               {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
             </span>
@@ -290,7 +292,8 @@ export default function PostDetailPage() {
                 <p className="text-ink text-sm">{localizedField(c, 'content', lang)}</p>
                 <p className="text-xs text-ink/50 mt-1 flex items-center gap-2 flex-wrap">
                   <span>
-                    {c.author?.full_name} · {c.author?.apartment_number} ·{' '}
+                    {c.author?.full_name}
+                    <AuthorBadges badges={c.author?.badges} /> · {c.author?.apartment_number} ·{' '}
                     {new Date(c.created_at).toLocaleDateString()}
                     {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
                   </span>

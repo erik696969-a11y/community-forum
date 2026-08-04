@@ -132,6 +132,8 @@ function NewPostForm() {
       originalLang = lang;
     }
 
+    const selectedCategory = categories.find((c) => c.id === categoryId);
+
     const { data: newPost, error: insertError } = await supabase
       .from('posts')
       .insert({
@@ -145,6 +147,7 @@ function NewPostForm() {
         original_lang: originalLang,
         title_translations: titleTranslations,
         content_translations: contentTranslations,
+        pinned: !!selectedCategory?.board_only,
       })
       .select()
       .single();
@@ -154,6 +157,14 @@ function NewPostForm() {
     if (insertError) {
       setError(t(lang, 'postSaveError'));
       return;
+    }
+
+    if (selectedCategory?.board_only) {
+      fetch('/api/notify-announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, authorId: session.user.id }),
+      }).catch(() => {});
     }
 
     if (selectedType === 'interest' && groupId) {
@@ -192,7 +203,9 @@ function NewPostForm() {
               onChange={(e) => handleCategoryChange(e.target.value)}
               className="input-field"
             >
-              {categories.map((c) => (
+              {categories
+                .filter((c) => !c.board_only || profile.role === 'board')
+                .map((c) => (
                 <option key={c.id} value={c.id}>
                   {c[`name_${lang}`] || c.name}
                 </option>

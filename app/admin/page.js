@@ -6,6 +6,7 @@ import { useProfile } from '../../lib/useProfile';
 import { useLanguage } from '../../lib/useLanguage';
 import { supabase } from '../../lib/supabaseClient';
 import { t } from '../../lib/i18n';
+import { BADGE_OPTIONS } from '../../lib/badges';
 import Header from '../components/Header';
 
 export default function AdminPage() {
@@ -63,6 +64,15 @@ export default function AdminPage() {
     loadProfiles();
   }
 
+  async function toggleBadge(profileId, badgeKey, currentBadges) {
+    const has = (currentBadges || []).includes(badgeKey);
+    const next = has
+      ? currentBadges.filter((b) => b !== badgeKey)
+      : [...(currentBadges || []), badgeKey];
+    await supabase.from('profiles').update({ badges: next }).eq('id', profileId);
+    loadProfiles();
+  }
+
   if (loading || !profile || profile.role !== 'board') {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -111,9 +121,25 @@ export default function AdminPage() {
         <div className="space-y-2">
           {approved.map((p) => (
             <div key={p.id} className="card p-3 flex items-center justify-between gap-3 flex-wrap">
-              <p className="text-sm text-ink">
-                {p.full_name} · {p.apartment_number}
-              </p>
+              <div>
+                <p className="text-sm text-ink">
+                  {p.full_name} · {p.apartment_number}
+                </p>
+                <div className="flex items-center gap-1 mt-1">
+                  {BADGE_OPTIONS.map((b) => (
+                    <button
+                      key={b.key}
+                      onClick={() => toggleBadge(p.id, b.key, p.badges)}
+                      title={b.label}
+                      className={`text-sm px-1.5 py-0.5 rounded border ${
+                        (p.badges || []).includes(b.key) ? 'bg-ochre/20 border-ochre' : 'border-transparent opacity-40 hover:opacity-100'
+                      }`}
+                    >
+                      {b.emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div className="flex items-center gap-3 flex-shrink-0">
                 {p.role === 'board' && <span className="text-xs font-semibold text-ochre">{t(lang, 'board')}</span>}
                 {p.role !== 'board' && (

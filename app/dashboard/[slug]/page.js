@@ -49,7 +49,7 @@ export default function CategoryPage() {
       if (cat) {
         const { data: postsData } = await supabase
           .from('posts')
-          .select('*, author:profiles(full_name, apartment_number)')
+          .select('*, author:profiles(full_name, apartment_number, badges)')
           .eq('category_id', cat.id)
           .order('pinned', { ascending: false })
           .order('created_at', { ascending: false });
