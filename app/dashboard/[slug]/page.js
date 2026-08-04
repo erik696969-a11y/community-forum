@@ -51,6 +51,7 @@ export default function CategoryPage() {
           .from('posts')
           .select('*, author:profiles(full_name, apartment_number)')
           .eq('category_id', cat.id)
+          .order('pinned', { ascending: false })
           .order('created_at', { ascending: false });
         setPosts(postsData || []);
       }
@@ -102,6 +103,7 @@ export default function CategoryPage() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="font-display text-lg text-harbor">
+                      {post.pinned && <span className="mr-1">📌</span>}
                       {localizedField(post, 'title', lang)}
                     </h2>
                     {post.issue_status && (

@@ -17,6 +17,17 @@ export default function SettingsPage() {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
+  useEffect(() => {
+    if (profile) setNotificationsEnabled(profile.notifications_enabled !== false);
+  }, [profile]);
+
+  async function handleToggleNotifications() {
+    const next = !notificationsEnabled;
+    setNotificationsEnabled(next);
+    await supabase.from('profiles').update({ notifications_enabled: next }).eq('id', session.user.id);
+  }
 
   useEffect(() => {
     if (loading) return;
@@ -82,6 +93,27 @@ export default function SettingsPage() {
               {t(lang, 'privacyPolicyLink')}
             </Link>
           </p>
+        </div>
+
+        <div className="card p-6 mb-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h2 className="font-display text-lg text-harbor">{t(lang, 'emailNotificationsLabel')}</h2>
+              <p className="text-sm text-ink/70 mt-1">{t(lang, 'emailNotificationsNote')}</p>
+            </div>
+            <button
+              onClick={handleToggleNotifications}
+              className={`flex-shrink-0 w-12 h-7 rounded-full transition-colors relative ${
+                notificationsEnabled ? 'bg-ochre' : 'bg-ink/20'
+              }`}
+            >
+              <span
+                className={`absolute top-1 w-5 h-5 rounded-full bg-white transition-transform ${
+                  notificationsEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
         </div>
 
         <div className="card p-6 mb-6">

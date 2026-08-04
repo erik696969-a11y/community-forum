@@ -46,7 +46,8 @@ export async function POST(request) {
       .from('profiles')
       .select('id')
       .eq('role', 'board')
-      .eq('status', 'approved');
+      .eq('status', 'approved')
+      .neq('notifications_enabled', false);
 
     const boardIds = new Set((boardProfiles || []).map((p) => p.id));
     const boardEmails = users

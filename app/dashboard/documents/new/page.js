@@ -92,6 +92,8 @@ export default function NewDocumentPage() {
             <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field">
               <option value="statutes">{t(lang, 'statutesSection')}</option>
               <option value="minutes">{t(lang, 'minutesSection')}</option>
+              <option value="insurance">{t(lang, 'insuranceSection')}</option>
+              <option value="maintenance">{t(lang, 'maintenanceSection')}</option>
             </select>
           </div>
 

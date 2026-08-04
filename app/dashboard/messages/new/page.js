@@ -28,8 +28,8 @@ function NewMessageForm() {
 
   const [boardMembers, setBoardMembers] = useState([]);
   const [recipientId, setRecipientId] = useState('all');
-  const [subject, setSubject] = useState('');
-  const [content, setContent] = useState('');
+  const [subject, setSubject] = useState(searchParams.get('subject') || '');
+  const [content, setContent] = useState(searchParams.get('body') || '');
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
 

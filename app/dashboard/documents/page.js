@@ -58,6 +58,8 @@ export default function DocumentsPage() {
   const isBoard = profile.role === 'board';
   const statutes = documents.filter((d) => d.category === 'statutes');
   const minutes = documents.filter((d) => d.category === 'minutes');
+  const insurance = documents.filter((d) => d.category === 'insurance');
+  const maintenance = documents.filter((d) => d.category === 'maintenance');
 
   function DocRow({ doc }) {
     const ext = doc.file_url.split('.').pop().split('?')[0];
@@ -125,6 +127,28 @@ export default function DocumentsPage() {
                 <p className="text-ink/60 text-sm">{t(lang, 'noDocumentsYet')}</p>
               ) : (
                 minutes.map((doc) => <DocRow key={doc.id} doc={doc} />)
+              )}
+            </div>
+
+            <h2 className="text-xs font-semibold text-ochre uppercase tracking-wide mb-3 mt-8">
+              {t(lang, 'insuranceSection')}
+            </h2>
+            <div className="space-y-2 mb-8">
+              {insurance.length === 0 ? (
+                <p className="text-ink/60 text-sm">{t(lang, 'noDocumentsYet')}</p>
+              ) : (
+                insurance.map((doc) => <DocRow key={doc.id} doc={doc} />)
+              )}
+            </div>
+
+            <h2 className="text-xs font-semibold text-harbor/60 uppercase tracking-wide mb-3">
+              {t(lang, 'maintenanceSection')}
+            </h2>
+            <div className="space-y-2">
+              {maintenance.length === 0 ? (
+                <p className="text-ink/60 text-sm">{t(lang, 'noDocumentsYet')}</p>
+              ) : (
+                maintenance.map((doc) => <DocRow key={doc.id} doc={doc} />)
               )}
             </div>
           </>

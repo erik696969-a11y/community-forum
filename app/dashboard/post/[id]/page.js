@@ -153,6 +153,16 @@ export default function PostDetailPage() {
     }
   }
 
+  async function handleTogglePin() {
+    await supabase.from('posts').update({ pinned: !post.pinned }).eq('id', params.id);
+    loadAll();
+  }
+
+  function reportLink(kind, title, content) {
+    const body = `${t(lang, 'reportBodyPrefix')}\n\n"${(content || '').slice(0, 300)}"\n\n${t(lang, 'reportReasonPrompt')} `;
+    return `/dashboard/messages/new?subject=${encodeURIComponent(t(lang, 'reportSubject'))}&body=${encodeURIComponent(body)}`;
+  }
+
   async function handleDeleteComment(commentId) {
     if (!window.confirm(t(lang, 'confirmDeleteComment'))) return;
     await supabase.from('comments').delete().eq('id', commentId);
@@ -204,12 +214,22 @@ export default function PostDetailPage() {
 
         <div className={`card ${cardPadding} mt-3`}>
           <div className="flex items-center justify-between gap-3">
-            <h1 className={titleClass}>{localizedField(post, 'title', lang)}</h1>
-            {post.issue_status && (
-              <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}>
-                {t(lang, ISSUE_KEYS[post.issue_status])}
-              </span>
-            )}
+            <h1 className={titleClass}>
+              {post.pinned && <span className="mr-2">📌</span>}
+              {localizedField(post, 'title', lang)}
+            </h1>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {post.issue_status && (
+                <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}>
+                  {t(lang, ISSUE_KEYS[post.issue_status])}
+                </span>
+              )}
+              {profile.role === 'board' && (
+                <button onClick={handleTogglePin} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
+                  {post.pinned ? t(lang, 'unpinPost') : t(lang, 'pinPost')}
+                </button>
+              )}
+            </div>
           </div>
           <p className="text-xs text-ink/50 mt-1 mb-4 flex items-center gap-2 flex-wrap">
             <span>
@@ -225,6 +245,12 @@ export default function PostDetailPage() {
                 {t(lang, 'replyPrivately')}
               </Link>
             )}
+            <Link
+              href={reportLink('post', localizedField(post, 'title', lang), postContent)}
+              className="text-ink/40 hover:text-red-500 underline whitespace-nowrap"
+            >
+              {t(lang, 'reportContent')}
+            </Link>
             {canDeletePost && (
               <button onClick={handleDeletePost} className="text-red-500 hover:text-red-700 underline whitespace-nowrap">
                 {t(lang, 'deletePost')}
@@ -276,6 +302,12 @@ export default function PostDetailPage() {
                       {t(lang, 'replyPrivately')}
                     </Link>
                   )}
+                  <Link
+                    href={reportLink('comment', '', localizedField(c, 'content', lang))}
+                    className="text-ink/40 hover:text-red-500 underline whitespace-nowrap"
+                  >
+                    {t(lang, 'reportContent')}
+                  </Link>
                   {canDeleteComment && (
                     <button
                       onClick={() => handleDeleteComment(c.id)}
