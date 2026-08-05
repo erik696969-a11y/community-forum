@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
+    "@vercel/analytics": "^1.4.1",
     "jszip": "^3.10.1",
     "next": "14.2.5",
     "pdfjs-dist": "^3.11.174",

@@ -1,4 +1,5 @@
 import './globals.css';
+import { Analytics } from '@vercel/analytics/next';
 import Footer from './components/Footer';
 import BrandFooter from './components/BrandFooter';
 
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         {children}
         <Footer />
         <BrandFooter />
+        <Analytics />
       </body>
     </html>
   );
