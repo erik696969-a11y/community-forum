@@ -119,13 +119,23 @@ export async function POST(request) {
 
     // Note: email-originated replies are stored in the sender's own language,
     // without automatic translation (unlike replies made inside the app).
-    await adminClient.from('comments').insert({
+    const { error: insertError } = await adminClient.from('comments').insert({
       post_id: postId,
       author_id: matchedUser.id,
       content: replyText,
       original_lang: senderProfile.language || 'en',
       content_translations: {},
     });
+
+    if (insertError) {
+      await log({
+        resend_email_id: event.data.email_id,
+        post_id: postId,
+        sender_email: senderEmail,
+        status: `insert_failed: ${insertError.message}`.slice(0, 200),
+      });
+      return Response.json({ error: insertError.message }, { status: 500 });
+    }
 
     await log({ resend_email_id: event.data.email_id, post_id: postId, sender_email: senderEmail, status: 'success' });
 
