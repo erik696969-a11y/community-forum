@@ -116,10 +116,6 @@ export default function DashboardPage() {
                 <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'eventsTitle')}</h2>
                 <p className="text-sm text-ink/70">{t(lang, 'eventsTileDesc')}</p>
               </Link>
-              <Link href="/dashboard/documents" className="card p-5 hover:border-ochre transition-colors block">
-                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'documentsTitle')}</h2>
-                <p className="text-sm text-ink/70">{t(lang, 'documentsTileDesc')}</p>
-              </Link>
               <Link href="/dashboard/polls" className="card p-5 hover:border-ochre transition-colors block">
                 <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'pollsTitle')}</h2>
                 <p className="text-sm text-ink/70">{t(lang, 'pollsTileDesc')}</p>
@@ -127,10 +123,6 @@ export default function DashboardPage() {
               <Link href="/dashboard/suppliers" className="card p-5 hover:border-ochre transition-colors block">
                 <h2 className="font-display text-lg text-harbor mb-1">⭐ {t(lang, 'suppliersTitle')}</h2>
                 <p className="text-sm text-ink/70">{t(lang, 'suppliersTileDesc')}</p>
-              </Link>
-              <Link href="/dashboard/directory" className="card p-5 hover:border-ochre transition-colors block">
-                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'directoryTitle')}</h2>
-                <p className="text-sm text-ink/70">{t(lang, 'directoryTileDesc')}</p>
               </Link>
             </div>
           </>

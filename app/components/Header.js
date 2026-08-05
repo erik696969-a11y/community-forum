@@ -18,6 +18,12 @@ export default function Header({ profile, lang, onLanguageChange }) {
           <Link href="/dashboard/search" className="hover:text-ochre whitespace-nowrap">
             🔍
           </Link>
+          <Link href="/dashboard/documents" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'documentsTitle')}
+          </Link>
+          <Link href="/dashboard/directory" className="hover:text-ochre whitespace-nowrap">
+            {t(lang, 'directoryTitle')}
+          </Link>
           <Link href="/dashboard/contacts" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'contacts')}
           </Link>
