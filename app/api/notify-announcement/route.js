@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 // per-user notification on/off toggle (unlike interest-group broadcasts).
 export async function POST(request) {
   try {
-    const { title, authorId } = await request.json();
+    const { title, authorId, postId } = await request.json();
 
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -34,6 +34,8 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
+    const replyTo = postId ? `post-${postId}@kareipixai.resend.app` : undefined;
+
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -43,11 +45,13 @@ export async function POST(request) {
       body: JSON.stringify({
         from: 'Mi Hacienda <noreply@myhumandesign.sk>',
         to: emails,
+        reply_to: replyTo,
         subject: `📢 ${title} — Mi Hacienda`,
         html: `
           <h2>📢 Official Announcement</h2>
           <p><strong>${title}</strong></p>
           <p>Open the app to read the full announcement.</p>
+          ${replyTo ? '<p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>' : ''}
         `,
       }),
     });

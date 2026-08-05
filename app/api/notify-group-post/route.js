@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request) {
   try {
-    const { groupId, title, authorId } = await request.json();
+    const { groupId, title, authorId, postId } = await request.json();
 
     if (!groupId) {
       return Response.json({ error: 'Missing groupId' }, { status: 400 });
@@ -43,6 +43,8 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
+    const replyTo = postId ? `post-${postId}@kareipixai.resend.app` : undefined;
+
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -52,11 +54,13 @@ export async function POST(request) {
       body: JSON.stringify({
         from: 'Mi Hacienda <noreply@myhumandesign.sk>',
         to: emails,
+        reply_to: replyTo,
         subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
         html: `
           <h2>${title}</h2>
           <p>A new post was shared in the "${group?.name_en || 'group'}" group you've joined.</p>
           <p>Open the app to read it and reply.</p>
+          ${replyTo ? '<p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>' : ''}
         `,
       }),
     });

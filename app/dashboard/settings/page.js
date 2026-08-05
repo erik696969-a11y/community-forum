@@ -32,7 +32,7 @@ export default function SettingsPage() {
   async function handleToggleDirectory() {
     const next = !directoryVisible;
     setDirectoryVisible(next);
-    await supabase.from('profiles').update({ directory_visible: next }).eq('id', session.user.id);
+    await supabase.rpc('update_own_preferences', { p_directory_visible: next });
   }
 
   async function toggleSpokenLanguage(code) {
@@ -40,13 +40,13 @@ export default function SettingsPage() {
       ? spokenLanguages.filter((l) => l !== code)
       : [...spokenLanguages, code];
     setSpokenLanguages(next);
-    await supabase.from('profiles').update({ spoken_languages: next }).eq('id', session.user.id);
+    await supabase.rpc('update_own_preferences', { p_spoken_languages: next });
   }
 
   async function handleToggleNotifications() {
     const next = !notificationsEnabled;
     setNotificationsEnabled(next);
-    await supabase.from('profiles').update({ notifications_enabled: next }).eq('id', session.user.id);
+    await supabase.rpc('update_own_preferences', { p_notifications_enabled: next });
   }
 
   useEffect(() => {

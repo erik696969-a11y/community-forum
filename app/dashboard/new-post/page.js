@@ -163,7 +163,7 @@ function NewPostForm() {
       fetch('/api/notify-announcement', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, authorId: session.user.id }),
+        body: JSON.stringify({ title, authorId: session.user.id, postId: newPost.id }),
       }).catch(() => {});
     }
 
@@ -171,7 +171,7 @@ function NewPostForm() {
       fetch('/api/notify-group-post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupId, title, authorId: session.user.id }),
+        body: JSON.stringify({ groupId, title, authorId: session.user.id, postId: newPost.id }),
       }).catch(() => {});
     }
 
