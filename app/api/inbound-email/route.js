@@ -49,13 +49,14 @@ export async function POST(request) {
       event = resend.webhooks.verify({
         payload,
         headers: {
-          'svix-id': request.headers.get('svix-id'),
-          'svix-timestamp': request.headers.get('svix-timestamp'),
-          'svix-signature': request.headers.get('svix-signature'),
+          id: request.headers.get('svix-id'),
+          timestamp: request.headers.get('svix-timestamp'),
+          signature: request.headers.get('svix-signature'),
         },
-        secret: process.env.RESEND_WEBHOOK_SECRET,
+        webhookSecret: process.env.RESEND_WEBHOOK_SECRET,
       });
     } catch (verifyError) {
+      await log({ status: `signature_invalid: ${String(verifyError?.message || verifyError).slice(0, 150)}` });
       return Response.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
