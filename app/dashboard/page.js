@@ -87,25 +87,53 @@ export default function DashboardPage() {
         {loadingCats ? (
           <p className="text-ink/60">{t(lang, 'loadingCategories')}</p>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={cat.slug === 'aktivity' ? '/dashboard/groups' : `/dashboard/${cat.slug}`}
-                className="card p-5 hover:border-ochre transition-colors block relative"
-              >
-                {newMap[cat.id] && (
-                  <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-ochre" />
-                )}
-                <h2 className="font-display text-lg text-harbor mb-1">
-                  {cat[`name_${lang}`] || cat.name}
-                </h2>
-                <p className="text-sm text-ink/70">
-                  {cat[`description_${lang}`] || cat.description}
-                </p>
+          <>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={cat.slug === 'aktivity' ? '/dashboard/groups' : `/dashboard/${cat.slug}`}
+                  className="card p-5 hover:border-ochre transition-colors block relative"
+                >
+                  {newMap[cat.id] && (
+                    <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-ochre" />
+                  )}
+                  <h2 className="font-display text-lg text-harbor mb-1">
+                    {cat[`name_${lang}`] || cat.name}
+                  </h2>
+                  <p className="text-sm text-ink/70">
+                    {cat[`description_${lang}`] || cat.description}
+                  </p>
+                </Link>
+              ))}
+            </div>
+
+            <h2 className="text-xs font-semibold text-harbor/50 uppercase tracking-wide mt-8 mb-3">
+              {t(lang, 'moreLabel')}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Link href="/dashboard/events" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'eventsTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'eventsTileDesc')}</p>
               </Link>
-            ))}
-          </div>
+              <Link href="/dashboard/documents" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'documentsTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'documentsTileDesc')}</p>
+              </Link>
+              <Link href="/dashboard/polls" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'pollsTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'pollsTileDesc')}</p>
+              </Link>
+              <Link href="/dashboard/suppliers" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">⭐ {t(lang, 'suppliersTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'suppliersTileDesc')}</p>
+              </Link>
+              <Link href="/dashboard/directory" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'directoryTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'directoryTileDesc')}</p>
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </main>

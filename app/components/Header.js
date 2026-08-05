@@ -18,15 +18,6 @@ export default function Header({ profile, lang, onLanguageChange }) {
           <Link href="/dashboard/search" className="hover:text-ochre whitespace-nowrap">
             🔍
           </Link>
-          <Link href="/dashboard/documents" className="hover:text-ochre whitespace-nowrap">
-            {t(lang, 'documentsTitle')}
-          </Link>
-          <Link href="/dashboard/events" className="hover:text-ochre whitespace-nowrap">
-            {t(lang, 'eventsTitle')}
-          </Link>
-          <Link href="/dashboard/directory" className="hover:text-ochre whitespace-nowrap">
-            {t(lang, 'directoryTitle')}
-          </Link>
           <Link href="/dashboard/contacts" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'contacts')}
           </Link>
@@ -37,9 +28,6 @@ export default function Header({ profile, lang, onLanguageChange }) {
                 {count > 9 ? '9+' : count}
               </span>
             )}
-          </Link>
-          <Link href="/dashboard/polls" className="hover:text-ochre whitespace-nowrap">
-            {t(lang, 'pollsTitle')}
           </Link>
           <Link href="/dashboard/settings" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'settingsTitle')}
