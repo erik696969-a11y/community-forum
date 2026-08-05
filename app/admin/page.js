@@ -117,9 +117,14 @@ export default function AdminPage() {
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'managementTitle')}</h1>
-          <Link href="/admin/moderation" className="btn-secondary text-sm">
-            {t(lang, 'moderationTitle')}
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/insights" className="btn-secondary text-sm">
+              {t(lang, 'insightsTitle')}
+            </Link>
+            <Link href="/admin/moderation" className="btn-secondary text-sm">
+              {t(lang, 'moderationTitle')}
+            </Link>
+          </div>
         </div>
 
         <h2 className="font-display text-lg text-harbor mb-3">
