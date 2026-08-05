@@ -117,7 +117,7 @@ function NewPostForm() {
       const res = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ texts: [title, content] }),
+        body: JSON.stringify({ texts: [title, content], authorLang: lang }),
       });
       const data = await res.json();
       if (data.translations) {

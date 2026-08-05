@@ -45,7 +45,7 @@ export default function NewEventPage() {
       const res = await fetch('/api/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ texts: [title, description] }),
+        body: JSON.stringify({ texts: [title, description], authorLang: lang }),
       });
       const data = await res.json();
       if (data.translations) {

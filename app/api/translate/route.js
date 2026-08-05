@@ -1,6 +1,6 @@
 const TARGET_LANGS = ['EN', 'ES', 'FR', 'DE'];
 
-async function callDeepL(texts, targetLang) {
+async function callDeepL(texts, targetLang, sourceLang) {
   const apiKey = process.env.DEEPL_API_KEY;
   const isFree = apiKey && apiKey.endsWith(':fx');
   const url = isFree
@@ -10,6 +10,7 @@ async function callDeepL(texts, targetLang) {
   const params = new URLSearchParams();
   texts.forEach((text) => params.append('text', text));
   params.append('target_lang', targetLang);
+  if (sourceLang) params.append('source_lang', sourceLang);
 
   const response = await fetch(url, {
     method: 'POST',
@@ -25,18 +26,30 @@ async function callDeepL(texts, targetLang) {
   }
 
   const data = await response.json();
-  return data.translations; // array of { detected_source_language, text }
+  return data.translations;
 }
 
-// POST body: { texts: string[] }
+// POST body: { texts: string[], authorLang: 'en'|'es'|'fr'|'de' }
 // Returns: { originalLang: 'en', translations: { en: [...], es: [...], fr: [...], de: [...] } }
+//
+// Note: we deliberately use the AUTHOR'S OWN app language as the source
+// language, instead of letting DeepL auto-detect it. Auto-detection is
+// unreliable for short or ambiguous text (e.g. the English word "gate"
+// is also a valid Swedish word meaning "street", which DeepL would
+// happily "detect" and mistranslate). Since we already know which of
+// our 4 supported languages the person is writing in, that's a far more
+// reliable signal than guessing from a few words.
 export async function POST(request) {
   try {
-    const { texts } = await request.json();
+    const { texts, authorLang } = await request.json();
 
     if (!texts || !Array.isArray(texts) || texts.length === 0) {
       return Response.json({ error: 'No texts provided' }, { status: 400 });
     }
+
+    const sourceLang = TARGET_LANGS.includes((authorLang || '').toUpperCase())
+      ? authorLang.toUpperCase()
+      : 'EN';
 
     if (!process.env.DEEPL_API_KEY) {
       // No translation configured - just echo back originals for every language
@@ -44,33 +57,20 @@ export async function POST(request) {
       TARGET_LANGS.forEach((l) => {
         fallback[l.toLowerCase()] = texts;
       });
-      return Response.json({ originalLang: 'es', translations: fallback });
+      return Response.json({ originalLang: sourceLang.toLowerCase(), translations: fallback });
     }
 
-    // First call: translate to EN, this also tells us the detected source language
-    const firstBatch = await callDeepL(texts, 'EN');
-    const detectedLang = (firstBatch[0]?.detected_source_language || 'ES').toLowerCase();
-
     const translations = {};
-    translations.en = firstBatch.map((t) => t.text);
-    translations[detectedLang] = texts; // original text for its own language
+    translations[sourceLang.toLowerCase()] = texts;
 
-    const remainingLangs = TARGET_LANGS.filter(
-      (l) => l.toLowerCase() !== 'en' && l.toLowerCase() !== detectedLang
-    );
+    const remainingLangs = TARGET_LANGS.filter((l) => l !== sourceLang);
 
     for (const targetLang of remainingLangs) {
-      const batch = await callDeepL(texts, targetLang);
+      const batch = await callDeepL(texts, targetLang, sourceLang);
       translations[targetLang.toLowerCase()] = batch.map((t) => t.text);
     }
 
-    // Ensure all 4 languages are present even if something was skipped
-    TARGET_LANGS.forEach((l) => {
-      const key = l.toLowerCase();
-      if (!translations[key]) translations[key] = texts;
-    });
-
-    return Response.json({ originalLang: detectedLang, translations });
+    return Response.json({ originalLang: sourceLang.toLowerCase(), translations });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
