@@ -28,6 +28,7 @@ export default function GroupDetailPage() {
   const [posts, setPosts] = useState([]);
   const [isMember, setIsMember] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -112,7 +113,16 @@ export default function GroupDetailPage() {
             <span>{group.icon}</span> {group[`name_${lang}`] || group.name_en}
           </h1>
           <div className="flex items-center gap-2">
-            <button onClick={load} className="btn-secondary text-sm">
+            <button
+              onClick={async () => {
+                setRefreshing(true);
+                await load();
+                setRefreshing(false);
+              }}
+              disabled={refreshing}
+              className="btn-secondary text-sm flex items-center gap-1.5"
+            >
+              <span className={refreshing ? 'inline-block animate-spin' : ''}>🔄</span>
               {t(lang, 'refreshButton')}
             </button>
             <button

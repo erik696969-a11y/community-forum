@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const [categories, setCategories] = useState([]);
   const [newMap, setNewMap] = useState({});
   const [loadingCats, setLoadingCats] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -60,6 +61,12 @@ export default function DashboardPage() {
 
   useRefreshOnFocus(loadCategories);
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    await loadCategories();
+    setRefreshing(false);
+  }
+
   if (loading || !profile || profile.status !== 'approved') {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -75,7 +82,8 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'forumCategories')}</h1>
           <div className="flex items-center gap-2">
-            <button onClick={loadCategories} className="btn-secondary text-sm">
+            <button onClick={handleRefresh} disabled={refreshing} className="btn-secondary text-sm flex items-center gap-1.5">
+              <span className={refreshing ? 'inline-block animate-spin' : ''}>🔄</span>
               {t(lang, 'refreshButton')}
             </button>
             <Link href="/dashboard/new-post" className="btn-primary">

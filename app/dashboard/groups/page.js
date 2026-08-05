@@ -19,6 +19,7 @@ export default function GroupsPage() {
   const [myGroupIds, setMyGroupIds] = useState(new Set());
   const [newMap, setNewMap] = useState({});
   const [loadingData, setLoadingData] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -102,7 +103,16 @@ export default function GroupsPage() {
         </Link>
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'interestGroupsTitle')}</h1>
-          <button onClick={loadGroups} className="btn-secondary text-sm">
+          <button
+            onClick={async () => {
+              setRefreshing(true);
+              await loadGroups();
+              setRefreshing(false);
+            }}
+            disabled={refreshing}
+            className="btn-secondary text-sm flex items-center gap-1.5"
+          >
+            <span className={refreshing ? 'inline-block animate-spin' : ''}>🔄</span>
             {t(lang, 'refreshButton')}
           </button>
         </div>
