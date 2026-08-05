@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../lib/useProfile';
 import { useLanguage } from '../../lib/useLanguage';
+import { useRefreshOnFocus } from '../../lib/useRefreshOnFocus';
+import { getLastSeenMap } from '../../lib/useLastSeen';
 import { supabase } from '../../lib/supabaseClient';
 import { t } from '../../lib/i18n';
 import Header from '../components/Header';
@@ -14,6 +16,7 @@ export default function DashboardPage() {
   const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
   const [categories, setCategories] = useState([]);
+  const [newMap, setNewMap] = useState({});
   const [loadingCats, setLoadingCats] = useState(true);
 
   useEffect(() => {
@@ -27,19 +30,35 @@ export default function DashboardPage() {
     }
   }, [loading, session, profile, router]);
 
+  const loadCategories = useCallback(async () => {
+    const { data } = await supabase.from('categories').select('*').order('sort_order', { ascending: true });
+    const cats = data || [];
+    setCategories(cats);
+
+    const { data: latestRows } = await supabase.from('category_latest_post').select('*');
+    const latestMap = {};
+    (latestRows || []).forEach((r) => {
+      latestMap[r.category_id] = r.latest_at;
+    });
+
+    const scopes = cats.map((c) => `category:${c.id}`);
+    const seenMap = await getLastSeenMap(scopes);
+
+    const result = {};
+    cats.forEach((c) => {
+      const latest = latestMap[c.id];
+      const seen = seenMap[`category:${c.id}`];
+      result[c.id] = !!latest && (!seen || new Date(latest) > new Date(seen));
+    });
+    setNewMap(result);
+    setLoadingCats(false);
+  }, []);
+
   useEffect(() => {
-    async function loadCategories() {
-      const { data } = await supabase
-        .from('categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
-      setCategories(data || []);
-      setLoadingCats(false);
-    }
-    if (profile?.status === 'approved') {
-      loadCategories();
-    }
-  }, [profile]);
+    if (profile?.status === 'approved') loadCategories();
+  }, [profile, loadCategories]);
+
+  useRefreshOnFocus(loadCategories);
 
   if (loading || !profile || profile.status !== 'approved') {
     return (
@@ -55,9 +74,14 @@ export default function DashboardPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'forumCategories')}</h1>
-          <Link href="/dashboard/new-post" className="btn-primary">
-            {t(lang, 'newPost')}
-          </Link>
+          <div className="flex items-center gap-2">
+            <button onClick={loadCategories} className="btn-secondary text-sm">
+              {t(lang, 'refreshButton')}
+            </button>
+            <Link href="/dashboard/new-post" className="btn-primary">
+              {t(lang, 'newPost')}
+            </Link>
+          </div>
         </div>
 
         {loadingCats ? (
@@ -68,8 +92,11 @@ export default function DashboardPage() {
               <Link
                 key={cat.id}
                 href={cat.slug === 'aktivity' ? '/dashboard/groups' : `/dashboard/${cat.slug}`}
-                className="card p-5 hover:border-ochre transition-colors block"
+                className="card p-5 hover:border-ochre transition-colors block relative"
               >
+                {newMap[cat.id] && (
+                  <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-ochre" />
+                )}
                 <h2 className="font-display text-lg text-harbor mb-1">
                   {cat[`name_${lang}`] || cat.name}
                 </h2>

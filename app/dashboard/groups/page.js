@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
+import { useRefreshOnFocus } from '../../../lib/useRefreshOnFocus';
+import { getLastSeenMap } from '../../../lib/useLastSeen';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
@@ -15,6 +17,7 @@ export default function GroupsPage() {
   const router = useRouter();
   const [groups, setGroups] = useState([]);
   const [myGroupIds, setMyGroupIds] = useState(new Set());
+  const [newMap, setNewMap] = useState({});
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
@@ -28,7 +31,7 @@ export default function GroupsPage() {
     }
   }, [loading, session, profile, router]);
 
-  async function loadGroups() {
+  const loadGroups = useCallback(async () => {
     const { data: groupsData } = await supabase
       .from('interest_groups')
       .select('*, interest_group_members(user_id)')
@@ -42,13 +45,32 @@ export default function GroupsPage() {
       });
       setMyGroupIds(mine);
     }
+
+    const { data: latestRows } = await supabase.from('group_latest_post').select('*');
+    const latestMap = {};
+    (latestRows || []).forEach((r) => {
+      latestMap[r.interest_group_id] = r.latest_at;
+    });
+
+    const scopes = (groupsData || []).map((g) => `group:${g.id}`);
+    const seenMap = await getLastSeenMap(scopes);
+
+    const result = {};
+    (groupsData || []).forEach((g) => {
+      const latest = latestMap[g.id];
+      const seen = seenMap[`group:${g.id}`];
+      result[g.id] = !!latest && (!seen || new Date(latest) > new Date(seen));
+    });
+    setNewMap(result);
+
     setLoadingData(false);
-  }
+  }, [session]);
 
   useEffect(() => {
     if (profile?.status === 'approved') loadGroups();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile]);
+  }, [profile, loadGroups]);
+
+  useRefreshOnFocus(loadGroups);
 
   async function toggleMembership(groupId, isMember) {
     if (isMember) {
@@ -78,7 +100,12 @@ export default function GroupsPage() {
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
           {t(lang, 'backToDashboard')}
         </Link>
-        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'interestGroupsTitle')}</h1>
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h1 className="font-display text-2xl text-harbor">{t(lang, 'interestGroupsTitle')}</h1>
+          <button onClick={loadGroups} className="btn-secondary text-sm">
+            {t(lang, 'refreshButton')}
+          </button>
+        </div>
 
         {loadingData ? (
           <p className="text-ink/60">{t(lang, 'loading')}</p>
@@ -88,7 +115,10 @@ export default function GroupsPage() {
               const isMember = myGroupIds.has(g.id);
               const memberCount = g.interest_group_members.length;
               return (
-                <div key={g.id} className="card p-5">
+                <div key={g.id} className="card p-5 relative">
+                  {newMap[g.id] && (
+                    <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-ochre" />
+                  )}
                   <Link href={`/dashboard/groups/${g.slug}`} className="block hover:opacity-80 transition-opacity">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-2xl">{g.icon}</span>

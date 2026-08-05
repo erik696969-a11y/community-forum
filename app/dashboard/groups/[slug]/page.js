@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
+import { useRefreshOnFocus } from '../../../../lib/useRefreshOnFocus';
+import { markSeen } from '../../../../lib/useLastSeen';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
@@ -32,7 +34,7 @@ export default function GroupDetailPage() {
     if (!session) router.replace('/login');
   }, [loading, session, router]);
 
-  async function load() {
+  const load = useCallback(async () => {
     const { data: groupData } = await supabase
       .from('interest_groups')
       .select('*')
@@ -54,14 +56,16 @@ export default function GroupDetailPage() {
         .eq('interest_group_id', groupData.id)
         .order('created_at', { ascending: false });
       setPosts(postsData || []);
+      markSeen(`group:${groupData.id}`);
     }
     setLoadingData(false);
-  }
+  }, [params.slug, session]);
 
   useEffect(() => {
     if (profile?.status === 'approved') load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.slug, profile]);
+  }, [profile, load]);
+
+  useRefreshOnFocus(load);
 
   async function toggleMembership() {
     if (isMember) {
@@ -107,12 +111,17 @@ export default function GroupDetailPage() {
           <h1 className="font-display text-2xl text-harbor flex items-center gap-2">
             <span>{group.icon}</span> {group[`name_${lang}`] || group.name_en}
           </h1>
-          <button
-            onClick={toggleMembership}
-            className={isMember ? 'btn-secondary text-sm' : 'btn-primary text-sm'}
-          >
-            {isMember ? t(lang, 'leaveGroup') : t(lang, 'joinGroup')}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={load} className="btn-secondary text-sm">
+              {t(lang, 'refreshButton')}
+            </button>
+            <button
+              onClick={toggleMembership}
+              className={isMember ? 'btn-secondary text-sm' : 'btn-primary text-sm'}
+            >
+              {isMember ? t(lang, 'leaveGroup') : t(lang, 'joinGroup')}
+            </button>
+          </div>
         </div>
 
         <p className="text-sm text-ink/60 mb-6">

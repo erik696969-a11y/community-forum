@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
+import { useRefreshOnFocus } from '../../../lib/useRefreshOnFocus';
+import { markSeen } from '../../../lib/useLastSeen';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
@@ -36,31 +38,35 @@ export default function CategoryPage() {
     if (!session) router.replace('/login');
   }, [loading, session, router]);
 
-  useEffect(() => {
-    async function load() {
-      const { data: cat } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('slug', params.slug)
-        .single();
+  const load = useCallback(async () => {
+    const { data: cat } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('slug', params.slug)
+      .single();
 
-      setCategory(cat);
+    setCategory(cat);
 
-      if (cat) {
-        const { data: postsData } = await supabase
-          .from('posts')
-          .select('*, author:profiles(full_name, apartment_number, badges)')
-          .eq('category_id', cat.id)
-          .order('pinned', { ascending: false })
-          .order('created_at', { ascending: false });
-        setPosts(postsData || []);
-      }
-      setLoadingPosts(false);
+    if (cat) {
+      const { data: postsData } = await supabase
+        .from('posts')
+        .select('*, author:profiles(full_name, apartment_number, badges)')
+        .eq('category_id', cat.id)
+        .order('pinned', { ascending: false })
+        .order('created_at', { ascending: false });
+      setPosts(postsData || []);
+      markSeen(`category:${cat.id}`);
     }
+    setLoadingPosts(false);
+  }, [params.slug]);
+
+  useEffect(() => {
     if (profile?.status === 'approved') {
       load();
     }
-  }, [params.slug, profile]);
+  }, [profile, load]);
+
+  useRefreshOnFocus(load);
 
   if (loading || !profile) {
     return (
@@ -82,9 +88,14 @@ export default function CategoryPage() {
           <h1 className="font-display text-2xl text-harbor">
             {category ? category[`name_${lang}`] || category.name : ''}
           </h1>
-          <Link href={`/dashboard/new-post?category=${params.slug}`} className="btn-primary">
-            {t(lang, 'newPost')}
-          </Link>
+          <div className="flex items-center gap-2">
+            <button onClick={load} className="btn-secondary text-sm">
+              {t(lang, 'refreshButton')}
+            </button>
+            <Link href={`/dashboard/new-post?category=${params.slug}`} className="btn-primary">
+              {t(lang, 'newPost')}
+            </Link>
+          </div>
         </div>
 
         {loadingPosts ? (
