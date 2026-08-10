@@ -130,7 +130,14 @@ export default function EventDetailPage() {
         </Link>
 
         <div className="card p-6 mt-3 mb-8">
-          <h1 className="font-display text-2xl text-harbor mb-1">{localizedField(event, 'title', lang)}</h1>
+          <h1 className="font-display text-2xl text-harbor mb-1 flex items-center gap-2">
+            {(event.event_type === 'agm' || event.event_type === 'egm') && (
+              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
+                {t(lang, event.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
+              </span>
+            )}
+            {localizedField(event, 'title', lang)}
+          </h1>
           {event.event_date && (
             <p className="text-sm text-ochre font-semibold">
               {new Date(event.event_date).toLocaleDateString(undefined, {

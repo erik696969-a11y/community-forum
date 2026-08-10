@@ -18,6 +18,7 @@ export default function NewEventPage() {
   const [description, setDescription] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [location, setLocation] = useState('');
+  const [eventType, setEventType] = useState('social');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -66,6 +67,7 @@ export default function NewEventPage() {
         description,
         event_date: eventDate || null,
         location,
+        event_type: eventType,
         created_by: session.user.id,
         original_lang: originalLang,
         title_translations: titleTranslations,
@@ -102,6 +104,15 @@ export default function NewEventPage() {
         <h1 className="font-display text-2xl text-harbor mb-6 mt-3">{t(lang, 'addEvent')}</h1>
 
         <form onSubmit={handleSubmit} className="card p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'eventTypeLabel')}</label>
+            <select value={eventType} onChange={(e) => setEventType(e.target.value)} className="input-field">
+              <option value="social">{t(lang, 'eventTypeSocial')}</option>
+              <option value="agm">{t(lang, 'eventTypeAGM')}</option>
+              <option value="egm">{t(lang, 'eventTypeEGM')}</option>
+            </select>
+          </div>
+
           <div>
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'eventTitleLabel')}</label>
             <input

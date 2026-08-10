@@ -61,7 +61,14 @@ export default function EventsPage() {
   function EventCard({ ev }) {
     return (
       <Link href={`/dashboard/events/${ev.id}`} className="card p-5 block hover:border-ochre transition-colors">
-        <h3 className="font-display text-lg text-harbor">{localizedField(ev, 'title', lang)}</h3>
+        <h3 className="font-display text-lg text-harbor flex items-center gap-2">
+          {(ev.event_type === 'agm' || ev.event_type === 'egm') && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
+              {t(lang, ev.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
+            </span>
+          )}
+          {localizedField(ev, 'title', lang)}
+        </h3>
         {ev.event_date && (
           <p className="text-sm text-ochre font-semibold mt-1">
             {new Date(ev.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
