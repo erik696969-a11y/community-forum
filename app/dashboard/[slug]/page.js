@@ -108,6 +108,28 @@ export default function CategoryPage() {
           </div>
         </div>
 
+        {params.slug === 'problemy' && (
+          <>
+            <a
+              href="https://www.tucomunidad.com/propietarios"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block bg-ochre/10 border border-ochre/30 rounded-lg px-4 py-3 mb-3 hover:bg-ochre/20 transition-colors"
+            >
+              <p className="text-sm text-harbor font-semibold">
+                🏢 {t(lang, 'tucomunidadBannerTitle')}
+              </p>
+              <p className="text-xs text-ink/70 mt-0.5">{t(lang, 'tucomunidadBannerNote')} →</p>
+            </a>
+            <p className="text-xs text-ink/60 mb-6">
+              🚨 {t(lang, 'securityGuardNote')}{' '}
+              <Link href="/dashboard/contacts" className="underline text-harbor">
+                {t(lang, 'contacts')}
+              </Link>
+            </p>
+          </>
+        )}
+
         {loadingPosts ? (
           <p className="text-ink/60">{t(lang, 'loadingPosts')}</p>
         ) : posts.length === 0 ? (

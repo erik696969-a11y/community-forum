@@ -15,7 +15,7 @@ export async function POST(request) {
 
     const { data: members } = await adminClient
       .from('interest_group_members')
-      .select('user_id, profiles(notifications_enabled)')
+      .select('user_id, notify_email, profiles(notifications_enabled)')
       .eq('group_id', groupId);
 
     const { data: group } = await adminClient
@@ -25,7 +25,7 @@ export async function POST(request) {
       .single();
 
     const memberIds = (members || [])
-      .filter((m) => m.profiles?.notifications_enabled !== false)
+      .filter((m) => m.notify_email !== false && m.profiles?.notifications_enabled !== false)
       .map((m) => m.user_id)
       .filter((id) => id !== authorId);
 

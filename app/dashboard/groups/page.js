@@ -101,7 +101,7 @@ export default function GroupsPage() {
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
           {t(lang, 'backToDashboard')}
         </Link>
-        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <div className="flex items-center justify-between mb-1 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'interestGroupsTitle')}</h1>
           <button
             onClick={async () => {
@@ -116,6 +116,7 @@ export default function GroupsPage() {
             {t(lang, 'refreshButton')}
           </button>
         </div>
+        <p className="text-xs text-ink/60 mb-6 italic">{t(lang, 'interestGroupsEmailNote')}</p>
 
         {loadingData ? (
           <p className="text-ink/60">{t(lang, 'loading')}</p>

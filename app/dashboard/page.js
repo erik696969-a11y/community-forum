@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [categories, setCategories] = useState([]);
   const [newMap, setNewMap] = useState({});
+  const [latestMap, setLatestMap] = useState({});
   const [loadingCats, setLoadingCats] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -37,17 +38,18 @@ export default function DashboardPage() {
     setCategories(cats);
 
     const { data: latestRows } = await supabase.from('category_latest_post').select('*');
-    const latestMap = {};
+    const latestMapData = {};
     (latestRows || []).forEach((r) => {
-      latestMap[r.category_id] = r.latest_at;
+      latestMapData[r.category_id] = r.latest_at;
     });
+    setLatestMap(latestMapData);
 
     const scopes = cats.map((c) => `category:${c.id}`);
     const seenMap = await getLastSeenMap(scopes);
 
     const result = {};
     cats.forEach((c) => {
-      const latest = latestMap[c.id];
+      const latest = latestMapData[c.id];
       const seen = seenMap[`category:${c.id}`];
       result[c.id] = !!latest && (!seen || new Date(latest) > new Date(seen));
     });
@@ -112,6 +114,11 @@ export default function DashboardPage() {
                   <p className="text-sm text-ink/70">
                     {cat[`description_${lang}`] || cat.description}
                   </p>
+                  {latestMap[cat.id] && (
+                    <p className="text-xs text-ink/40 mt-2">
+                      {t(lang, 'lastActivityLabel')}: {new Date(latestMap[cat.id]).toLocaleDateString()}
+                    </p>
+                  )}
                 </Link>
               ))}
             </div>

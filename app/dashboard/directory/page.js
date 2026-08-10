@@ -90,7 +90,8 @@ export default function DirectoryPage() {
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
           {t(lang, 'backToDashboard')}
         </Link>
-        <h1 className="font-display text-2xl text-harbor mb-6">{t(lang, 'directoryTitle')}</h1>
+        <h1 className="font-display text-2xl text-harbor">{t(lang, 'directoryTitle')}</h1>
+        <p className="text-xs text-ink/60 mb-6 italic">{t(lang, 'directorySubtitle')}</p>
 
         <div className="flex gap-2 mb-6 flex-wrap">
           <select value={filterLang} onChange={(e) => setFilterLang(e.target.value)} className="input-field text-sm max-w-[160px]">

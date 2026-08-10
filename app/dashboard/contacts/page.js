@@ -189,8 +189,8 @@ export default function ContactsPage() {
                   </div>
                   {isBoard && (
                     <div className="flex gap-2 flex-shrink-0">
-                      <button onClick={() => startEdit(c)} className="text-xs text-harbor/60 hover:text-harbor">
-                        ✎
+                      <button onClick={() => startEdit(c)} className="text-xs text-harbor/60 hover:text-harbor underline">
+                        {t(lang, 'edit')}
                       </button>
                       <button onClick={() => handleDelete(c.id)} className="text-xs text-red-500 hover:text-red-700">
                         {t(lang, 'delete')}

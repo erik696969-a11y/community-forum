@@ -16,7 +16,9 @@ export default function NewDocumentPage() {
 
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('statutes');
+  const [docType, setDocType] = useState('file'); // 'file' | 'link'
   const [file, setFile] = useState(null);
+  const [externalUrl, setExternalUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -33,12 +35,35 @@ export default function NewDocumentPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!file) {
-      setError('Please choose a file.');
+    setError('');
+
+    if (docType === 'file' && !file) {
+      setError(t(lang, 'chooseFileError'));
       return;
     }
+    if (docType === 'link' && !externalUrl.trim()) {
+      setError(t(lang, 'enterLinkError'));
+      return;
+    }
+
     setSubmitting(true);
-    setError('');
+
+    if (docType === 'link') {
+      const { error: insertError } = await supabase.from('documents').insert({
+        category,
+        title,
+        doc_type: 'link',
+        external_url: externalUrl.trim(),
+        uploaded_by: session.user.id,
+      });
+      setSubmitting(false);
+      if (insertError) {
+        setError(insertError.message);
+        return;
+      }
+      router.push('/dashboard/documents');
+      return;
+    }
 
     const fileExt = file.name.split('.').pop();
     const filePath = `${category}/${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
@@ -55,6 +80,7 @@ export default function NewDocumentPage() {
     const { error: insertError } = await supabase.from('documents').insert({
       category,
       title,
+      doc_type: 'file',
       file_url: publicUrlData.publicUrl,
       uploaded_by: session.user.id,
     });
@@ -110,15 +136,48 @@ export default function NewDocumentPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'documentFileLabel')}</label>
-            <input
-              type="file"
-              accept=".pdf,.doc,.docx"
-              required
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="input-field"
-            />
+            <label className="block text-sm font-semibold text-harbor mb-2">{t(lang, 'documentTypeLabel')}</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setDocType('file')}
+                className={docType === 'file' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+              >
+                {t(lang, 'uploadFileOption')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDocType('link')}
+                className={docType === 'link' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+              >
+                {t(lang, 'externalLinkOption')}
+              </button>
+            </div>
           </div>
+
+          {docType === 'file' ? (
+            <div>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'documentFileLabel')}</label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                className="input-field"
+              />
+            </div>
+          ) : (
+            <div>
+              <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'externalLinkLabel')}</label>
+              <input
+                type="url"
+                value={externalUrl}
+                onChange={(e) => setExternalUrl(e.target.value)}
+                className="input-field"
+                placeholder="https://..."
+              />
+              <p className="text-xs text-ink/50 mt-1">{t(lang, 'externalLinkHint')}</p>
+            </div>
+          )}
 
           {error && <p className="text-red-600 text-sm">{error}</p>}
 

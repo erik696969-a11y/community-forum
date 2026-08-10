@@ -157,6 +157,8 @@ export default function SettingsPage() {
             <div>
               <h2 className="font-display text-lg text-harbor">{t(lang, 'emailNotificationsLabel')}</h2>
               <p className="text-sm text-ink/70 mt-1">{t(lang, 'emailNotificationsNote')}</p>
+              <p className="text-sm text-ink/70 mt-1">{t(lang, 'settingsNotificationsIntro')}</p>
+              <p className="text-xs text-ink/50 mt-1">{t(lang, 'settingsNotificationsFuture')}</p>
             </div>
             <button
               onClick={handleToggleNotifications}
@@ -171,6 +173,19 @@ export default function SettingsPage() {
               />
             </button>
           </div>
+        </div>
+
+        <div className="card p-6 mb-6">
+          <h2 className="font-display text-lg text-harbor mb-2">{t(lang, 'requestEmailChange')}</h2>
+          <p className="text-sm text-ink/70 mb-4">{t(lang, 'requestEmailChangeNote')}</p>
+          <a
+            href={`/dashboard/messages/new?subject=${encodeURIComponent(t(lang, 'emailChangeRequestSubject'))}&body=${encodeURIComponent(
+              t(lang, 'emailChangeRequestBody').replace('{email}', session?.user?.email || '')
+            )}`}
+            className="btn-secondary inline-block"
+          >
+            {t(lang, 'requestEmailChange')}
+          </a>
         </div>
 
         <div className="card p-6 mb-6">

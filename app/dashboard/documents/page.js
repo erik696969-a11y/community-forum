@@ -62,18 +62,26 @@ export default function DocumentsPage() {
   const maintenance = documents.filter((d) => d.category === 'maintenance');
 
   function DocRow({ doc }) {
-    const ext = doc.file_url.split('.').pop().split('?')[0];
-    const downloadUrl = `/api/download-file?url=${encodeURIComponent(doc.file_url)}&filename=${encodeURIComponent(doc.title + '.' + ext)}`;
+    const isLink = doc.doc_type === 'link';
+    const ext = !isLink ? doc.file_url.split('.').pop().split('?')[0] : '';
+    const downloadUrl = !isLink
+      ? `/api/download-file?url=${encodeURIComponent(doc.file_url)}&filename=${encodeURIComponent(doc.title + '.' + ext)}`
+      : null;
+    const openHref = isLink ? doc.external_url : `/dashboard/documents/view/${doc.id}`;
+    const linkProps = isLink ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
     return (
       <div className="card p-4 flex items-center justify-between gap-3">
-        <Link href={`/dashboard/documents/view/${doc.id}`} className="flex-1 hover:opacity-80 transition-opacity">
-          <p className="font-semibold text-harbor">{doc.title}</p>
+        <Link href={openHref} {...linkProps} className="flex-1 hover:opacity-80 transition-opacity">
+          <p className="font-semibold text-harbor">
+            {isLink && '🔗 '}
+            {doc.title}
+          </p>
           <p className="text-xs text-ink/50">{new Date(doc.created_at).toLocaleDateString()}</p>
         </Link>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Link href={`/dashboard/documents/view/${doc.id}`} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
-            {t(lang, 'openDocument')}
+          <Link href={openHref} {...linkProps} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
+            {isLink ? t(lang, 'openLink') : t(lang, 'openDocument')}
           </Link>
           {isBoard && (
             <button
@@ -95,7 +103,7 @@ export default function DocumentsPage() {
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
           {t(lang, 'backToDashboard')}
         </Link>
-        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'documentsTitle')}</h1>
           {isBoard && (
             <Link href="/dashboard/documents/new" className="btn-primary">
@@ -103,6 +111,16 @@ export default function DocumentsPage() {
             </Link>
           )}
         </div>
+
+        <a
+          href="https://www.tucomunidad.com/propietarios"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-ochre/10 border border-ochre/30 rounded-lg px-4 py-3 mb-6 hover:bg-ochre/20 transition-colors"
+        >
+          <p className="text-sm text-harbor font-semibold">🏢 {t(lang, 'documentsAmmexNote')}</p>
+          <p className="text-xs text-ink/70 mt-0.5">{t(lang, 'tucomunidadBannerNote')} →</p>
+        </a>
 
         {loadingData ? (
           <p className="text-ink/60">{t(lang, 'loading')}</p>

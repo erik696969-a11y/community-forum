@@ -176,6 +176,11 @@ export default function LoginPage() {
           </div>
 
           <div className="bg-sand-dark/60 border border-harbor/10 rounded-lg p-3 text-xs text-ink/80 space-y-1.5">
+            <p className="font-semibold text-harbor">{t(lang, 'membershipCriteriaTitle')}</p>
+            <p>{t(lang, 'membershipCriteriaText')}</p>
+          </div>
+
+          <div className="bg-sand-dark/60 border border-harbor/10 rounded-lg p-3 text-xs text-ink/80 space-y-1.5">
             <p className="font-semibold text-harbor">{t(lang, 'consentInfoTitle')}</p>
             <ul className="list-disc list-outside pl-4 space-y-1">
               <li>{t(lang, 'consentBullet1')}</li>

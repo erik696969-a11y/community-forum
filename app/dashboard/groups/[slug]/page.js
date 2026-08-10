@@ -27,6 +27,7 @@ export default function GroupDetailPage() {
   const [members, setMembers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [isMember, setIsMember] = useState(false);
+  const [notifyEmail, setNotifyEmail] = useState(true);
   const [loadingData, setLoadingData] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -46,10 +47,12 @@ export default function GroupDetailPage() {
     if (groupData) {
       const { data: memberData } = await supabase
         .from('interest_group_members')
-        .select('user_id, profiles(full_name, apartment_number)')
+        .select('user_id, notify_email, profiles(full_name, apartment_number)')
         .eq('group_id', groupData.id);
       setMembers(memberData || []);
-      setIsMember((memberData || []).some((m) => m.user_id === session?.user?.id));
+      const myMembership = (memberData || []).find((m) => m.user_id === session?.user?.id);
+      setIsMember(!!myMembership);
+      setNotifyEmail(myMembership?.notify_email !== false);
 
       const { data: postsData } = await supabase
         .from('posts')
@@ -79,6 +82,16 @@ export default function GroupDetailPage() {
       await supabase.from('interest_group_members').insert({ group_id: group.id, user_id: session.user.id });
     }
     load();
+  }
+
+  async function toggleNotifyEmail() {
+    const next = !notifyEmail;
+    setNotifyEmail(next);
+    await supabase
+      .from('interest_group_members')
+      .update({ notify_email: next })
+      .eq('group_id', group.id)
+      .eq('user_id', session.user.id);
   }
 
   if (loading || !profile || loadingData) {
@@ -133,6 +146,13 @@ export default function GroupDetailPage() {
             </button>
           </div>
         </div>
+
+        {isMember && (
+          <label className="flex items-center gap-2 text-sm text-ink/70 mb-4 cursor-pointer">
+            <input type="checkbox" checked={notifyEmail} onChange={toggleNotifyEmail} className="w-4 h-4" />
+            {t(lang, 'emailNotificationsForGroup')}
+          </label>
+        )}
 
         <p className="text-sm text-ink/60 mb-6">
           {members.length} {t(lang, 'members')}
