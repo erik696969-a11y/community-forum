@@ -139,6 +139,14 @@ export default function DashboardPage() {
                 <h2 className="font-display text-lg text-harbor mb-1">⭐ {t(lang, 'suppliersTitle')}</h2>
                 <p className="text-sm text-ink/70">{t(lang, 'suppliersTileDesc')}</p>
               </Link>
+              <Link href="/dashboard/facilities" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">{t(lang, 'facilitiesTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'facilitiesTileDesc')}</p>
+              </Link>
+              <Link href="/dashboard/ask" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">🤖 {t(lang, 'askAiTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'askAiNote')}</p>
+              </Link>
             </div>
           </>
         )}
