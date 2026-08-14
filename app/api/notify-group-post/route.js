@@ -1,17 +1,34 @@
-import { createClient } from '@supabase/supabase-js';
+import { getAuthedProfile } from '../../../lib/serverAuth';
 
 export async function POST(request) {
   try {
-    const { groupId, title, authorId, postId } = await request.json();
+    const auth = await getAuthedProfile(request);
+    if (!auth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { profile, user, adminClient } = auth;
 
-    if (!groupId) {
-      return Response.json({ error: 'Missing groupId' }, { status: 400 });
+    if (profile.status !== 'approved') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const { postId } = await request.json();
+    if (!postId) {
+      return Response.json({ error: 'Missing postId' }, { status: 400 });
+    }
+
+    // Look the post up ourselves - never trust title/authorId/groupId from the client.
+    const { data: post } = await adminClient
+      .from('posts')
+      .select('id, title, author_id, interest_group_id')
+      .eq('id', postId)
+      .single();
+
+    if (!post || !post.interest_group_id || post.author_id !== user.id) {
+      return Response.json({ error: 'Invalid post' }, { status: 400 });
+    }
+
+    const groupId = post.interest_group_id;
 
     const { data: members } = await adminClient
       .from('interest_group_members')
@@ -27,9 +44,9 @@ export async function POST(request) {
     const memberIds = (members || [])
       .filter((m) => m.notify_email !== false && m.profiles?.notifications_enabled !== false)
       .map((m) => m.user_id)
-      .filter((id) => id !== authorId);
+      .filter((id) => id !== post.author_id);
 
-    if (memberIds.length === 0) {
+    if (memberIds.length === 0 || !process.env.RESEND_API_KEY) {
       return Response.json({ skipped: true });
     }
 
@@ -39,11 +56,11 @@ export async function POST(request) {
       .map((u) => u.email)
       .filter(Boolean);
 
-    if (emails.length === 0 || !process.env.RESEND_API_KEY) {
+    if (emails.length === 0) {
       return Response.json({ skipped: true });
     }
 
-    const replyTo = postId ? `post-${postId}@kareipixai.resend.app` : undefined;
+    const replyTo = `post-${post.id}@kareipixai.resend.app`;
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -57,10 +74,10 @@ export async function POST(request) {
         reply_to: replyTo,
         subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
         html: `
-          <h2>${title}</h2>
+          <h2>${post.title}</h2>
           <p>A new post was shared in the "${group?.name_en || 'group'}" group you've joined.</p>
           <p>Open the app to read it and reply.</p>
-          ${replyTo ? '<p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>' : ''}
+          <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
         `,
       }),
     });

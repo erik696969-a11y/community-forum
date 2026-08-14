@@ -1,15 +1,35 @@
-import { createClient } from '@supabase/supabase-js';
+import { getAuthedProfile } from '../../../lib/serverAuth';
 
 // Official Board announcements are important enough that they bypass the
 // per-user notification on/off toggle (unlike interest-group broadcasts).
 export async function POST(request) {
   try {
-    const { title, authorId, postId } = await request.json();
+    const auth = await getAuthedProfile(request);
+    if (!auth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { profile, adminClient } = auth;
 
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    if (profile.role !== 'board' || profile.status !== 'approved') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const { postId } = await request.json();
+    if (!postId) {
+      return Response.json({ error: 'Missing postId' }, { status: 400 });
+    }
+
+    // Never trust title/authorId from the client - look the post up ourselves,
+    // and confirm it actually belongs to a board-only (Announcements) category.
+    const { data: post } = await adminClient
+      .from('posts')
+      .select('id, title, author_id, category_id, categories(board_only)')
+      .eq('id', postId)
+      .single();
+
+    if (!post || !post.categories?.board_only) {
+      return Response.json({ error: 'Not an announcement post' }, { status: 400 });
+    }
 
     const { data: approvedProfiles } = await adminClient
       .from('profiles')
@@ -18,7 +38,7 @@ export async function POST(request) {
 
     const recipientIds = (approvedProfiles || [])
       .map((p) => p.id)
-      .filter((id) => id !== authorId);
+      .filter((id) => id !== post.author_id);
 
     if (recipientIds.length === 0 || !process.env.RESEND_API_KEY) {
       return Response.json({ skipped: true });
@@ -34,7 +54,7 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
-    const replyTo = postId ? `post-${postId}@kareipixai.resend.app` : undefined;
+    const replyTo = `post-${post.id}@kareipixai.resend.app`;
 
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -46,12 +66,12 @@ export async function POST(request) {
         from: 'Mi Hacienda <noreply@myhumandesign.sk>',
         to: emails,
         reply_to: replyTo,
-        subject: `📢 ${title} — Mi Hacienda`,
+        subject: `📢 ${post.title} — Mi Hacienda`,
         html: `
           <h2>📢 Official Announcement</h2>
-          <p><strong>${title}</strong></p>
+          <p><strong>${post.title}</strong></p>
           <p>Open the app to read the full announcement.</p>
-          ${replyTo ? '<p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>' : ''}
+          <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
         `,
       }),
     });

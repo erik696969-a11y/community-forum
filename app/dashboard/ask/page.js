@@ -41,7 +41,10 @@ export default function AskAiPage() {
     try {
       const res = await fetch('/api/ask-ai', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ question: asked }),
       });
       const data = await res.json();

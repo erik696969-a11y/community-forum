@@ -116,7 +116,10 @@ export default function PostDetailPage() {
     try {
       const res = await fetch('/api/translate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ texts: [text], authorLang: lang }),
       });
       const data = await res.json();

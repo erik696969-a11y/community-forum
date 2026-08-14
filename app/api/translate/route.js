@@ -1,3 +1,5 @@
+import { getAuthedProfile } from '../../../lib/serverAuth';
+
 const TARGET_LANGS = ['EN', 'ES', 'FR', 'DE'];
 
 async function callDeepL(texts, targetLang, sourceLang) {
@@ -41,6 +43,14 @@ async function callDeepL(texts, targetLang, sourceLang) {
 // reliable signal than guessing from a few words.
 export async function POST(request) {
   try {
+    const auth = await getAuthedProfile(request);
+    if (!auth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (auth.profile.status !== 'approved') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const { texts, authorLang } = await request.json();
 
     if (!texts || !Array.isArray(texts) || texts.length === 0) {

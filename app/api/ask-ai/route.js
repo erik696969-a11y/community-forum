@@ -1,17 +1,21 @@
-import { createClient } from '@supabase/supabase-js';
+import { getAuthedProfile } from '../../../lib/serverAuth';
 
 export async function POST(request) {
   try {
+    const auth = await getAuthedProfile(request);
+    if (!auth) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (auth.profile.status !== 'approved') {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    const adminClient = auth.adminClient;
+
     const { question } = await request.json();
 
     if (!question || !question.trim()) {
       return Response.json({ error: 'No question provided' }, { status: 400 });
     }
-
-    const adminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
 
     const { data: entries } = await adminClient
       .from('ai_knowledge_base')

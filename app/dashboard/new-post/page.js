@@ -116,7 +116,10 @@ function NewPostForm() {
     try {
       const res = await fetch('/api/translate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ texts: [title, content], authorLang: lang }),
       });
       const data = await res.json();
@@ -162,16 +165,22 @@ function NewPostForm() {
     if (selectedCategory?.board_only) {
       fetch('/api/notify-announcement', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, authorId: session.user.id, postId: newPost.id }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ postId: newPost.id }),
       }).catch(() => {});
     }
 
     if (selectedType === 'interest' && groupId) {
       fetch('/api/notify-group-post', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ groupId, title, authorId: session.user.id, postId: newPost.id }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ postId: newPost.id }),
       }).catch(() => {});
     }
 
