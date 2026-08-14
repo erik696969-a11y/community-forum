@@ -1,4 +1,4 @@
-import { getAuthedProfile } from '../../../lib/serverAuth';
+import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 
 // Official Board announcements are important enough that they bypass the
 // per-user notification on/off toggle (unlike interest-group broadcasts).
@@ -44,7 +44,7 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
-    const { data: { users } } = await adminClient.auth.admin.listUsers();
+    const users = await listAllUsers(adminClient);
     const emails = users
       .filter((u) => recipientIds.includes(u.id))
       .map((u) => u.email)

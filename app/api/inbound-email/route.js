@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
+import { listAllUsers } from '../../../lib/serverAuth';
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Best-effort removal of quoted "reply chain" text, so only the person's
@@ -80,7 +82,7 @@ export async function POST(request) {
     const postId = match[1];
     const senderEmail = (email?.from || '').toLowerCase().match(/[^<\s]+@[^>\s]+/)?.[0] || '';
 
-    const { data: { users } } = await adminClient.auth.admin.listUsers();
+    const users = await listAllUsers(adminClient);
     const matchedUser = users.find((u) => u.email?.toLowerCase() === senderEmail);
 
     if (!matchedUser) {

@@ -1,4 +1,4 @@
-import { getAuthedProfile } from '../../../lib/serverAuth';
+import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 
 export async function POST(request) {
   try {
@@ -50,7 +50,7 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
-    const { data: { users } } = await adminClient.auth.admin.listUsers();
+    const users = await listAllUsers(adminClient);
     const emails = users
       .filter((u) => memberIds.includes(u.id))
       .map((u) => u.email)

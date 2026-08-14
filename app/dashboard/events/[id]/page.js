@@ -28,6 +28,7 @@ export default function EventDetailPage() {
   const [rsvps, setRsvps] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [downloadingZip, setDownloadingZip] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -63,6 +64,26 @@ export default function EventDetailPage() {
     if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
     await supabase.from('events').delete().eq('id', params.id);
     router.push('/dashboard/events');
+  }
+
+  async function handleDownloadZip() {
+    setDownloadingZip(true);
+    try {
+      const res = await fetch(`/api/download-event-photos?eventId=${params.id}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'event-photos.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      // silently ignore - button just won't trigger a download
+    }
+    setDownloadingZip(false);
   }
 
   async function handleUpload(e) {
@@ -220,12 +241,13 @@ export default function EventDetailPage() {
           <h2 className="font-display text-lg text-harbor">{t(lang, 'photosLabel')}</h2>
           <div className="flex items-center gap-3">
             {photos.length > 0 && (
-              <a
-                href={`/api/download-event-photos?eventId=${params.id}&token=${session.access_token}`}
+              <button
+                onClick={handleDownloadZip}
+                disabled={downloadingZip}
                 className="text-xs text-harbor/60 hover:text-harbor underline whitespace-nowrap"
               >
-                {t(lang, 'downloadAllPhotos')}
-              </a>
+                {downloadingZip ? t(lang, 'saving') : t(lang, 'downloadAllPhotos')}
+              </button>
             )}
             <label className="btn-primary text-sm cursor-pointer">
               {uploading ? t(lang, 'saving') : t(lang, 'uploadPhoto')}

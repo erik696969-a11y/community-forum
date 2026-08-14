@@ -17,13 +17,19 @@ export default function PdfViewer({ fileUrl }) {
     async function render() {
       try {
         const pdfjsLib = await import('pdfjs-dist/build/pdf');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        // Self-hosted worker (bundled by Next.js), not loaded from a third-party CDN.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+          'pdfjs-dist/build/pdf.worker.min.mjs',
+          import.meta.url
+        ).toString();
 
         const res = await fetch(fileUrl);
         if (!res.ok) throw new Error('Failed to fetch file');
         const buffer = await res.arrayBuffer();
 
-        const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+        // isEvalSupported: false is a defense-in-depth hardening flag -
+        // prevents PDF.js from using eval() even as a fallback path.
+        const pdf = await pdfjsLib.getDocument({ data: buffer, isEvalSupported: false }).promise;
         if (cancelled) return;
 
         const container = containerRef.current;

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { listAllUsers } from '../../../lib/serverAuth';
 
 export async function POST(request) {
   try {
@@ -14,7 +15,7 @@ export async function POST(request) {
     );
 
     // Find the profile that was just created for this email
-    const { data: { users } } = await adminClient.auth.admin.listUsers();
+    const users = await listAllUsers(adminClient);
     const newUser = users.find((u) => u.email === email);
 
     if (!newUser) {
