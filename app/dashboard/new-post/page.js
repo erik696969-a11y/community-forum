@@ -97,7 +97,7 @@ function NewPostForm() {
         .upload(filePath, imageFile);
 
       if (uploadError) {
-        setError(t(lang, 'imageUploadError'));
+        setError(`DEBUG: ${uploadError.message}`);
         setSubmitting(false);
         return;
       }
