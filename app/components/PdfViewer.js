@@ -17,11 +17,10 @@ export default function PdfViewer({ fileUrl }) {
     async function render() {
       try {
         const pdfjsLib = await import('pdfjs-dist/build/pdf');
-        // Self-hosted worker (bundled by Next.js), not loaded from a third-party CDN.
-        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-          'pdfjs-dist/build/pdf.worker.min.mjs',
-          import.meta.url
-        ).toString();
+        // Version-pinned CDN (jsDelivr) - self-hosting this specific worker
+        // file conflicts with Next.js's build bundler, so this stays on a
+        // CDN for now, matching the exact installed pdfjs-dist version.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
         const res = await fetch(fileUrl);
         if (!res.ok) throw new Error('Failed to fetch file');
