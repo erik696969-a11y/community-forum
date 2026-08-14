@@ -59,6 +59,12 @@ export default function EventDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, profile]);
 
+  async function handleDeleteEvent() {
+    if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
+    await supabase.from('events').delete().eq('id', params.id);
+    router.push('/dashboard/events');
+  }
+
   async function handleUpload(e) {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -133,14 +139,24 @@ export default function EventDetailPage() {
         </Link>
 
         <div className="card p-6 mt-3 mb-8">
-          <h1 className="font-display text-2xl text-harbor mb-1 flex items-center gap-2">
-            {(event.event_type === 'agm' || event.event_type === 'egm') && (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
-                {t(lang, event.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
-              </span>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="font-display text-2xl text-harbor mb-1 flex items-center gap-2">
+              {(event.event_type === 'agm' || event.event_type === 'egm') && (
+                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
+                  {t(lang, event.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
+                </span>
+              )}
+              {localizedField(event, 'title', lang)}
+            </h1>
+            {profile.role === 'board' && (
+              <button
+                onClick={handleDeleteEvent}
+                className="text-xs text-red-500 hover:text-red-700 whitespace-nowrap flex-shrink-0"
+              >
+                {t(lang, 'delete')}
+              </button>
             )}
-            {localizedField(event, 'title', lang)}
-          </h1>
+          </div>
           {event.event_date && (
             <p className="text-sm text-ochre font-semibold">
               {new Date(event.event_date).toLocaleDateString(undefined, {
