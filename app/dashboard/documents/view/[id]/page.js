@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useProfile } from '../../../../../lib/useProfile';
 import { useLanguage } from '../../../../../lib/useLanguage';
 import { supabase } from '../../../../../lib/supabaseClient';
+import { getSignedDownloadUrl } from '../../../../../lib/storageClient';
 import { t } from '../../../../../lib/i18n';
 import Header from '../../../../components/Header';
 import PdfViewer from '../../../../components/PdfViewer';
@@ -18,6 +19,7 @@ export default function ViewDocumentPage() {
 
   const [doc, setDoc] = useState(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [downloadUrl, setDownloadUrl] = useState(null);
 
   useEffect(() => {
     if (loading) return;
@@ -29,6 +31,12 @@ export default function ViewDocumentPage() {
       const { data } = await supabase.from('documents').select('*').eq('id', params.id).single();
       setDoc(data);
       setLoadingData(false);
+
+      if (data && data.doc_type !== 'link') {
+        const ext = data.file_url.split('.').pop().split('?')[0].toLowerCase();
+        const signed = await getSignedDownloadUrl('documents', data.file_url, `${data.title}.${ext}`);
+        setDownloadUrl(signed);
+      }
     }
     if (profile?.status === 'approved') load();
   }, [params.id, profile]);
@@ -52,9 +60,8 @@ export default function ViewDocumentPage() {
     );
   }
 
-  const ext = doc.file_url.split('.').pop().split('?')[0].toLowerCase();
+  const ext = doc.doc_type !== 'link' ? doc.file_url.split('.').pop().split('?')[0].toLowerCase() : '';
   const isPdf = ext === 'pdf';
-  const downloadUrl = `/api/download-file?url=${encodeURIComponent(doc.file_url)}&filename=${encodeURIComponent(doc.title + '.' + ext)}`;
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -65,7 +72,9 @@ export default function ViewDocumentPage() {
         </Link>
         <h1 className="font-display text-xl text-harbor mb-3">{doc.title}</h1>
 
-        {isPdf ? (
+        {!downloadUrl ? (
+          <p className="text-ink/60">{t(lang, 'loading')}</p>
+        ) : isPdf ? (
           <div className="overflow-y-auto flex-1 pb-8">
             <PdfViewer fileUrl={downloadUrl} />
           </div>

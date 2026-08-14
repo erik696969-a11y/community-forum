@@ -63,10 +63,6 @@ export default function DocumentsPage() {
 
   function DocRow({ doc }) {
     const isLink = doc.doc_type === 'link';
-    const ext = !isLink ? doc.file_url.split('.').pop().split('?')[0] : '';
-    const downloadUrl = !isLink
-      ? `/api/download-file?url=${encodeURIComponent(doc.file_url)}&filename=${encodeURIComponent(doc.title + '.' + ext)}`
-      : null;
     const openHref = isLink ? doc.external_url : `/dashboard/documents/view/${doc.id}`;
     const linkProps = isLink ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 

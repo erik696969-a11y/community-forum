@@ -1,8 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 import JSZip from 'jszip';
+import { getAuthedProfile } from '../../../lib/serverAuth';
 
 export async function GET(request) {
   try {
+    const auth = await getAuthedProfile(request);
+    if (!auth || auth.profile.status !== 'approved') {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const eventId = searchParams.get('eventId');
 
@@ -10,12 +16,12 @@ export async function GET(request) {
       return new Response('Missing eventId', { status: 400 });
     }
 
-    const supabase = createClient(
+    const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    const { data: photos } = await supabase
+    const { data: photos } = await adminClient
       .from('event_photos')
       .select('image_url')
       .eq('event_id', eventId);
@@ -29,9 +35,11 @@ export async function GET(request) {
     await Promise.all(
       photos.map(async (photo, i) => {
         try {
-          const res = await fetch(photo.image_url);
-          if (!res.ok) return;
-          const buffer = await res.arrayBuffer();
+          // image_url now stores the bare storage path (private bucket) -
+          // fetch the bytes directly with the service role, no signed URL needed.
+          const { data, error } = await adminClient.storage.from('event-photos').download(photo.image_url);
+          if (error || !data) return;
+          const buffer = await data.arrayBuffer();
           const ext = photo.image_url.split('.').pop().split('?')[0] || 'jpg';
           zip.file(`photo-${i + 1}.${ext}`, buffer);
         } catch (e) {

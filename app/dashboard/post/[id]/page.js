@@ -10,6 +10,7 @@ import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
 import ReactionBar from '../../../components/ReactionBar';
 import AuthorBadges from '../../../components/AuthorBadges';
+import StorageImage from '../../../components/StorageImage';
 
 const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
 const ISSUE_COLORS = {
@@ -281,8 +282,12 @@ export default function PostDetailPage() {
           </p>
           <p className={contentTextClass}>{postContent}</p>
           {post.image_url && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={post.image_url} alt="" className="mt-4 rounded-lg max-w-full" />
+            <StorageImage
+              bucket="post-images"
+              path={post.image_url}
+              alt=""
+              className="mt-4 rounded-lg max-w-full"
+            />
           )}
           <div className="mt-4">
             <ReactionBar

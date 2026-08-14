@@ -8,6 +8,8 @@ import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
+import StorageImage from '../../../components/StorageImage';
+import { getSignedDownloadUrl } from '../../../../lib/storageClient';
 
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
@@ -67,11 +69,12 @@ export default function EventDetailPage() {
       const filePath = `${params.id}/${session.user.id}-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
       const { error: uploadError } = await supabase.storage.from('event-photos').upload(filePath, file);
       if (!uploadError) {
-        const { data: publicUrlData } = supabase.storage.from('event-photos').getPublicUrl(filePath);
+        // Store the bare storage path (bucket is private) - a signed URL
+        // is generated on demand whenever the photo is displayed.
         await supabase.from('event_photos').insert({
           event_id: params.id,
           uploaded_by: session.user.id,
-          image_url: publicUrlData.publicUrl,
+          image_url: filePath,
         });
       }
     }
@@ -202,7 +205,7 @@ export default function EventDetailPage() {
           <div className="flex items-center gap-3">
             {photos.length > 0 && (
               <a
-                href={`/api/download-event-photos?eventId=${params.id}`}
+                href={`/api/download-event-photos?eventId=${params.id}&token=${session.access_token}`}
                 className="text-xs text-harbor/60 hover:text-harbor underline whitespace-nowrap"
               >
                 {t(lang, 'downloadAllPhotos')}
@@ -220,27 +223,30 @@ export default function EventDetailPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {photos.map((photo) => (
-              <div key={photo.id} className="relative group">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.image_url}
-                  alt=""
-                  className="w-full h-32 object-cover rounded-lg"
-                />
-                <a
-                  href={photo.image_url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="absolute bottom-1 right-1 bg-harbor/80 text-sand text-xs px-2 py-1 rounded"
-                >
-                  {t(lang, 'download')}
-                </a>
-              </div>
+              <GalleryPhoto key={photo.id} photo={photo} lang={lang} />
             ))}
           </div>
         )}
       </div>
     </main>
+  );
+}
+
+function GalleryPhoto({ photo, lang }) {
+  async function handleDownload() {
+    const url = await getSignedDownloadUrl('event-photos', photo.image_url, `photo-${photo.id}.jpg`);
+    if (url) window.open(url, '_blank');
+  }
+
+  return (
+    <div className="relative group">
+      <StorageImage bucket="event-photos" path={photo.image_url} alt="" className="w-full h-32 object-cover rounded-lg" />
+      <button
+        onClick={handleDownload}
+        className="absolute bottom-1 right-1 bg-harbor/80 text-sand text-xs px-2 py-1 rounded"
+      >
+        {t(lang, 'download')}
+      </button>
+    </div>
   );
 }

@@ -75,13 +75,13 @@ export default function NewDocumentPage() {
       return;
     }
 
-    const { data: publicUrlData } = supabase.storage.from('documents').getPublicUrl(filePath);
-
+    // Store the bare storage path (bucket is private) - a signed URL is
+    // generated on demand whenever the document is opened/downloaded.
     const { error: insertError } = await supabase.from('documents').insert({
       category,
       title,
       doc_type: 'file',
-      file_url: publicUrlData.publicUrl,
+      file_url: filePath,
       uploaded_by: session.user.id,
     });
 

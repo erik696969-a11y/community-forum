@@ -102,10 +102,9 @@ function NewPostForm() {
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage
-        .from('post-images')
-        .getPublicUrl(filePath);
-      imageUrl = publicUrlData.publicUrl;
+      // Store the bare storage path (bucket is private) - a signed URL
+      // is generated on demand whenever the image is displayed.
+      imageUrl = filePath;
     }
 
     // Automatic translation via DeepL (server-side)
