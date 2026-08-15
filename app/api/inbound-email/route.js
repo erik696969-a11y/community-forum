@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-import { parseReplyToAddress, verifyReplyToken } from '../../../lib/emailReplyToken';
+import { resolveReplyToken } from '../../../lib/emailReplyToken';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -90,24 +90,19 @@ export async function POST(request) {
 
     // Bezpečnostný backlog #2 (identita): predtým sa odosielateľ overoval
     // LEN podľa hlavičky "From:" - tá sa dá sfalšovať. Teraz reply-to adresa
-    // nesie kryptografický podpis konkrétnej dvojice post+užívateľ, takže
-    // vieme dokázať, že táto správa naozaj prišla na adresu, ktorú sme MY
-    // vygenerovali a poslali TOMUTO konkrétnemu členovi. Ak podpis nesedí
-    // (alebo ide o starú adresu spred tejto opravy, bez tokenu), odpoveď
-    // zahodíme - nespoliehame sa na "From:" ako záložný spôsob overenia.
-    const parsed = parseReplyToAddress(toAddress);
+    // nesie krátky náhodný token, ktorého existencia v databáze (tabuľka
+    // email_reply_tokens) je dôkaz, že táto správa naozaj prišla na adresu,
+    // ktorú sme MY vygenerovali a poslali TOMUTO konkrétnemu členovi. Ak
+    // token nesedí/neexistuje (alebo ide o starú adresu spred tejto opravy),
+    // odpoveď zahodíme - nespoliehame sa na "From:" ako záložný spôsob.
+    const resolved = await resolveReplyToken(adminClient, toAddress);
 
-    if (!parsed) {
-      await log({ resend_email_id: event.data.email_id, sender_email: senderEmail, status: 'no_post_match_or_legacy_address' });
+    if (!resolved) {
+      await log({ resend_email_id: event.data.email_id, sender_email: senderEmail, status: 'no_post_match_or_invalid_token' });
       return Response.json({ skipped: true });
     }
 
-    const { postId, userId, token } = parsed;
-
-    if (!verifyReplyToken(postId, userId, token)) {
-      await log({ resend_email_id: event.data.email_id, post_id: postId, sender_email: senderEmail, status: 'invalid_token' });
-      return Response.json({ skipped: true });
-    }
+    const { postId, userId } = resolved;
 
     const { data: senderProfile } = await adminClient
       .from('profiles')
