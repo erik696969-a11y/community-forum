@@ -56,8 +56,11 @@ export async function POST(request) {
       .map((m) => m.user_id)
       .filter((id) => id !== post.author_id);
 
+    console.log(`[notify-group-post] post=${post.id} group=${groupId} totalMembers=${(members || []).length} eligibleMemberIds=${memberIds.length}`);
+
     if (memberIds.length === 0 || !process.env.RESEND_API_KEY) {
-      return Response.json({ skipped: true });
+      console.log(`[notify-group-post] skipping: memberIds=${memberIds.length} hasApiKey=${!!process.env.RESEND_API_KEY}`);
+      return Response.json({ skipped: true, memberIds: memberIds.length, hasApiKey: !!process.env.RESEND_API_KEY });
     }
 
     const users = await listAllUsers(adminClient);
@@ -65,8 +68,11 @@ export async function POST(request) {
       .filter((u) => memberIds.includes(u.id) && u.email)
       .map((u) => ({ id: u.id, email: u.email }));
 
+    console.log(`[notify-group-post] totalAuthUsers=${users.length} recipients=${recipients.length}`);
+
     if (recipients.length === 0) {
-      return Response.json({ skipped: true });
+      console.log('[notify-group-post] skipping: no matching auth users with email for memberIds', memberIds);
+      return Response.json({ skipped: true, memberIds: memberIds.length, recipients: 0 });
     }
 
     // Bezpečnostný backlog #2: každý príjemca dostane VLASTNÝ e-mail (nie
@@ -86,8 +92,9 @@ export async function POST(request) {
       `,
     }));
 
+    let sentCount = 0;
     for (const batch of chunk(emailPayloads, BATCH_SIZE)) {
-      await fetch('https://api.resend.com/emails/batch', {
+      const resendRes = await fetch('https://api.resend.com/emails/batch', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -95,9 +102,18 @@ export async function POST(request) {
         },
         body: JSON.stringify(batch),
       });
+
+      const resendBody = await resendRes.text();
+
+      if (!resendRes.ok) {
+        console.error(`[notify-group-post] Resend batch send FAILED: status=${resendRes.status} body=${resendBody}`);
+      } else {
+        console.log(`[notify-group-post] Resend batch send OK: status=${resendRes.status} count=${batch.length} body=${resendBody}`);
+        sentCount += batch.length;
+      }
     }
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, sent: sentCount, attempted: emailPayloads.length });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
