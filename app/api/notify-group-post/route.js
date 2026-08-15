@@ -1,5 +1,5 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
-import { buildReplyToAddress } from '../../../lib/emailReplyToken';
+import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -77,12 +77,14 @@ export async function POST(request) {
 
     // Bezpečnostný backlog #2: každý príjemca dostane VLASTNÝ e-mail (nie
     // spoločný "to" zoznam - to by odhalilo e-mailové adresy všetkých
-    // ostatných) a VLASTNÚ, kryptograficky podpísanú reply-to adresu, takže
+    // ostatných) a VLASTNÚ reply-to adresu s krátkym náhodným tokenom, takže
     // odpoveď na e-mail sa dá spoľahlivo priradiť presne tomuto členovi.
+    const replyToMap = await buildReplyToAddresses(adminClient, post.id, recipients.map((r) => r.id));
+
     const emailPayloads = recipients.map((r) => ({
       from: 'Mi Hacienda <noreply@myhumandesign.sk>',
       to: [r.email],
-      reply_to: buildReplyToAddress(post.id, r.id),
+      reply_to: replyToMap.get(r.id),
       subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
       html: `
         <h2>${post.title}</h2>
