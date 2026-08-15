@@ -53,8 +53,19 @@ export default function AdminPage() {
     }
   }, [profile]);
 
-  async function updateStatus(id, status) {
+  async function logAudit(action, targetType, targetId, details) {
+    await supabase.from('admin_audit_log').insert({
+      admin_id: profile.id,
+      action,
+      target_type: targetType,
+      target_id: targetId,
+      details,
+    });
+  }
+
+  async function updateStatus(id, status, name) {
     await supabase.from('profiles').update({ status }).eq('id', id);
+    logAudit(status === 'approved' ? 'approve' : 'reject', 'profile', id, name);
     loadProfiles();
   }
 
@@ -62,6 +73,7 @@ export default function AdminPage() {
     const confirmed = window.confirm(t(lang, 'removeAccessConfirm').replace('{name}', name));
     if (!confirmed) return;
     await supabase.from('profiles').update({ status: 'rejected' }).eq('id', id);
+    logAudit('remove_access', 'profile', id, name);
     loadProfiles();
   }
 
@@ -72,16 +84,6 @@ export default function AdminPage() {
       : [...(currentBadges || []), badgeKey];
     await supabase.from('profiles').update({ badges: next }).eq('id', profileId);
     loadProfiles();
-  }
-
-  async function logAudit(action, targetType, targetId, details) {
-    await supabase.from('admin_audit_log').insert({
-      admin_id: profile.id,
-      action,
-      target_type: targetType,
-      target_id: targetId,
-      details,
-    });
   }
 
   async function toggleMute(id, name, currentlyMuted) {
@@ -146,10 +148,10 @@ export default function AdminPage() {
                   <p className="text-sm text-ink/60">{t(lang, 'apartment')}: {p.apartment_number}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => updateStatus(p.id, 'approved')} className="btn-primary text-sm">
+                  <button onClick={() => updateStatus(p.id, 'approved', p.full_name)} className="btn-primary text-sm">
                     {t(lang, 'approve')}
                   </button>
-                  <button onClick={() => updateStatus(p.id, 'rejected')} className="btn-secondary text-sm">
+                  <button onClick={() => updateStatus(p.id, 'rejected', p.full_name)} className="btn-secondary text-sm">
                     {t(lang, 'reject')}
                   </button>
                 </div>
