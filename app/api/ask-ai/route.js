@@ -1,5 +1,8 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 
+const DAILY_LIMIT = 30;
+const MAX_QUESTION_LENGTH = 1000;
+
 export async function POST(request) {
   try {
     const auth = await getAuthedProfile(request);
@@ -15,6 +18,22 @@ export async function POST(request) {
 
     if (!question || !question.trim()) {
       return Response.json({ error: 'No question provided' }, { status: 400 });
+    }
+
+    if (question.length > MAX_QUESTION_LENGTH) {
+      return Response.json({ error: 'Question is too long' }, { status: 400 });
+    }
+
+    // Per-user daily rate limit, so a single account can't rack up a large
+    // Anthropic bill by hammering this endpoint.
+    const { data: allowed } = await adminClient.rpc('check_and_increment_rate_limit', {
+      p_user_id: auth.user.id,
+      p_endpoint: 'ask-ai',
+      p_limit: DAILY_LIMIT,
+    });
+
+    if (!allowed) {
+      return Response.json({ error: 'Daily question limit reached. Please try again tomorrow.' }, { status: 429 });
     }
 
     const { data: entries } = await adminClient

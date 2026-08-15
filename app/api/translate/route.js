@@ -1,6 +1,9 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 
 const TARGET_LANGS = ['EN', 'ES', 'FR', 'DE'];
+const DAILY_LIMIT = 200;
+const MAX_ITEMS = 10;
+const MAX_TEXT_LENGTH = 5000;
 
 async function callDeepL(texts, targetLang, sourceLang) {
   const apiKey = process.env.DEEPL_API_KEY;
@@ -55,6 +58,26 @@ export async function POST(request) {
 
     if (!texts || !Array.isArray(texts) || texts.length === 0) {
       return Response.json({ error: 'No texts provided' }, { status: 400 });
+    }
+
+    if (texts.length > MAX_ITEMS) {
+      return Response.json({ error: 'Too many items in one request' }, { status: 400 });
+    }
+
+    if (texts.some((text) => typeof text === 'string' && text.length > MAX_TEXT_LENGTH)) {
+      return Response.json({ error: 'One or more texts are too long' }, { status: 400 });
+    }
+
+    // Per-user daily rate limit, so a single account can't rack up a large
+    // DeepL bill by hammering this endpoint.
+    const { data: allowed } = await auth.adminClient.rpc('check_and_increment_rate_limit', {
+      p_user_id: auth.user.id,
+      p_endpoint: 'translate',
+      p_limit: DAILY_LIMIT,
+    });
+
+    if (!allowed) {
+      return Response.json({ error: 'Daily translation limit reached. Please try again tomorrow.' }, { status: 429 });
     }
 
     const sourceLang = TARGET_LANGS.includes((authorLang || '').toUpperCase())
