@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
 const STATUS_TABS = [
   ['pending', 'statusPending'],
@@ -38,11 +39,12 @@ export default function ModerationPage() {
   }, [loading, session, profile, router]);
 
   async function load() {
-    const { data } = await supabase
+    const { data: dataRaw } = await supabase
       .from('reports')
-      .select('*, post:posts(id, title), comment:comments(id, content, post_id), reporter:profiles(full_name)')
+      .select('*, post:posts(id, title), comment:comments(id, content, post_id)')
       .order('created_at', { ascending: false });
-    setReports(data || []);
+    const authorMap = await fetchAuthorProfiles((dataRaw || []).map((r) => r.reporter_id));
+    setReports(attachAuthors(dataRaw, authorMap, { idField: 'reporter_id', asField: 'reporter' }) || []);
     setLoadingData(false);
   }
 
