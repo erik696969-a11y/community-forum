@@ -1,0 +1,17 @@
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Lokálne premenné prostredia - NIKDY necommitovať skutočné tajomstvá
+.env
+.env.local
+.env.*.local
+
+# Build/OS/editor
+.vercel
+.DS_Store
+*.log
+npm-debug.log*
