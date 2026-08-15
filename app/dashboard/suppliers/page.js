@@ -9,6 +9,7 @@ import { useRefreshOnFocus } from '../../../lib/useRefreshOnFocus';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
 const CATEGORIES = [
   ['electrician', 'categoryElectrician'],
@@ -49,11 +50,12 @@ export default function SuppliersPage() {
   }, [loading, session, profile, router]);
 
   async function load() {
-    const { data: supplierData } = await supabase
+    const { data: supplierDataRaw } = await supabase
       .from('suppliers')
-      .select('*, recommender:profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false });
-    setSuppliers(supplierData || []);
+    const authorMap = await fetchAuthorProfiles((supplierDataRaw || []).map((s) => s.recommended_by));
+    setSuppliers(attachAuthors(supplierDataRaw, authorMap, { idField: 'recommended_by', asField: 'recommender' }) || []);
 
     const { data: voteData } = await supabase.from('supplier_votes').select('*');
     setVotes(voteData || []);
