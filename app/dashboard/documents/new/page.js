@@ -88,6 +88,10 @@ export default function NewDocumentPage() {
     setSubmitting(false);
 
     if (insertError) {
+      // Súbor sa už nahral do Storage, ale záznam v databáze sa nepodarilo
+      // vytvoriť - vyčistíme nahratý súbor, aby po ňom nezostal navždy
+      // osamotený "duch" bez akéhokoľvek odkazu.
+      await supabase.storage.from('documents').remove([filePath]);
       setError(insertError.message);
       return;
     }
