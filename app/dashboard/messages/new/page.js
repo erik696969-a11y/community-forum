@@ -44,11 +44,7 @@ function NewMessageForm() {
       return;
     }
     async function loadBoard() {
-      const { data } = await supabase
-        .from('profiles')
-        .select('id, full_name')
-        .eq('role', 'board')
-        .eq('status', 'approved');
+      const { data } = await supabase.rpc('get_board_members');
       setBoardMembers(data || []);
     }
     if (profile?.status === 'approved') loadBoard();
