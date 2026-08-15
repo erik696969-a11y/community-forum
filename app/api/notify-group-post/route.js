@@ -1,4 +1,14 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
+import { buildReplyToAddress } from '../../../lib/emailReplyToken';
+
+// Resend batch endpoint accepts at most 100 emails per call.
+const BATCH_SIZE = 100;
+
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
 
 export async function POST(request) {
   try {
@@ -51,36 +61,41 @@ export async function POST(request) {
     }
 
     const users = await listAllUsers(adminClient);
-    const emails = users
-      .filter((u) => memberIds.includes(u.id))
-      .map((u) => u.email)
-      .filter(Boolean);
+    const recipients = users
+      .filter((u) => memberIds.includes(u.id) && u.email)
+      .map((u) => ({ id: u.id, email: u.email }));
 
-    if (emails.length === 0) {
+    if (recipients.length === 0) {
       return Response.json({ skipped: true });
     }
 
-    const replyTo = `post-${post.id}@kareipixai.resend.app`;
+    // Bezpečnostný backlog #2: každý príjemca dostane VLASTNÝ e-mail (nie
+    // spoločný "to" zoznam - to by odhalilo e-mailové adresy všetkých
+    // ostatných) a VLASTNÚ, kryptograficky podpísanú reply-to adresu, takže
+    // odpoveď na e-mail sa dá spoľahlivo priradiť presne tomuto členovi.
+    const emailPayloads = recipients.map((r) => ({
+      from: 'Mi Hacienda <noreply@myhumandesign.sk>',
+      to: [r.email],
+      reply_to: buildReplyToAddress(post.id, r.id),
+      subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
+      html: `
+        <h2>${post.title}</h2>
+        <p>A new post was shared in the "${group?.name_en || 'group'}" group you've joined.</p>
+        <p>Open the app to read it and reply.</p>
+        <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
+      `,
+    }));
 
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Mi Hacienda <noreply@myhumandesign.sk>',
-        to: emails,
-        reply_to: replyTo,
-        subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
-        html: `
-          <h2>${post.title}</h2>
-          <p>A new post was shared in the "${group?.name_en || 'group'}" group you've joined.</p>
-          <p>Open the app to read it and reply.</p>
-          <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
-        `,
-      }),
-    });
+    for (const batch of chunk(emailPayloads, BATCH_SIZE)) {
+      await fetch('https://api.resend.com/emails/batch', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(batch),
+      });
+    }
 
     return Response.json({ success: true });
   } catch (error) {
