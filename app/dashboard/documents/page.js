@@ -39,10 +39,18 @@ export default function DocumentsPage() {
     if (profile?.status === 'approved') loadDocs();
   }, [profile]);
 
-  async function handleDelete(id, title) {
-    const confirmed = window.confirm(t(lang, 'confirmDeleteDocument').replace('{title}', title));
+  async function handleDelete(doc) {
+    const confirmed = window.confirm(t(lang, 'confirmDeleteDocument').replace('{title}', doc.title));
     if (!confirmed) return;
-    await supabase.from('documents').delete().eq('id', id);
+
+    // Bezpečnostný/technický backlog: pri mazaní dokumentu vyčistíme aj
+    // samotný súbor v Storage (nie len riadok v databáze), aby po zmazanom
+    // dokumente nezostal osamotený súbor navždy zaberajúci miesto.
+    if (doc.doc_type === 'file' && doc.file_url) {
+      await supabase.storage.from('documents').remove([doc.file_url]);
+    }
+
+    await supabase.from('documents').delete().eq('id', doc.id);
     const { data } = await supabase.from('documents').select('*').order('created_at', { ascending: false });
     setDocuments(data || []);
   }
@@ -81,7 +89,7 @@ export default function DocumentsPage() {
           </Link>
           {isBoard && (
             <button
-              onClick={() => handleDelete(doc.id, doc.title)}
+              onClick={() => handleDelete(doc)}
               className="text-xs text-red-500 hover:text-red-700 whitespace-nowrap"
             >
               {t(lang, 'delete')}
