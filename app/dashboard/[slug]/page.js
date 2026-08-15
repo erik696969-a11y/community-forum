@@ -112,7 +112,7 @@ export default function CategoryPage() {
 
         {params.slug === 'problemy' && (
           <>
-            
+            <a
               href="https://www.tucomunidad.com/propietarios"
               target="_blank"
               rel="noopener noreferrer"
