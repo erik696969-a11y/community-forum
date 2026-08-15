@@ -10,6 +10,7 @@ import { markSeen } from '../../../lib/useLastSeen';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
 const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
 const ISSUE_COLORS = {
@@ -49,13 +50,14 @@ export default function CategoryPage() {
     setCategory(cat);
 
     if (cat) {
-      const { data: postsData } = await supabase
+      const { data: postsDataRaw } = await supabase
         .from('posts')
-        .select('*, author:profiles(full_name, apartment_number, badges)')
+        .select('*')
         .eq('category_id', cat.id)
         .order('pinned', { ascending: false })
         .order('created_at', { ascending: false });
-      setPosts(postsData || []);
+      const authorMap = await fetchAuthorProfiles((postsDataRaw || []).map((p) => p.author_id));
+      setPosts(attachAuthors(postsDataRaw, authorMap) || []);
       markSeen(`category:${cat.id}`);
     }
     setLoadingPosts(false);
@@ -110,7 +112,7 @@ export default function CategoryPage() {
 
         {params.slug === 'problemy' && (
           <>
-            <a
+            
               href="https://www.tucomunidad.com/propietarios"
               target="_blank"
               rel="noopener noreferrer"
