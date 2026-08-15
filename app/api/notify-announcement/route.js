@@ -1,5 +1,5 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
-import { buildReplyToAddress } from '../../../lib/emailReplyToken';
+import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -69,10 +69,12 @@ export async function POST(request) {
       return Response.json({ skipped: true, recipientIds: recipientIds.length, recipients: 0 });
     }
 
+    const replyToMap = await buildReplyToAddresses(adminClient, post.id, recipients.map((r) => r.id));
+
     const emailPayloads = recipients.map((r) => ({
       from: 'Mi Hacienda <noreply@myhumandesign.sk>',
       to: [r.email],
-      reply_to: buildReplyToAddress(post.id, r.id),
+      reply_to: replyToMap.get(r.id),
       subject: `📢 ${post.title} — Mi Hacienda`,
       html: `
         <h2>📢 Official Announcement</h2>
