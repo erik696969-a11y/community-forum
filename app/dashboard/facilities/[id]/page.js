@@ -8,6 +8,7 @@ import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
 export default function FacilityDetailPage() {
   const { loading, session, profile } = useProfile();
@@ -35,13 +36,14 @@ export default function FacilityDetailPage() {
     const { data: facilityData } = await supabase.from('facilities').select('*').eq('id', params.id).single();
     setFacility(facilityData);
 
-    const { data: bookingsData } = await supabase
+    const { data: bookingsDataRaw } = await supabase
       .from('facility_bookings')
-      .select('*, booker:profiles(full_name)')
+      .select('*')
       .eq('facility_id', params.id)
       .gte('starts_at', new Date().toISOString())
       .order('starts_at');
-    setBookings(bookingsData || []);
+    const authorMap = await fetchAuthorProfiles((bookingsDataRaw || []).map((b) => b.user_id));
+    setBookings(attachAuthors(bookingsDataRaw, authorMap, { idField: 'user_id', asField: 'booker' }) || []);
 
     setLoadingData(false);
   }, [params.id]);
