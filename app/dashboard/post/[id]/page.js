@@ -11,6 +11,7 @@ import Header from '../../../components/Header';
 import ReactionBar from '../../../components/ReactionBar';
 import AuthorBadges from '../../../components/AuthorBadges';
 import StorageImage from '../../../components/StorageImage';
+import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
 const ISSUE_KEYS = { new: 'issueNew', in_progress: 'issueInProgress', resolved: 'issueResolved' };
 const ISSUE_COLORS = {
@@ -50,11 +51,27 @@ export default function PostDetailPage() {
   }, [loading, session, router]);
 
   async function loadAll() {
-    const { data: postData } = await supabase
+    const { data: postDataRaw } = await supabase
       .from('posts')
-      .select('*, author:profiles(full_name, apartment_number, badges)')
+      .select('*')
       .eq('id', params.id)
       .single();
+
+    const { data: commentsDataRaw } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', params.id)
+      .order('created_at', { ascending: true });
+
+    const authorIds = [
+      ...(postDataRaw ? [postDataRaw.author_id] : []),
+      ...(commentsDataRaw || []).map((c) => c.author_id),
+    ];
+    const authorMap = await fetchAuthorProfiles(authorIds);
+
+    const postData = postDataRaw
+      ? { ...postDataRaw, author: authorMap.get(postDataRaw.author_id) || null }
+      : null;
     setPost(postData);
 
     if (postData) {
@@ -66,11 +83,7 @@ export default function PostDetailPage() {
       setCategory(catData);
     }
 
-    const { data: commentsData } = await supabase
-      .from('comments')
-      .select('*, author:profiles(full_name, apartment_number, badges)')
-      .eq('post_id', params.id)
-      .order('created_at', { ascending: true });
+    const commentsData = attachAuthors(commentsDataRaw, authorMap);
     setComments(commentsData || []);
 
     const { data: postReacts } = await supabase
