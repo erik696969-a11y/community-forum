@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
 
-import { listAllUsers } from '../../../lib/serverAuth';
+import { parseReplyToAddress, verifyReplyToken } from '../../../lib/emailReplyToken';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -66,34 +66,53 @@ export async function POST(request) {
       return Response.json({ skipped: true });
     }
 
+    // Bezpečnostný backlog #2 (idempotency): Resend môže ten istý webhook
+    // doručiť opakovane až 24h. Overíme PRED akýmkoľvek spracovaním, či sme
+    // tento email_id už spracovali - inak by pri retry vznikol duplicitný
+    // komentár.
+    const { data: existingLog } = await adminClient
+      .from('inbound_email_log')
+      .select('id')
+      .eq('resend_email_id', event.data.email_id)
+      .maybeSingle();
+
+    if (existingLog) {
+      return Response.json({ skipped: true, reason: 'already_processed' });
+    }
+
     const { data: email } = await resend.emails.receiving.get(event.data.email_id);
 
     const toAddress =
       (email?.to && email.to[0]) ||
       (event.data.received_for && event.data.received_for[0]) ||
       '';
-    const match = toAddress.match(/post-([a-f0-9-]+)@/i);
+    const senderEmail = (email?.from || '').toLowerCase().match(/[^<\s]+@[^>\s]+/)?.[0] || '';
 
-    if (!match) {
-      await log({ resend_email_id: event.data.email_id, sender_email: email?.from, status: 'no_post_match' });
+    // Bezpečnostný backlog #2 (identita): predtým sa odosielateľ overoval
+    // LEN podľa hlavičky "From:" - tá sa dá sfalšovať. Teraz reply-to adresa
+    // nesie kryptografický podpis konkrétnej dvojice post+užívateľ, takže
+    // vieme dokázať, že táto správa naozaj prišla na adresu, ktorú sme MY
+    // vygenerovali a poslali TOMUTO konkrétnemu členovi. Ak podpis nesedí
+    // (alebo ide o starú adresu spred tejto opravy, bez tokenu), odpoveď
+    // zahodíme - nespoliehame sa na "From:" ako záložný spôsob overenia.
+    const parsed = parseReplyToAddress(toAddress);
+
+    if (!parsed) {
+      await log({ resend_email_id: event.data.email_id, sender_email: senderEmail, status: 'no_post_match_or_legacy_address' });
       return Response.json({ skipped: true });
     }
 
-    const postId = match[1];
-    const senderEmail = (email?.from || '').toLowerCase().match(/[^<\s]+@[^>\s]+/)?.[0] || '';
+    const { postId, userId, token } = parsed;
 
-    const users = await listAllUsers(adminClient);
-    const matchedUser = users.find((u) => u.email?.toLowerCase() === senderEmail);
-
-    if (!matchedUser) {
-      await log({ resend_email_id: event.data.email_id, post_id: postId, sender_email: senderEmail, status: 'unknown_sender' });
+    if (!verifyReplyToken(postId, userId, token)) {
+      await log({ resend_email_id: event.data.email_id, post_id: postId, sender_email: senderEmail, status: 'invalid_token' });
       return Response.json({ skipped: true });
     }
 
     const { data: senderProfile } = await adminClient
       .from('profiles')
       .select('*')
-      .eq('id', matchedUser.id)
+      .eq('id', userId)
       .single();
 
     if (!senderProfile || senderProfile.status !== 'approved') {
@@ -124,7 +143,7 @@ export async function POST(request) {
     // without automatic translation (unlike replies made inside the app).
     const { error: insertError } = await adminClient.from('comments').insert({
       post_id: postId,
-      author_id: matchedUser.id,
+      author_id: userId,
       content: replyText,
       original_lang: senderProfile.language || 'en',
       content_translations: {},
