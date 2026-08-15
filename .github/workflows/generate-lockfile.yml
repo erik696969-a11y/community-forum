@@ -1,0 +1,35 @@
+name: Generate Lockfile (one-off utility)
+
+# Spúšťa sa LEN ručne (tlačidlo "Run workflow" v záložke Actions), nikdy
+# automaticky. Účel: vygenerovať package-lock.json a commitnúť ho do repa,
+# keďže lokálne (bez node/npm na počítači) sa to inak nedá spraviť.
+#
+# Použi to teraz na prvotné vygenerovanie, a kedykoľvek v budúcnosti, keď sa
+# zmenia závislosti v package.json a lockfile treba obnoviť.
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-lockfile:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies (generates package-lock.json)
+        run: npm install
+
+      - name: Commit and push lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git diff --cached --quiet && echo "Nothing to commit" || git commit -m "Generate package-lock.json"
+          git push
