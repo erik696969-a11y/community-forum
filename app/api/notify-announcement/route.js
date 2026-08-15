@@ -1,4 +1,14 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
+import { buildReplyToAddress } from '../../../lib/emailReplyToken';
+
+// Resend batch endpoint accepts at most 100 emails per call.
+const BATCH_SIZE = 100;
+
+function chunk(arr, size) {
+  const out = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
 
 // Official Board announcements are important enough that they bypass the
 // per-user notification on/off toggle (unlike interest-group broadcasts).
@@ -45,36 +55,37 @@ export async function POST(request) {
     }
 
     const users = await listAllUsers(adminClient);
-    const emails = users
-      .filter((u) => recipientIds.includes(u.id))
-      .map((u) => u.email)
-      .filter(Boolean);
+    const recipients = users
+      .filter((u) => recipientIds.includes(u.id) && u.email)
+      .map((u) => ({ id: u.id, email: u.email }));
 
-    if (emails.length === 0) {
+    if (recipients.length === 0) {
       return Response.json({ skipped: true });
     }
 
-    const replyTo = `post-${post.id}@kareipixai.resend.app`;
+    const emailPayloads = recipients.map((r) => ({
+      from: 'Mi Hacienda <noreply@myhumandesign.sk>',
+      to: [r.email],
+      reply_to: buildReplyToAddress(post.id, r.id),
+      subject: `📢 ${post.title} — Mi Hacienda`,
+      html: `
+        <h2>📢 Official Announcement</h2>
+        <p><strong>${post.title}</strong></p>
+        <p>Open the app to read the full announcement.</p>
+        <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
+      `,
+    }));
 
-    await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'Mi Hacienda <noreply@myhumandesign.sk>',
-        to: emails,
-        reply_to: replyTo,
-        subject: `📢 ${post.title} — Mi Hacienda`,
-        html: `
-          <h2>📢 Official Announcement</h2>
-          <p><strong>${post.title}</strong></p>
-          <p>Open the app to read the full announcement.</p>
-          <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
-        `,
-      }),
-    });
+    for (const batch of chunk(emailPayloads, BATCH_SIZE)) {
+      await fetch('https://api.resend.com/emails/batch', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(batch),
+      });
+    }
 
     return Response.json({ success: true });
   } catch (error) {
