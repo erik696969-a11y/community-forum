@@ -60,8 +60,16 @@ export default function EventDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, profile]);
 
-  async function handleDeleteEvent() {
+ async function handleDeleteEvent() {
     if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
+
+    // Clean up the actual photo files from storage first, so deleting an
+    // event doesn't leave orphaned files behind in the bucket.
+    if (photos.length > 0) {
+      const paths = photos.map((p) => p.image_url);
+      await supabase.storage.from('event-photos').remove(paths);
+    }
+
     await supabase.from('events').delete().eq('id', params.id);
     router.push('/dashboard/events');
   }
