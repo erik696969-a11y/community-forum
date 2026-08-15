@@ -50,8 +50,11 @@ export async function POST(request) {
       .map((p) => p.id)
       .filter((id) => id !== post.author_id);
 
+    console.log(`[notify-announcement] post=${post.id} totalApproved=${(approvedProfiles || []).length} recipientIds=${recipientIds.length}`);
+
     if (recipientIds.length === 0 || !process.env.RESEND_API_KEY) {
-      return Response.json({ skipped: true });
+      console.log(`[notify-announcement] skipping: recipientIds=${recipientIds.length} hasApiKey=${!!process.env.RESEND_API_KEY}`);
+      return Response.json({ skipped: true, recipientIds: recipientIds.length, hasApiKey: !!process.env.RESEND_API_KEY });
     }
 
     const users = await listAllUsers(adminClient);
@@ -59,8 +62,11 @@ export async function POST(request) {
       .filter((u) => recipientIds.includes(u.id) && u.email)
       .map((u) => ({ id: u.id, email: u.email }));
 
+    console.log(`[notify-announcement] totalAuthUsers=${users.length} recipients=${recipients.length}`);
+
     if (recipients.length === 0) {
-      return Response.json({ skipped: true });
+      console.log('[notify-announcement] skipping: no matching auth users with email for recipientIds', recipientIds);
+      return Response.json({ skipped: true, recipientIds: recipientIds.length, recipients: 0 });
     }
 
     const emailPayloads = recipients.map((r) => ({
@@ -76,8 +82,9 @@ export async function POST(request) {
       `,
     }));
 
+    let sentCount = 0;
     for (const batch of chunk(emailPayloads, BATCH_SIZE)) {
-      await fetch('https://api.resend.com/emails/batch', {
+      const resendRes = await fetch('https://api.resend.com/emails/batch', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
@@ -85,9 +92,18 @@ export async function POST(request) {
         },
         body: JSON.stringify(batch),
       });
+
+      const resendBody = await resendRes.text();
+
+      if (!resendRes.ok) {
+        console.error(`[notify-announcement] Resend batch send FAILED: status=${resendRes.status} body=${resendBody}`);
+      } else {
+        console.log(`[notify-announcement] Resend batch send OK: status=${resendRes.status} count=${batch.length} body=${resendBody}`);
+        sentCount += batch.length;
+      }
     }
 
-    return Response.json({ success: true });
+    return Response.json({ success: true, sent: sentCount, attempted: emailPayloads.length });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
