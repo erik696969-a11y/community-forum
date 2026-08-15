@@ -10,6 +10,7 @@ import { markSeen } from '../../../../lib/useLastSeen';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
@@ -45,21 +46,32 @@ export default function GroupDetailPage() {
     setGroup(groupData);
 
     if (groupData) {
-      const { data: memberData } = await supabase
+      const { data: memberDataRaw } = await supabase
         .from('interest_group_members')
-        .select('user_id, notify_email, profiles(full_name, apartment_number)')
+        .select('user_id, notify_email')
         .eq('group_id', groupData.id);
+
+      const { data: postsDataRaw } = await supabase
+        .from('posts')
+        .select('*')
+        .eq('interest_group_id', groupData.id)
+        .order('created_at', { ascending: false });
+
+      const authorMap = await fetchAuthorProfiles([
+        ...(memberDataRaw || []).map((m) => m.user_id),
+        ...(postsDataRaw || []).map((p) => p.author_id),
+      ]);
+
+      const memberData = (memberDataRaw || []).map((m) => ({
+        ...m,
+        profiles: authorMap.get(m.user_id) || null,
+      }));
       setMembers(memberData || []);
-      const myMembership = (memberData || []).find((m) => m.user_id === session?.user?.id);
+      const myMembership = memberData.find((m) => m.user_id === session?.user?.id);
       setIsMember(!!myMembership);
       setNotifyEmail(myMembership?.notify_email !== false);
 
-      const { data: postsData } = await supabase
-        .from('posts')
-        .select('*, author:profiles(full_name, apartment_number)')
-        .eq('interest_group_id', groupData.id)
-        .order('created_at', { ascending: false });
-      setPosts(postsData || []);
+      setPosts(attachAuthors(postsDataRaw, authorMap) || []);
       markSeen(`group:${groupData.id}`);
     }
     setLoadingData(false);
