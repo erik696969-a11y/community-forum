@@ -3,7 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 
 import { resolveReplyToken } from '../../../lib/emailReplyToken';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Bezpečnostný backlog #3 (vedľajšia oprava): Resend klient sa vytvára AŽ
+// vo vnútri funkcie (nie hneď pri načítaní súboru), aby build appky
+// nespadol v prostrediach bez nastaveného RESEND_API_KEY (napr. GitHub
+// Actions CI, ktoré nemá prístup k produkčným tajomstvám) - Next.js totiž
+// pri builde krátko načíta každú API route, aj keď ju reálne nespúšťa.
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY);
+}
 
 // Best-effort removal of quoted "reply chain" text, so only the person's
 // new reply becomes the comment — not their entire email history.
@@ -45,6 +52,7 @@ export async function POST(request) {
 
   try {
     const payload = await request.text();
+    const resend = getResendClient();
 
     let event;
     try {
