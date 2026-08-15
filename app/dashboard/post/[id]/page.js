@@ -172,7 +172,7 @@ export default function PostDetailPage() {
   }
 
   async function handleTogglePin() {
-    await supabase.from('posts').update({ pinned: !post.pinned }).eq('id', params.id);
+    await supabase.rpc('set_post_pinned', { p_post_id: params.id, p_pinned: !post.pinned });
     loadAll();
   }
 
@@ -189,7 +189,7 @@ export default function PostDetailPage() {
   }
 
   async function handleToggleLock() {
-    await supabase.from('posts').update({ locked: !post.locked }).eq('id', params.id);
+    await supabase.rpc('set_post_locked', { p_post_id: params.id, p_locked: !post.locked });
     loadAll();
   }
 
