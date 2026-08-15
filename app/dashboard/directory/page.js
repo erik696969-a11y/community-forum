@@ -39,10 +39,7 @@ export default function DirectoryPage() {
   useEffect(() => {
     async function loadDirectory() {
       const { data: membersData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('status', 'approved')
-        .eq('directory_visible', true)
+        .rpc('get_directory_members')
         .order('full_name');
       setMembers(membersData || []);
 
