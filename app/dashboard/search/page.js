@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
+import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
@@ -45,19 +46,26 @@ function SearchInner() {
     setSearching(true);
     setSearched(true);
 
-    const { data: matchingPosts } = await supabase
+    const { data: matchingPostsRaw } = await supabase
       .from('posts')
-      .select('*, author:profiles(full_name, apartment_number)')
+      .select('*')
       .or(`title.ilike.%${q}%,content.ilike.%${q}%`)
       .order('created_at', { ascending: false })
       .limit(30);
 
-    const { data: matchingComments } = await supabase
+    const { data: matchingCommentsRaw } = await supabase
       .from('comments')
-      .select('*, post:posts(id, title), author:profiles(full_name)')
+      .select('*, post:posts(id, title)')
       .ilike('content', `%${q}%`)
       .order('created_at', { ascending: false })
       .limit(30);
+
+    const authorMap = await fetchAuthorProfiles([
+      ...(matchingPostsRaw || []).map((p) => p.author_id),
+      ...(matchingCommentsRaw || []).map((c) => c.author_id),
+    ]);
+    const matchingPosts = attachAuthors(matchingPostsRaw, authorMap);
+    const matchingComments = attachAuthors(matchingCommentsRaw, authorMap);
 
     const { data: matchingDocs } = await supabase
       .from('documents')
