@@ -59,7 +59,7 @@ export default function MessagesPage() {
   }, [profile, tab]);
 
   async function markRead(id) {
-    await supabase.from('messages').update({ is_read: true }).eq('id', id);
+    await supabase.rpc('mark_message_read', { p_message_id: id });
     loadMessages();
   }
 
