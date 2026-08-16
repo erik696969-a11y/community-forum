@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate, formatTime } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 
 export default function DocumentsPage() {
@@ -81,7 +82,7 @@ export default function DocumentsPage() {
             {isLink && '🔗 '}
             {doc.title}
           </p>
-          <p className="text-xs text-ink/50">{new Date(doc.created_at).toLocaleDateString()}</p>
+          <p className="text-xs text-ink/50">{formatDate(doc.created_at, lang)}</p>
         </Link>
         <div className="flex items-center gap-3 flex-shrink-0">
           <Link href={openHref} {...linkProps} className="text-xs text-harbor/60 hover:text-harbor whitespace-nowrap">
