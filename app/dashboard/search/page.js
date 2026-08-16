@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate, formatTime } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
@@ -134,7 +135,7 @@ function SearchInner() {
                         {localizedField(r.item, 'content', lang)}
                       </p>
                       <p className="text-xs text-ink/50 mt-1">
-                        {r.item.author?.full_name} · {new Date(r.item.created_at).toLocaleDateString()}
+                        {r.item.author?.full_name} · {formatDate(r.item.created_at, lang)}
                       </p>
                     </Link>
                   );
