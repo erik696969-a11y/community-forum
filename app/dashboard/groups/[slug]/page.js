@@ -9,6 +9,7 @@ import { useRefreshOnFocus } from '../../../../lib/useRefreshOnFocus';
 import { markSeen } from '../../../../lib/useLastSeen';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
+import { formatDate, formatTime } from '../../../../lib/formatDate';
 import Header from '../../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
@@ -195,7 +196,7 @@ export default function GroupDetailPage() {
                 <p className="text-sm text-ink/70 mt-1 line-clamp-2">{localizedField(post, 'content', lang)}</p>
                 <p className="text-xs text-ink/50 mt-2">
                   {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
-                  {new Date(post.created_at).toLocaleDateString()}
+                  {formatDate(post.created_at, lang)}
                 </p>
               </Link>
             ))}
