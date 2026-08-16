@@ -112,7 +112,7 @@ export default function FacilitiesPage() {
         {loadingData ? (
           <p className="text-ink/60">{t(lang, 'loading')}</p>
         ) : facilities.length === 0 ? (
-          <p className="text-ink/60">{t(lang, 'noSuppliersYet')}</p>
+          <p className="text-ink/60">{t(lang, 'noFacilitiesYet')}</p>
         ) : (
           <div className="space-y-3">
             {facilities.map((f) => (
