@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
@@ -112,7 +113,7 @@ export default function ModerationPage() {
                 <div key={r.id} className="card p-5">
                   <p className="text-xs text-ink/50 mb-1">
                     {t(lang, 'reportContent')}: {r.target_type} · {r.reporter?.full_name} ·{' '}
-                    {new Date(r.created_at).toLocaleDateString()}
+                    {formatDate(r.created_at, lang)}
                   </p>
                   <p className="text-sm text-ink mb-2 line-clamp-2">"{preview}"</p>
                   {r.reason && <p className="text-sm text-ink/70 italic mb-2">{r.reason}</p>}
