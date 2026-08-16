@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate, formatTime } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 
 function localizedField(item, field, lang) {
@@ -103,7 +104,7 @@ export default function PollsPage() {
           )}
         </div>
         <p className="text-xs text-ink/50 mt-1">
-          {totals[poll.id] || 0} {t(lang, 'votesLabel')} · {new Date(poll.created_at).toLocaleDateString()}
+          {totals[poll.id] || 0} {t(lang, 'votesLabel')} · {formatDate(poll.created_at, lang)}
         </p>
       </Link>
     );
