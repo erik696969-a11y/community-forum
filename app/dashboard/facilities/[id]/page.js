@@ -7,6 +7,7 @@ import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
+import { formatDate, formatTime } from '../../../../lib/formatDate';
 import Header from '../../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
@@ -182,9 +183,9 @@ export default function FacilityDetailPage() {
                 <div key={b.id} className="card p-4 flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-harbor">
-                      {new Date(b.starts_at).toLocaleDateString()} ·{' '}
-                      {new Date(b.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}–
-                      {new Date(b.ends_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatDate(b.starts_at, lang)} ·{' '}
+                      {formatTime(b.starts_at, lang)}–
+                      {formatTime(b.ends_at, lang)}
                     </p>
                     <p className="text-xs text-ink/50">
                       {t(lang, 'bookedByLabel')}: {b.booker?.full_name}
