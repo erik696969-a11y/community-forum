@@ -9,6 +9,7 @@ import { useRefreshOnFocus } from '../../lib/useRefreshOnFocus';
 import { getLastSeenMap } from '../../lib/useLastSeen';
 import { supabase } from '../../lib/supabaseClient';
 import { t } from '../../lib/i18n';
+import { formatDate, formatTime } from '../../lib/formatDate';
 import Header from '../components/Header';
 
 export default function DashboardPage() {
@@ -116,7 +117,7 @@ export default function DashboardPage() {
                   </p>
                   {latestMap[cat.id] && (
                     <p className="text-xs text-ink/40 mt-2">
-                      {t(lang, 'lastActivityLabel')}: {new Date(latestMap[cat.id]).toLocaleDateString()}
+                      {t(lang, 'lastActivityLabel')}: {formatDate(latestMap[cat.id], lang)}
                     </p>
                   )}
                 </Link>
