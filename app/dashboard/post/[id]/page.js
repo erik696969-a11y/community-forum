@@ -7,6 +7,7 @@ import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
+import { formatDate, formatTime } from '../../../../lib/formatDate';
 import Header from '../../../components/Header';
 import ReactionBar from '../../../components/ReactionBar';
 import AuthorBadges from '../../../components/AuthorBadges';
@@ -270,7 +271,7 @@ export default function PostDetailPage() {
             <span>
               {post.author?.full_name}
               <AuthorBadges badges={post.author?.badges} /> · {post.author?.apartment_number} ·{' '}
-              {new Date(post.created_at).toLocaleDateString()}
+              {formatDate(post.created_at, lang)}
               {postTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
             </span>
             {!isPostAuthor && (
@@ -332,7 +333,7 @@ export default function PostDetailPage() {
                   <span>
                     {c.author?.full_name}
                     <AuthorBadges badges={c.author?.badges} /> · {c.author?.apartment_number} ·{' '}
-                    {new Date(c.created_at).toLocaleDateString()}
+                    {formatDate(c.created_at, lang)}
                     {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
                   </span>
                   {!isCommentAuthor && (
