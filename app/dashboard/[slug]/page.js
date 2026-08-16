@@ -9,6 +9,7 @@ import { useRefreshOnFocus } from '../../../lib/useRefreshOnFocus';
 import { markSeen } from '../../../lib/useLastSeen';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate, formatTime } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../lib/authorProfiles';
 
@@ -164,7 +165,7 @@ export default function CategoryPage() {
                   </p>
                   <p className="text-xs text-ink/50 mt-2">
                     {post.author?.full_name} · {post.author?.apartment_number} ·{' '}
-                    {new Date(post.created_at).toLocaleDateString()}
+                    {formatDate(post.created_at, lang)}
                     {isTranslated && <span className="ml-2 italic">({t(lang, 'translatedNotice')})</span>}
                   </p>
                 </Link>
