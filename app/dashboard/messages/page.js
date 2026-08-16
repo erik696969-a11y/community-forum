@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { formatDate, formatTime } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 
 export default function MessagesPage() {
@@ -134,7 +135,7 @@ export default function MessagesPage() {
                       </>
                     )}
                     {' · '}
-                    {new Date(m.created_at).toLocaleDateString()}
+                    {formatDate(m.created_at, lang)}
                   </p>
                   <button
                     onClick={(e) => {
