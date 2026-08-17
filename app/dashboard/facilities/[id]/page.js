@@ -7,7 +7,7 @@ import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
-import { formatDate, formatTime } from '../../../../lib/formatDate';
+import { formatFacilityDate, formatFacilityTime, zonedTimeToUtc } from '../../../../lib/formatDate';
 import Header from '../../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
@@ -59,8 +59,10 @@ export default function FacilityDetailPage() {
 
     if (!date || !startTime || !endTime) return;
 
-    const startsAt = new Date(`${date}T${startTime}`);
-    const endsAt = new Date(`${date}T${endTime}`);
+    // Bookings are always interpreted as Europe/Madrid local time, not the
+    // booking member's own browser timezone (see lib/formatDate.js).
+    const startsAt = zonedTimeToUtc(date, startTime);
+    const endsAt = zonedTimeToUtc(date, endTime);
 
     if (endsAt <= startsAt) {
       setError(t(lang, 'bookingOverlapError'));
@@ -191,9 +193,9 @@ export default function FacilityDetailPage() {
                 <div key={b.id} className="card p-4 flex items-center justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-harbor">
-                      {formatDate(b.starts_at, lang)} ·{' '}
-                      {formatTime(b.starts_at, lang)}–
-                      {formatTime(b.ends_at, lang)}
+                      {formatFacilityDate(b.starts_at, lang)} ·{' '}
+                      {formatFacilityTime(b.starts_at, lang)}–
+                      {formatFacilityTime(b.ends_at, lang)}
                     </p>
                     <p className="text-xs text-ink/50">
                       {t(lang, 'bookedByLabel')}: {b.booker?.full_name}
