@@ -120,9 +120,11 @@ export default function AskAiPage() {
     setAsking(true);
     setError('');
 
-    // Send the last couple of turns so follow-up questions ("what if the
-    // neighbour isn't home?") keep context, without resending everything.
-    const recentHistory = history.slice(-2).map((h) => ({ question: h.question, answer: h.answer.answer }));
+    // Only send back what our own server previously returned for those
+    // questions (the question text itself, and the validated source codes)
+    // - never the free-form answer text. The server re-derives everything
+    // else itself; this just lets follow-up retrieval carry sources forward.
+    const recentHistory = history.slice(-2).map((h) => ({ question: h.question, sources: h.answer.sources || [] }));
 
     try {
       const res = await fetch('/api/ask-ai', {
