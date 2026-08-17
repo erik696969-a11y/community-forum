@@ -4,6 +4,7 @@ const DAILY_LIMIT = 30;
 const MAX_QUESTION_LENGTH = 1000;
 const MAX_HISTORY_TURNS = 2;
 const MAX_RETRIEVED_ENTRIES = 5;
+const ALLOWED_URGENCY = ['info', 'yellow', 'orange', 'red'];
 
 // Deterministic, app-side danger detection. This never depends on the
 // Anthropic API being reachable — it fires purely on the raw question text
@@ -90,7 +91,7 @@ YOU MUST NEVER:
 - invent a phone number, email, name, opening hour, or procedure that is not explicitly given to you below
 - state or imply legal or insurance responsibility/liability
 
-If the provided rules and contacts don't clearly cover the question, say so honestly in "answer" rather than guessing, and leave "contacts"/"sources" reflecting only what you actually used.
+If the provided rules and contacts don't clearly cover the question, say so honestly in "answer" rather than guessing, and leave "contactRoles"/"sources" reflecting only what you actually used.
 
 ${emergencyDetected ? 'NOTE: the app has detected likely emergency language in this question. Treat this as potentially urgent — lead with immediate safety steps and set "call112": true unless the provided rules clearly indicate otherwise.\n' : ''}
 RELEVANT COMMUNITY PROCEDURES (only use these, cite their intent_code in "sources"):
@@ -99,7 +100,7 @@ ${rulesText || '(no specific procedure matched this question)'}
 COMMUNITY FACTS (current, from the Board):
 ${configText}
 
-CURRENT CONTACTS (use ONLY these — never invent a different number/email):
+CURRENT CONTACTS (for reference only — you do NOT know their phone/email, the app fills that in):
 ${contactsText}
 
 Respond ONLY with a JSON object in exactly this shape:
@@ -108,7 +109,7 @@ Respond ONLY with a JSON object in exactly this shape:
   "answer": "string, written in the same language as the question, concise and friendly",
   "immediateActions": ["short imperative steps, empty array if none needed"],
   "doNot": ["short warnings, empty array if none needed"],
-  "contacts": [{"label": "string", "name": "string", "phone": "string", "email": "string"}],
+  "contactRoles": ["exact role_label string(s) from CURRENT CONTACTS above that the resident should contact, empty array if none needed — NEVER include a phone number or email yourself, only the role_label text"],
   "call112": true | false,
   "sources": ["intent codes you actually used, e.g. WAT-01"]
 }`;
@@ -124,6 +125,35 @@ function safeParseJson(raw) {
   } catch {
     return null;
   }
+}
+
+function clampUrgency(value, fallback) {
+  return ALLOWED_URGENCY.includes(value) ? value : fallback;
+}
+
+// The model is told to reference contacts only by their role_label - it
+// never sees or invents an actual phone number/email. The app looks the
+// real contact up here, so a hallucinated or malformed role simply matches
+// nothing and is silently dropped rather than shown to the resident.
+function resolveContactRoles(requestedRoles, contacts) {
+  if (!Array.isArray(requestedRoles) || !Array.isArray(contacts)) return [];
+  const resolved = [];
+  const usedLabels = new Set();
+
+  for (const role of requestedRoles) {
+    if (typeof role !== 'string' || !role.trim()) continue;
+    const wanted = role.trim().toLowerCase();
+
+    const exact = contacts.find((c) => (c.role_label || '').toLowerCase() === wanted);
+    const fuzzy = exact || contacts.find((c) => (c.role_label || '').toLowerCase().includes(wanted));
+    const match = exact || fuzzy;
+
+    if (match && !usedLabels.has(match.role_label)) {
+      usedLabels.add(match.role_label);
+      resolved.push({ label: match.role_label, name: match.name || '', phone: match.phone || '', email: match.email || '' });
+    }
+  }
+  return resolved;
 }
 
 // Best-effort, anonymous telemetry - never stores question/answer text,
@@ -154,6 +184,13 @@ export async function POST(request) {
 
     const body = await request.json();
     const question = (body.question || '').trim();
+    // The client only ever sends its own PAST QUESTIONS and the SOURCE CODES
+    // our server previously returned for them - never free-form "assistant"
+    // text. That text would otherwise be forwarded to Anthropic as a
+    // trusted `assistant` turn, which is an unnecessary prompt-injection
+    // surface (a user could fabricate a fake "previous AI answer" in their
+    // own request). Sources are safe to echo back because we re-validate
+    // them against the real knowledge base below regardless.
     const clientHistory = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY_TURNS) : [];
     // Only board members can force-test a single (possibly inactive) entry
     // from the admin "Test this entry" preview.
@@ -216,6 +253,22 @@ export async function POST(request) {
       const retrieval = retrieveRelevantEntries(entries, question);
       relevantEntries = retrieval.entries;
       fallbackUsed = retrieval.fallbackUsed;
+
+      // Follow-up fix: a question like "what if the neighbour isn't home?"
+      // often has no keyword overlap with the water-leak scenario the
+      // previous turn already surfaced. Carry forward whatever sources our
+      // own server actually returned in the last turn(s) so context isn't
+      // silently dropped, without trusting anything else from the client.
+      const previousSourceCodes = new Set(
+        clientHistory.flatMap((h) => (Array.isArray(h?.sources) ? h.sources : []))
+      );
+      if (previousSourceCodes.size > 0) {
+        const alreadyIncludedIds = new Set(relevantEntries.map((e) => e.id));
+        const carried = entries.filter(
+          (e) => !alreadyIncludedIds.has(e.id) && previousSourceCodes.has(e.intent_code || e.id)
+        );
+        relevantEntries = [...relevantEntries, ...carried];
+      }
     }
 
     const [{ data: contacts }, { data: config }] = await Promise.all([
@@ -227,8 +280,12 @@ export async function POST(request) {
       .map((e) => `[${e.intent_code || e.id}] ${e.title}\n${e.content}`)
       .join('\n\n');
 
+    // Contacts shown to the model omit phone/email entirely - it only ever
+    // sees role labels, so it physically has no real number to copy or
+    // misremember. See resolveContactRoles() for how the app fills in the
+    // real details afterwards.
     const contactsText = (contacts || [])
-      .map((c) => `- ${c.role_label}: ${c.name || ''} ${c.phone || ''} ${c.email || ''}`.trim())
+      .map((c) => `- ${c.role_label}`)
       .join('\n') || '(no contacts configured yet)';
 
     const configText = (config || [])
@@ -238,13 +295,20 @@ export async function POST(request) {
 
     const systemPrompt = buildSystemPrompt({ rulesText, contactsText, configText, emergencyDetected });
 
-    const messages = [];
-    for (const turn of clientHistory) {
-      if (!turn || typeof turn.question !== 'string' || typeof turn.answer !== 'string') continue;
-      messages.push({ role: 'user', content: turn.question.slice(0, MAX_QUESTION_LENGTH) });
-      messages.push({ role: 'assistant', content: turn.answer.slice(0, 2000) });
-    }
-    messages.push({ role: 'user', content: question });
+    // Only the resident's own past QUESTIONS are folded into the prompt, as
+    // a single user turn - never a fabricated "assistant" turn built from
+    // client-supplied text. This keeps the Anthropic messages array trivially
+    // valid (single user message, no alternation to get wrong) and removes
+    // the prompt-injection surface entirely.
+    const historyQuestions = clientHistory
+      .map((h) => (h && typeof h.question === 'string' ? h.question.trim().slice(0, MAX_QUESTION_LENGTH) : null))
+      .filter(Boolean);
+
+    const userContent = historyQuestions.length > 0
+      ? `${historyQuestions.map((q) => `Previous question: ${q}`).join('\n')}\nFollow-up question: ${question}`
+      : question;
+
+    const messages = [{ role: 'user', content: userContent }];
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -315,10 +379,18 @@ export async function POST(request) {
       });
     }
 
+    // Never trust the model's own claims about which sources/contacts it
+    // used - re-validate everything against what we actually retrieved and
+    // what actually exists in the contacts table.
+    const validSourceCodes = new Set(relevantEntries.map((e) => e.intent_code || e.id));
+    const validatedSources = (Array.isArray(parsed.sources) ? parsed.sources : []).filter((s) => validSourceCodes.has(s));
+    const validatedContacts = resolveContactRoles(parsed.contactRoles, contacts || []);
+    const validatedUrgency = clampUrgency(parsed.urgency, emergencyDetected ? 'red' : 'info');
+
     const logId = testIntentId ? null : await logAiQuery(adminClient, {
       user_id: auth.user.id,
       matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
-      urgency: parsed.urgency || (emergencyDetected ? 'red' : 'info'),
+      urgency: validatedUrgency,
       emergency_detected: emergencyDetected,
       fallback_used: fallbackUsed,
       latency_ms: Date.now() - requestStartedAt,
@@ -327,13 +399,13 @@ export async function POST(request) {
     });
 
     return Response.json({
-      urgency: parsed.urgency || (emergencyDetected ? 'red' : 'info'),
+      urgency: validatedUrgency,
       answer: parsed.answer,
       immediateActions: Array.isArray(parsed.immediateActions) ? parsed.immediateActions : [],
       doNot: Array.isArray(parsed.doNot) ? parsed.doNot : [],
-      contacts: Array.isArray(parsed.contacts) ? parsed.contacts : [],
+      contacts: validatedContacts,
       call112: Boolean(parsed.call112) || emergencyDetected,
-      sources: Array.isArray(parsed.sources) ? parsed.sources : [],
+      sources: validatedSources,
       emergencyDetected,
       logId,
     });
