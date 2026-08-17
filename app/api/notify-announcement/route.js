@@ -1,5 +1,6 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
+import { escapeHtml } from '../../../lib/htmlEscape';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -78,7 +79,7 @@ export async function POST(request) {
       subject: `📢 ${post.title} — Mi Hacienda`,
       html: `
         <h2>📢 Official Announcement</h2>
-        <p><strong>${post.title}</strong></p>
+        <p><strong>${escapeHtml(post.title)}</strong></p>
         <p>Open the app to read the full announcement.</p>
         <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
       `,
