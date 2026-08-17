@@ -129,6 +129,9 @@ export default function AdminPage() {
             <Link href="/admin/ai-knowledge" className="btn-secondary text-sm">
               🤖 {t(lang, 'knowledgeBaseTitle')}
             </Link>
+            <Link href="/admin/community-config" className="btn-secondary text-sm">
+              ℹ️ {t(lang, 'communityConfigTitle')}
+            </Link>
           </div>
         </div>
 
