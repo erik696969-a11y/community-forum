@@ -70,12 +70,16 @@ export async function POST(request) {
 
     // Per-user daily rate limit, so a single account can't rack up a large
     // DeepL bill by hammering this endpoint.
-    const { data: allowed } = await auth.adminClient.rpc('check_and_increment_rate_limit', {
+    const { data: allowed, error: rateLimitError } = await auth.adminClient.rpc('check_and_increment_rate_limit', {
       p_user_id: auth.user.id,
       p_endpoint: 'translate',
       p_limit: DAILY_LIMIT,
     });
 
+    if (rateLimitError) {
+      console.error('translate rate limit check failed:', rateLimitError);
+      return Response.json({ error: 'Translation is temporarily unavailable. Please try again later.' }, { status: 503 });
+    }
     if (!allowed) {
       return Response.json({ error: 'Daily translation limit reached. Please try again tomorrow.' }, { status: 429 });
     }
