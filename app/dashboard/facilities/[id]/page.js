@@ -93,7 +93,15 @@ export default function FacilityDetailPage() {
     setSubmitting(false);
 
     if (insertError) {
-      setError(insertError.message);
+      // 23P01 = exclusion_violation, the DB-level overlap guard we added
+      // in migration 20260820000000. The client-side check above already
+      // catches most cases, but this is the authoritative guard against a
+      // race condition (two people booking the same slot at once).
+      if (insertError.code === '23P01') {
+        setError(t(lang, 'bookingOverlapError'));
+      } else {
+        setError(insertError.message);
+      }
       return;
     }
 
