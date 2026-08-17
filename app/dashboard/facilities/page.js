@@ -20,6 +20,7 @@ export default function FacilitiesPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     if (loading) return;
@@ -45,8 +46,15 @@ export default function FacilitiesPage() {
   async function handleAdd(e) {
     e.preventDefault();
     setSubmitting(true);
-    await supabase.from('facilities').insert({ name, description, created_by: session.user.id });
+    setSaveError('');
+    const { error } = await supabase.from('facilities').insert({ name, description, created_by: session.user.id });
     setSubmitting(false);
+
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
+
     setName('');
     setDescription('');
     setShowForm(false);
@@ -55,7 +63,11 @@ export default function FacilitiesPage() {
 
   async function handleDelete(id) {
     if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
-    await supabase.from('facilities').delete().eq('id', id);
+    const { error } = await supabase.from('facilities').delete().eq('id', id);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
     load();
   }
 
@@ -103,6 +115,7 @@ export default function FacilitiesPage() {
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'facilityDescLabel')}</label>
               <textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className="input-field" />
             </div>
+            {saveError && <p className="text-sm text-red-600">{saveError}</p>}
             <button type="submit" disabled={submitting} className="btn-primary w-full">
               {submitting ? t(lang, 'saving') : t(lang, 'save')}
             </button>
