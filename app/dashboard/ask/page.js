@@ -15,7 +15,7 @@ const URGENCY_COLORS = {
   red: 'border-red-500',
 };
 
-function AnswerCard({ h, lang }) {
+function AnswerCard({ h, lang, onFeedback }) {
   const a = h.answer;
   const borderClass = URGENCY_COLORS[a.urgency] || URGENCY_COLORS.info;
   return (
@@ -58,7 +58,34 @@ function AnswerCard({ h, lang }) {
         </div>
       )}
 
-      <p className="text-xs text-ink/40 mt-3 italic">{t(lang, 'askAiDisclaimer')}</p>
+      <div className="flex items-center justify-between mt-3">
+        <p className="text-xs text-ink/40 italic">{t(lang, 'askAiDisclaimer')}</p>
+        {a.logId && (
+          <div className="flex items-center gap-2 shrink-0 ml-3">
+            {a.feedback ? (
+              <span className="text-xs text-ink/40">{t(lang, 'askAiFeedbackThanks')}</span>
+            ) : (
+              <>
+                <span className="text-xs text-ink/40">{t(lang, 'askAiFeedbackPrompt')}</span>
+                <button
+                  onClick={() => onFeedback('up')}
+                  aria-label="thumbs up"
+                  className="text-sm hover:opacity-70"
+                >
+                  👍
+                </button>
+                <button
+                  onClick={() => onFeedback('down')}
+                  aria-label="thumbs down"
+                  className="text-sm hover:opacity-70"
+                >
+                  👎
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -122,6 +149,28 @@ export default function AskAiPage() {
     setAsking(false);
   }
 
+  async function handleFeedback(index, feedback) {
+    const entry = history[index];
+    if (!entry?.answer?.logId) return;
+
+    // Optimistic update so the buttons disappear immediately.
+    setHistory((prev) => prev.map((h, i) => (i === index ? { ...h, answer: { ...h.answer, feedback } } : h)));
+
+    try {
+      await fetch('/api/ask-ai/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ logId: entry.answer.logId, feedback }),
+      });
+    } catch {
+      // Non-critical - if this fails, worst case is a missing telemetry
+      // data point, not a broken user experience.
+    }
+  }
+
   if (loading || !profile) {
     return (
       <main className="min-h-screen flex items-center justify-center">
@@ -151,7 +200,7 @@ export default function AskAiPage() {
                   <div className="card p-4 bg-harbor text-white mb-2 ml-8">
                     <p className="text-sm">{h.question}</p>
                   </div>
-                  <AnswerCard h={h} lang={lang} />
+                  <AnswerCard h={h} lang={lang} onFeedback={(fb) => handleFeedback(i, fb)} />
                 </div>
               ))}
               {asking && <p className="text-sm text-ink/50 italic">{t(lang, 'askAiThinking')}</p>}
