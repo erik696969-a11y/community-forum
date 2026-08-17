@@ -1,5 +1,6 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
+import { escapeHtml } from '../../../lib/htmlEscape';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -87,8 +88,8 @@ export async function POST(request) {
       reply_to: replyToMap.get(r.id),
       subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
       html: `
-        <h2>${post.title}</h2>
-        <p>A new post was shared in the "${group?.name_en || 'group'}" group you've joined.</p>
+        <h2>${escapeHtml(post.title)}</h2>
+        <p>A new post was shared in the "${escapeHtml(group?.name_en || 'group')}" group you've joined.</p>
         <p>Open the app to read it and reply.</p>
         <p>You can also just reply directly to this email — your reply will be posted as a comment on the forum.</p>
       `,
