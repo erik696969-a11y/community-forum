@@ -29,10 +29,30 @@ const EMERGENCY_PATTERNS = [
   /\bviolent\b|\bagresivo\b|\bviolento\b|\bviolent\b|\baggressiv\b|\bweapon\b|\barma\b/i,
   /\bheavy bleeding\b|\bsangrado abundante\b/i,
   /\b112\b/,
+  // Sparks are dangerous on their own, independent of any water context.
+  /\bspark(s|ing)?\b|\bchispas?\b|\bétincelles?\b|\bfunken\b/i,
+  // Structural danger.
+  /\bceiling.*(collaps|falling|caving)|\bcollaps.*ceiling/i,
+  /\btecho.*(colaps|cayendo)|\bcolapso.*techo/i,
+  /\bplafond.*(effondr)/i,
+  /\bdecke.*(einsturz|stürzt)/i,
+  // A person physically trapped is an emergency regardless of cause.
+  /\btrapped\b|\batrapad[oa]\b|\bcoinc[ée]\b|\beingeklemmt\b/i,
 ];
 
+// Some combinations are only dangerous together - water alone or an
+// electrical mention alone is routine, but water near anything electrical
+// (a light fitting, socket, wiring) is a real shock/fire hazard even
+// though neither word alone would trip the single-pattern list above.
+const WATER_TERMS = /\bwater\b|\bagua\b|\beau\b|\bwasser\b|\bleak(ing)?\b|\bfuga\b|\bfuite\b|\bleck\b/i;
+const ELECTRICAL_TERMS = /\blight(s|ing)?\b|\blamp\b|\bsocket\b|\belectric|\bwir(e|ing)\b|\bluz\b|\blámpara\b|\benchufe\b|\beléctric|\bcable\b|\blumière\b|\bprise\b|\bélectriq|\bfil\b|\blicht\b|\blampe\b|\bsteckdose\b|\belektrisch|\bkabel\b/i;
+
+function hasDangerousCombo(text) {
+  return WATER_TERMS.test(text) && ELECTRICAL_TERMS.test(text);
+}
+
 function detectEmergency(text) {
-  return EMERGENCY_PATTERNS.some((re) => re.test(text));
+  return EMERGENCY_PATTERNS.some((re) => re.test(text)) || hasDangerousCombo(text);
 }
 
 // Very small, dependency-free keyword retrieval. Scores each active KB entry
