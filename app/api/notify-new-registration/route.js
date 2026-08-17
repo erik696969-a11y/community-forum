@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { listAllUsers } from '../../../lib/serverAuth';
+import { escapeHtml } from '../../../lib/htmlEscape';
 
 export async function POST(request) {
   try {
@@ -72,7 +73,7 @@ export async function POST(request) {
         subject: 'New registration request — Mi Hacienda',
         html: `
           <h2>New registration request</h2>
-          <p><strong>${profile.full_name}</strong> (apartment ${profile.apartment_number}) has requested access to the forum.</p>
+          <p><strong>${escapeHtml(profile.full_name)}</strong> (apartment ${escapeHtml(profile.apartment_number)}) has requested access to the forum.</p>
           <p>Please review and approve or reject this request in the Admin section of the app.</p>
         `,
       }),
