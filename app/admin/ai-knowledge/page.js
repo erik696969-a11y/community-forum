@@ -39,6 +39,7 @@ export default function AiKnowledgePage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   const [testingId, setTestingId] = useState(null);
   const [testQuestion, setTestQuestion] = useState('');
@@ -89,6 +90,7 @@ export default function AiKnowledgePage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
+    setSaveError('');
 
     const keywordsArray = form.keywords
       .split(',')
@@ -108,16 +110,24 @@ export default function AiKnowledgePage() {
       reviewed_at: new Date().toISOString(),
     };
 
-    if (form.id) {
-      await supabase
-        .from('ai_knowledge_base')
-        .update({ ...payload, version: (form.version || 1) + 1 })
-        .eq('id', form.id);
-    } else {
-      await supabase.from('ai_knowledge_base').insert(payload);
-    }
+    const { error } = form.id
+      ? await supabase
+          .from('ai_knowledge_base')
+          .update({ ...payload, version: (form.version || 1) + 1 })
+          .eq('id', form.id)
+      : await supabase.from('ai_knowledge_base').insert(payload);
 
     setSubmitting(false);
+
+    if (error) {
+      // Critical: for emergency knowledge base entries, a silently failed
+      // save could leave the Board believing a life-safety procedure was
+      // published when it wasn't. Keep the form open with the data intact
+      // so nothing typed is lost.
+      setSaveError(error.message);
+      return;
+    }
+
     setForm(emptyForm);
     setShowForm(false);
     load();
@@ -125,7 +135,11 @@ export default function AiKnowledgePage() {
 
   async function handleDelete(id) {
     if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
-    await supabase.from('ai_knowledge_base').delete().eq('id', id);
+    const { error } = await supabase.from('ai_knowledge_base').delete().eq('id', id);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
     load();
   }
 
@@ -258,13 +272,15 @@ export default function AiKnowledgePage() {
               />
             </div>
 
+            {saveError && <p className="text-sm text-red-600">{saveError}</p>}
+
             <div className="flex gap-2">
               <button type="submit" disabled={submitting} className="btn-primary flex-1">
                 {submitting ? t(lang, 'saving') : t(lang, 'save')}
               </button>
               <button
                 type="button"
-                onClick={() => { setForm(emptyForm); setShowForm(false); }}
+                onClick={() => { setForm(emptyForm); setShowForm(false); setSaveError(''); }}
                 className="px-4 py-2 text-sm text-ink/60 hover:text-ink"
               >
                 {t(lang, 'cancel')}
