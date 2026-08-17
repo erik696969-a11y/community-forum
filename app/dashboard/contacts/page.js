@@ -25,6 +25,7 @@ export default function ContactsPage() {
   const [email, setEmail] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     if (loading) return;
@@ -55,6 +56,7 @@ export default function ContactsPage() {
     setNotes('');
     setEditingId(null);
     setShowForm(false);
+    setSaveError('');
   }
 
   function startEdit(contact) {
@@ -70,30 +72,39 @@ export default function ContactsPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
+    setSaveError('');
 
-    if (editingId) {
-      await supabase
-        .from('contacts')
-        .update({ role_label: roleLabel, name, phone, email, notes })
-        .eq('id', editingId);
-    } else {
-      await supabase.from('contacts').insert({
-        role_label: roleLabel,
-        name,
-        phone,
-        email,
-        notes,
-        sort_order: contacts.length,
-      });
-    }
+    const { error } = editingId
+      ? await supabase
+          .from('contacts')
+          .update({ role_label: roleLabel, name, phone, email, notes })
+          .eq('id', editingId)
+      : await supabase.from('contacts').insert({
+          role_label: roleLabel,
+          name,
+          phone,
+          email,
+          notes,
+          sort_order: contacts.length,
+        });
 
     setSaving(false);
+
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
+
     resetForm();
     loadContacts();
   }
 
   async function handleDelete(id) {
-    await supabase.from('contacts').delete().eq('id', id);
+    const { error } = await supabase.from('contacts').delete().eq('id', id);
+    if (error) {
+      setSaveError(error.message);
+      return;
+    }
     loadContacts();
   }
 
@@ -152,6 +163,7 @@ export default function ContactsPage() {
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'notesLabel')}</label>
               <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field" />
             </div>
+            {saveError && <p className="text-sm text-red-600">{saveError}</p>}
             <div className="flex gap-2">
               <button type="submit" disabled={saving} className="btn-primary">
                 {saving ? t(lang, 'saving') : t(lang, 'save')}
