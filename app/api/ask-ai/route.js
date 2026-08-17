@@ -49,7 +49,7 @@ function tokenize(text) {
 
 function retrieveRelevantEntries(entries, question) {
   const questionTokens = new Set(tokenize(question));
-  if (questionTokens.size === 0) return [];
+  if (questionTokens.size === 0) return { entries: [], fallbackUsed: false };
 
   const scored = entries.map((entry) => {
     const keywordTokens = (entry.keywords || []).flatMap((k) => tokenize(k));
@@ -66,11 +66,11 @@ function retrieveRelevantEntries(entries, question) {
   scored.sort((a, b) => b.score - a.score);
   const matched = scored.filter((s) => s.score > 0).slice(0, MAX_RETRIEVED_ENTRIES);
 
-  if (matched.length > 0) return matched.map((s) => s.entry);
+  if (matched.length > 0) return { entries: matched.map((s) => s.entry), fallbackUsed: false };
 
   // No keyword match at all: fall back to a small set of general entries so
   // the assistant isn't completely silent, rather than guessing.
-  return entries.filter((e) => (e.category || '').toLowerCase() === 'general').slice(0, 3);
+  return { entries: entries.filter((e) => (e.category || '').toLowerCase() === 'general').slice(0, 3), fallbackUsed: true };
 }
 
 function buildSystemPrompt({ rulesText, contactsText, configText, emergencyDetected }) {
@@ -126,7 +126,22 @@ function safeParseJson(raw) {
   }
 }
 
+// Best-effort, anonymous telemetry - never stores question/answer text,
+// just enough to see which scenarios get used, where the AI falls back or
+// fails, and roughly what it costs. Never throws: a logging failure must
+// never break the actual answer the resident is waiting for.
+async function logAiQuery(adminClient, fields) {
+  try {
+    const { data } = await adminClient.from('ai_query_log').insert(fields).select('id').single();
+    return data?.id || null;
+  } catch (err) {
+    console.error('ask-ai: telemetry logging failed (non-fatal):', err);
+    return null;
+  }
+}
+
 export async function POST(request) {
+  const requestStartedAt = Date.now();
   try {
     const auth = await getAuthedProfile(request);
     if (!auth) {
@@ -180,6 +195,7 @@ export async function POST(request) {
     const emergencyDetected = detectEmergency(question);
 
     let relevantEntries = [];
+    let fallbackUsed = false;
     if (testIntentId) {
       const { data: single } = await adminClient
         .from('ai_knowledge_base')
@@ -197,7 +213,9 @@ export async function POST(request) {
       if (!entries || entries.length === 0) {
         return Response.json({ noKnowledge: true });
       }
-      relevantEntries = retrieveRelevantEntries(entries, question);
+      const retrieval = retrieveRelevantEntries(entries, question);
+      relevantEntries = retrieval.entries;
+      fallbackUsed = retrieval.fallbackUsed;
     }
 
     const [{ data: contacts }, { data: config }] = await Promise.all([
@@ -246,6 +264,16 @@ export async function POST(request) {
     if (!res.ok) {
       const errText = await res.text();
       console.error('ask-ai Anthropic request failed:', errText);
+      if (!testIntentId) {
+        await logAiQuery(adminClient, {
+          user_id: auth.user.id,
+          matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+          emergency_detected: emergencyDetected,
+          fallback_used: fallbackUsed,
+          had_error: true,
+          latency_ms: Date.now() - requestStartedAt,
+        });
+      }
       return Response.json(
         {
           error: 'The Community Assistant is temporarily unavailable. Please try again later.',
@@ -259,9 +287,20 @@ export async function POST(request) {
     const data = await res.json();
     const rawText = data.content?.[0]?.text || '';
     const parsed = safeParseJson(rawText);
+    const usage = data.usage || {};
 
     if (!parsed || typeof parsed.answer !== 'string') {
       console.error('ask-ai: could not parse structured AI response:', rawText);
+      const logId = testIntentId ? null : await logAiQuery(adminClient, {
+        user_id: auth.user.id,
+        matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+        emergency_detected: emergencyDetected,
+        fallback_used: fallbackUsed,
+        parse_error: true,
+        latency_ms: Date.now() - requestStartedAt,
+        input_tokens: usage.input_tokens || null,
+        output_tokens: usage.output_tokens || null,
+      });
       return Response.json({
         urgency: emergencyDetected ? 'red' : 'info',
         answer: rawText || 'The Community Assistant could not generate a clear answer. Please contact the Board directly.',
@@ -272,8 +311,20 @@ export async function POST(request) {
         sources: [],
         emergencyDetected,
         parseError: true,
+        logId,
       });
     }
+
+    const logId = testIntentId ? null : await logAiQuery(adminClient, {
+      user_id: auth.user.id,
+      matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+      urgency: parsed.urgency || (emergencyDetected ? 'red' : 'info'),
+      emergency_detected: emergencyDetected,
+      fallback_used: fallbackUsed,
+      latency_ms: Date.now() - requestStartedAt,
+      input_tokens: usage.input_tokens || null,
+      output_tokens: usage.output_tokens || null,
+    });
 
     return Response.json({
       urgency: parsed.urgency || (emergencyDetected ? 'red' : 'info'),
@@ -284,6 +335,7 @@ export async function POST(request) {
       call112: Boolean(parsed.call112) || emergencyDetected,
       sources: Array.isArray(parsed.sources) ? parsed.sources : [],
       emergencyDetected,
+      logId,
     });
   } catch (error) {
     console.error('ask-ai unexpected error:', error);
