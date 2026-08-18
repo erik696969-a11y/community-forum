@@ -149,7 +149,7 @@ export default function FacilityDetailPage() {
         <h1 className="font-display text-2xl text-harbor mt-3 mb-1">{facility.name}</h1>
         {facility.description && <p className="text-sm text-ink/60 mb-6">{facility.description}</p>}
 
-        <form onSubmit={handleBook} className="card p-5 space-y-3 mb-8">
+        <form onSubmit={handleBook} className="card p-5 space-y-3 mb-8 overflow-hidden">
           <h2 className="font-display text-lg text-harbor">{t(lang, 'bookThisFacility')}</h2>
           <div>
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'bookingDateLabel')}</label>
