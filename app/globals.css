@@ -37,6 +37,8 @@ html, body {
 
 .input-field {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0.65rem 0.9rem;
   border-radius: 0.5rem;
   border: 1.5px solid #D8CFBC;
