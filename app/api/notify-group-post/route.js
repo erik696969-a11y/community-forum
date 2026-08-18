@@ -1,6 +1,7 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
 import { escapeHtml } from '../../../lib/htmlEscape';
+import { brandConfig } from '../../../lib/brandConfig';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -83,10 +84,10 @@ export async function POST(request) {
     const replyToMap = await buildReplyToAddresses(adminClient, post.id, recipients.map((r) => r.id));
 
     const emailPayloads = recipients.map((r) => ({
-      from: 'Mi Hacienda <noreply@myhumandesign.sk>',
+      from: `${brandConfig.name} <${brandConfig.senderEmail}>`,
       to: [r.email],
       reply_to: replyToMap.get(r.id),
-      subject: `New post in ${group?.name_en || 'your group'} — Mi Hacienda`,
+      subject: `New post in ${group?.name_en || 'your group'} — ${brandConfig.name}`,
       html: `
         <h2>${escapeHtml(post.title)}</h2>
         <p>A new post was shared in the "${escapeHtml(group?.name_en || 'group')}" group you've joined.</p>
