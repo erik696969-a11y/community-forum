@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '../../lib/useLanguage';
 import { privacyContent } from '../../lib/privacyContent';
+import { resolveBrandPlaceholders } from '../../lib/brandConfig';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 export default function PrivacyPage() {
@@ -27,7 +28,7 @@ export default function PrivacyPage() {
             {content.sections.map((section) => (
               <div key={section.heading}>
                 <h2 className="font-semibold text-harbor mb-1">{section.heading}</h2>
-                <p className="text-sm text-ink/80 leading-relaxed">{section.body}</p>
+                <p className="text-sm text-ink/80 leading-relaxed">{resolveBrandPlaceholders(section.body)}</p>
               </div>
             ))}
           </div>
