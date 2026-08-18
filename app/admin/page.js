@@ -132,6 +132,9 @@ export default function AdminPage() {
             <Link href="/admin/community-config" className="btn-secondary text-sm">
               ℹ️ {t(lang, 'communityConfigTitle')}
             </Link>
+            <Link href="/admin/preapproved-members" className="btn-secondary text-sm">
+              ✅ {t(lang, 'preapprovedMembersTitle')}
+            </Link>
           </div>
         </div>
 
