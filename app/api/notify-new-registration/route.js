@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { listAllUsers } from '../../../lib/serverAuth';
 import { escapeHtml } from '../../../lib/htmlEscape';
+import { brandConfig } from '../../../lib/brandConfig';
 
 export async function POST(request) {
   try {
@@ -68,9 +69,9 @@ export async function POST(request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Mi Hacienda <noreply@myhumandesign.sk>',
+        from: `${brandConfig.name} <${brandConfig.senderEmail}>`,
         to: boardEmails,
-        subject: 'New registration request — Mi Hacienda',
+        subject: `New registration request — ${brandConfig.name}`,
         html: `
           <h2>New registration request</h2>
           <p><strong>${escapeHtml(profile.full_name)}</strong> (apartment ${escapeHtml(profile.apartment_number)}) has requested access to the forum.</p>
