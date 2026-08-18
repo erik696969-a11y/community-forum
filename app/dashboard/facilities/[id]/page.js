@@ -163,13 +163,13 @@ export default function FacilityDetailPage() {
             />
           </div>
           <div className="flex gap-3">
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'startTimeLabel')}</label>
-              <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="input-field" />
+              <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="input-field w-full" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'endTimeLabel')}</label>
-              <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="input-field" />
+              <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="input-field w-full" />
             </div>
           </div>
           <div>
