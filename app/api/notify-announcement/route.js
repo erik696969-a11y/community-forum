@@ -1,6 +1,7 @@
 import { getAuthedProfile, listAllUsers } from '../../../lib/serverAuth';
 import { buildReplyToAddresses } from '../../../lib/emailReplyToken';
 import { escapeHtml } from '../../../lib/htmlEscape';
+import { brandConfig } from '../../../lib/brandConfig';
 
 // Resend batch endpoint accepts at most 100 emails per call.
 const BATCH_SIZE = 100;
@@ -73,10 +74,10 @@ export async function POST(request) {
     const replyToMap = await buildReplyToAddresses(adminClient, post.id, recipients.map((r) => r.id));
 
     const emailPayloads = recipients.map((r) => ({
-      from: 'Mi Hacienda <noreply@myhumandesign.sk>',
+      from: `${brandConfig.name} <${brandConfig.senderEmail}>`,
       to: [r.email],
       reply_to: replyToMap.get(r.id),
-      subject: `📢 ${post.title} — Mi Hacienda`,
+      subject: `📢 ${post.title} — ${brandConfig.name}`,
       html: `
         <h2>📢 Official Announcement</h2>
         <p><strong>${escapeHtml(post.title)}</strong></p>
