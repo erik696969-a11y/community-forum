@@ -153,23 +153,29 @@ export default function FacilityDetailPage() {
           <h2 className="font-display text-lg text-harbor">{t(lang, 'bookThisFacility')}</h2>
           <div>
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'bookingDateLabel')}</label>
-            <input
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 10)}
-              className="input-field"
-            />
+            <div className="date-time-field-wrapper">
+              <input
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                min={new Date().toISOString().slice(0, 10)}
+                className="input-field"
+              />
+            </div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 min-w-0">
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'startTimeLabel')}</label>
-              <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="input-field w-full" />
+              <div className="date-time-field-wrapper">
+                <input type="time" required value={startTime} onChange={(e) => setStartTime(e.target.value)} className="input-field" />
+              </div>
             </div>
             <div className="flex-1 min-w-0">
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'endTimeLabel')}</label>
-              <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="input-field w-full" />
+              <div className="date-time-field-wrapper">
+                <input type="time" required value={endTime} onChange={(e) => setEndTime(e.target.value)} className="input-field" />
+              </div>
             </div>
           </div>
           <div>
