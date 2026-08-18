@@ -9,9 +9,8 @@ import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
 
-const URGENCY_OPTIONS = ['info', 'yellow', 'orange', 'red'];
+const URGENCY_OPTIONS = ['yellow', 'orange', 'red'];
 const URGENCY_COLORS = {
-  info: 'bg-sand-dark/60 text-ink',
   yellow: 'bg-yellow-100 text-yellow-800',
   orange: 'bg-orange-100 text-orange-800',
   red: 'bg-red-100 text-red-800',
@@ -22,7 +21,7 @@ const emptyForm = {
   intent_code: '',
   title: '',
   category: '',
-  urgency: 'info',
+  urgency: 'yellow',
   keywords: '',
   content: '',
   active: true,
@@ -78,7 +77,7 @@ export default function AiKnowledgePage() {
       intent_code: entry.intent_code || '',
       title: entry.title || '',
       category: entry.category || '',
-      urgency: entry.urgency || 'info',
+      urgency: entry.urgency || 'yellow',
       keywords: (entry.keywords || []).join(', '),
       content: entry.content || '',
       active: entry.active ?? true,
@@ -302,8 +301,8 @@ export default function AiKnowledgePage() {
                         <span className="text-xs font-mono text-ink/40">{entry.intent_code}</span>
                       )}
                       <p className="font-semibold text-harbor">{entry.title}</p>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${URGENCY_COLORS[entry.urgency] || URGENCY_COLORS.info}`}>
-                        {entry.urgency || 'info'}
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${URGENCY_COLORS[entry.urgency] || URGENCY_COLORS.yellow}`}>
+                        {entry.urgency || 'yellow'}
                       </span>
                       {entry.active === false && (
                         <span className="text-xs px-2 py-0.5 rounded-full bg-ink/10 text-ink/50">{t(lang, 'knowledgeInactiveBadge')}</span>
