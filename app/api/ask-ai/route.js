@@ -1,63 +1,92 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 import {
   detectEmergency,
+  keywordPoolForEntry,
   retrieveRelevantEntries,
-  mergeCarriedSources,
+  selectAttachedEntries,
+  computeRelatedIntents,
+  applyDeterministicBranching,
+  resolveModules,
+  resolvePlaceholdersInText,
+  resolvePlaceholdersInArray,
   safeParseJson,
   clampUrgency,
   validateSources,
-  resolveContactRoles,
+  ALLOWED_SOURCE_STATUS,
 } from '../../../lib/aiAssistant';
 
 const DAILY_LIMIT = 30;
 const MAX_QUESTION_LENGTH = 1000;
 const MAX_HISTORY_TURNS = 2;
 
-function buildSystemPrompt({ rulesText, contactsText, configText, emergencyDetected }) {
-  return `You are the Community Assistant for a residential complex. You answer residents' questions using ONLY the information provided below. You must respond with a single valid JSON object and nothing else — no markdown, no code fences, no commentary outside the JSON.
+const AI_BEHAVIOR_RULES = [
+  "Respond in the same language as the user's question unless the user asks for another language.",
+  'Lead with the action that matters now. In urgent situations, do not begin with background explanations.',
+  'If there is an immediate threat to life, serious injury, fire, major smoke, explosion risk, serious structural danger, violence, drowning, or another clearly dangerous situation, tell the user to call 112 immediately.',
+  'If the severity is uncertain but a plausible immediate danger exists, state the safety precaution first and tell the user when 112 is appropriate. Ask at most one short clarifying question only when the answer materially changes the immediate action.',
+  'Never invent a community contact, telephone number, opening time, apartment number, technical fact, rule or policy. If a configured field is missing, say that the contact is not available in the app and give the safe general action.',
+  'Never tell a resident to perform dangerous electrical, gas, elevator, structural, fire-suppression or technical repairs. Allow only simple isolation actions that can clearly be done without entering a hazardous area.',
+  'Do not determine legal liability, insurance liability, fault, ownership of a pipe, responsibility for repair costs or whether a resident is legally entitled to enter another apartment. Route those issues to the administrator, insurer or competent professional.',
+  'When multiple hazards are present, prioritize the highest-risk hazard. Example: water through a light fitting is an electrical-safety issue first and a water-damage issue second.',
+  "For incidents involving another private apartment, do not advise forced entry. Use the community's authorized emergency-access procedure or emergency services where justified.",
+  'For crime or suspicious behavior, prioritize personal safety and evidence preservation. Do not advise confrontation, pursuit or physical intervention.',
+  'For medical emergencies, do not diagnose. Tell the user to call 112 for serious or potentially serious symptoms and to follow the operator\'s instructions.',
+  'For poisoning or chemical exposure, serious symptoms or immediate danger require 112. The Spanish Toxicological Information Service is +34 91 562 04 20 and operates 24/7.',
+  'When damage may lead to an insurance or community claim, recommend photos/video, time, location, affected apartment(s) and a concise incident record after people are safe.',
+  'Keep crisis responses short enough to scan quickly: ideally 4-8 action lines plus contact details. Offer further detail only after the immediate steps.',
+  'Do not overwhelm a panicked user with every possible scenario. Surface only the steps relevant to the described incident.',
+  'If official authorities issue an evacuation, weather, wildfire, flood, earthquake or tsunami instruction, their directions override the general guidance in this knowledge base.',
+  'For property-damage incidents, separate immediate safety from post-incident handling. Do not overload the first answer with insurance detail until the immediate situation is stable.',
+  'For insurance routing, use source_status values: unknown, private_own, private_other, communal, external_or_unknown, criminal_act, contractor, not_applicable. Keep source_status=unknown until the cause is reasonably confirmed.',
+  "If the user's own property is damaged, the assistant may advise notifying the user's own insurer promptly even while source/liability is unresolved.",
+  'If another private apartment is confirmed as the technical source, advise informing that owner and asking them to notify their insurer. Never state that this confirmation alone establishes legal liability.',
+  'If communal infrastructure/common elements are confirmed as the source, route the Community Administrator to the Community repair/insurance process while affected owners may also notify their own insurers.',
+  'Reusable follow-up modules are authoritative. The LLM must not invent an insurance branch outside the modules supplied by the server.',
+];
 
-SAFETY HIERARCHY (overrides everything else):
-Human safety always comes before community rules or procedures.
-If there is any possible immediate danger to a person: the first priority in your answer is always to get them to safety and, if appropriate, call the emergency number 112. Community procedures come after that.
+function buildSystemPrompt({ primary, attached, moduleSummaries, configText, sourceStatus, emergencyDetected }) {
+  const scenarioBlocks = attached
+    .map((e) => {
+      const l = e.logic_json || {};
+      return `[${e.intent_code}] ${e.title} (severity: ${e.urgency})\nImmediate actions (already shown to the resident verbatim - do not repeat them, just refer to them naturally): ${(l.immediate_actions || []).join(' | ')}\nDo not: ${(l.do_not || []).join(' | ')}`;
+    })
+    .join('\n\n');
 
-YOU MUST NEVER:
-- instruct a resident to repair electrical equipment
-- instruct a resident to repair or investigate a gas installation
-- instruct a resident to force open an elevator door
-- instruct a resident to enter another private apartment
-- instruct a resident to confront an aggressive or violent person
-- diagnose a medical condition or give medical treatment instructions
-- invent a phone number, email, name, opening hour, or procedure that is not explicitly given to you below
-- state or imply legal or insurance responsibility/liability
+  const moduleText = moduleSummaries
+    .map((m) => `[${m.module_code}] ${m.title}: ${(m.content_json?.trigger) || ''}`)
+    .join('\n');
 
-If the provided rules and contacts don't clearly cover the question, say so honestly in "answer" rather than guessing, and leave "contactRoles"/"sources" reflecting only what you actually used.
+  return `You are the Community Assistant for a residential complex in Spain. You must respond with a single valid JSON object and nothing else — no markdown, no code fences, no commentary outside the JSON.
 
-${emergencyDetected ? 'NOTE: the app has detected likely emergency language in this question. Treat this as potentially urgent — lead with immediate safety steps and set "call112": true unless the provided rules clearly indicate otherwise.\n' : ''}
-RELEVANT COMMUNITY PROCEDURES (only use these, cite their intent_code in "sources"):
-${rulesText || '(no specific procedure matched this question)'}
+BEHAVIOR RULES (all apply, in order of general importance):
+${AI_BEHAVIOR_RULES.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 
-COMMUNITY FACTS (current, from the Board):
+${emergencyDetected ? 'NOTE: the app has detected likely emergency language in this question independently of the rules above - treat this as potentially urgent.\n' : ''}
+PRIMARY SCENARIO: ${primary ? `[${primary.intent_code}] ${primary.title}` : '(no specific scenario matched - answer generally and cautiously, and say so if you cannot help)'}
+
+ATTACHED SCENARIOS (for context; their immediate_actions/do_not are already being shown to the resident by the app - your job is to write a short connecting narrative, not to restate these lists):
+${scenarioBlocks || '(none)'}
+
+AVAILABLE FOLLOW-UP MODULES (only reference these by module_code in "modules_used" if genuinely relevant to this turn; never invent a module not listed here):
+${moduleText || '(none)'}
+
+CURRENT KNOWN source_status FOR THIS CONVERSATION: "${sourceStatus}"
+Only change source_status if this message provides new, reasonably confirmed evidence about the technical cause. Otherwise return it unchanged.
+
+COMMUNITY FACTS:
 ${configText}
-
-CURRENT CONTACTS (for reference only — you do NOT know their phone/email, the app fills that in):
-${contactsText}
 
 Respond ONLY with a JSON object in exactly this shape:
 {
-  "urgency": "info" | "yellow" | "orange" | "red",
-  "answer": "string, written in the same language as the question, concise and friendly",
-  "immediateActions": ["short imperative steps, empty array if none needed"],
-  "doNot": ["short warnings, empty array if none needed"],
-  "contactRoles": ["exact role_label string(s) from CURRENT CONTACTS above that the resident should contact, empty array if none needed — NEVER include a phone number or email yourself, only the role_label text"],
+  "answer": "string, written in the same language as the question - a short narrative connecting the situation to the actions already shown, plus anything the attached lists don't cover",
+  "urgency": "yellow" | "orange" | "red",
   "call112": true | false,
-  "sources": ["intent codes you actually used, e.g. WAT-01"]
+  "source_status": "unknown" | "private_own" | "private_other" | "communal" | "external_or_unknown" | "criminal_act" | "contractor" | "not_applicable",
+  "modules_used": ["module codes from AVAILABLE FOLLOW-UP MODULES that apply this turn"],
+  "clarifying_question": "one short question, or empty string if none needed"
 }`;
 }
 
-// Best-effort, anonymous telemetry - never stores question/answer text,
-// just enough to see which scenarios get used, where the AI falls back or
-// fails, and roughly what it costs. Never throws: a logging failure must
-// never break the actual answer the resident is waiting for.
 async function logAiQuery(adminClient, fields) {
   try {
     const { data } = await adminClient.from('ai_query_log').insert(fields).select('id').single();
@@ -72,135 +101,100 @@ export async function POST(request) {
   const requestStartedAt = Date.now();
   try {
     const auth = await getAuthedProfile(request);
-    if (!auth) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    if (auth.profile.status !== 'approved') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    if (!auth) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (auth.profile.status !== 'approved') return Response.json({ error: 'Forbidden' }, { status: 403 });
     const adminClient = auth.adminClient;
 
     const body = await request.json();
     const question = (body.question || '').trim();
-    // The client only ever sends its own PAST QUESTIONS and the SOURCE CODES
-    // our server previously returned for them - never free-form "assistant"
-    // text. That text would otherwise be forwarded to Anthropic as a
-    // trusted `assistant` turn, which is an unnecessary prompt-injection
-    // surface (a user could fabricate a fake "previous AI answer" in their
-    // own request). Sources are safe to echo back because we re-validate
-    // them against the real knowledge base below regardless.
     const clientHistory = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY_TURNS) : [];
-    // Only board members can force-test a single (possibly inactive) entry
-    // from the admin "Test this entry" preview.
+    // The client's own PRIOR STATE (what our server returned last turn) -
+    // treated as an untrusted hint only; every field is re-validated below
+    // against real data before use.
+    const clientState = body.state && typeof body.state === 'object' ? body.state : {};
     const testIntentId = auth.profile.role === 'board' ? body.testIntentId : null;
 
-    if (!question) {
-      return Response.json({ error: 'No question provided' }, { status: 400 });
-    }
-    if (question.length > MAX_QUESTION_LENGTH) {
-      return Response.json({ error: 'Question is too long' }, { status: 400 });
-    }
+    if (!question) return Response.json({ error: 'No question provided' }, { status: 400 });
+    if (question.length > MAX_QUESTION_LENGTH) return Response.json({ error: 'Question is too long' }, { status: 400 });
 
     if (!testIntentId) {
-      // Per-user daily rate limit, so a single account can't rack up a large
-      // Anthropic bill by hammering this endpoint. Test previews (board only,
-      // used sparingly) skip the resident rate limit.
       const { data: allowed, error: rateLimitError } = await adminClient.rpc('check_and_increment_rate_limit', {
         p_user_id: auth.user.id,
         p_endpoint: 'ask-ai',
         p_limit: DAILY_LIMIT,
       });
-
       if (rateLimitError) {
         console.error('ask-ai rate limit check failed:', rateLimitError);
-        return Response.json(
-          { error: 'The Community Assistant is temporarily unavailable. Please try again later.' },
-          { status: 503 }
-        );
+        return Response.json({ error: 'The Community Assistant is temporarily unavailable. Please try again later.' }, { status: 503 });
       }
-      if (!allowed) {
-        return Response.json({ error: 'Daily question limit reached. Please try again tomorrow.' }, { status: 429 });
-      }
+      if (!allowed) return Response.json({ error: 'Daily question limit reached. Please try again tomorrow.' }, { status: 429 });
     }
 
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return Response.json({ error: 'AI assistant is not configured yet' }, { status: 500 });
-    }
+    if (!process.env.ANTHROPIC_API_KEY) return Response.json({ error: 'AI assistant is not configured yet' }, { status: 500 });
 
     const emergencyDetected = detectEmergency(question);
 
-    let relevantEntries = [];
-    let fallbackUsed = false;
-    if (testIntentId) {
-      const { data: single } = await adminClient
-        .from('ai_knowledge_base')
-        .select('id, intent_code, title, content, category, urgency, keywords')
-        .eq('id', testIntentId)
-        .single();
-      if (single) relevantEntries = [single];
-    } else {
-      const { data: entries } = await adminClient
-        .from('ai_knowledge_base')
-        .select('id, intent_code, title, content, category, urgency, keywords')
-        .eq('active', true)
-        .order('updated_at', { ascending: true });
-
-      if (!entries || entries.length === 0) {
-        return Response.json({ noKnowledge: true });
-      }
-      const retrieval = retrieveRelevantEntries(entries, question);
-      relevantEntries = retrieval.entries;
-      fallbackUsed = retrieval.fallbackUsed;
-
-      // Follow-up fix: a question like "what if the neighbour isn't home?"
-      // often has no keyword overlap with the water-leak scenario the
-      // previous turn already surfaced. Carry forward whatever sources our
-      // own server actually returned in the last turn(s) so context isn't
-      // silently dropped, without trusting anything else from the client.
-      const previousSourceCodes = new Set(
-        clientHistory.flatMap((h) => (Array.isArray(h?.sources) ? h.sources : []))
-      );
-      relevantEntries = mergeCarriedSources(entries, relevantEntries, previousSourceCodes);
-    }
-
-    const [{ data: contacts }, { data: config }] = await Promise.all([
-      adminClient.from('contacts').select('role_label, name, phone, email').order('sort_order', { ascending: true }),
-      adminClient.from('community_config').select('key, label, value'),
+    const [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }] = await Promise.all([
+      adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
+      adminClient.from('contacts').select('role_label, name, phone, email'),
+      adminClient.from('community_config').select('key, value'),
+      adminClient.from('ai_response_modules').select('module_code, title, content_json').eq('active', true),
     ]);
 
-    const rulesText = relevantEntries
-      .map((e) => `[${e.intent_code || e.id}] ${e.title}\n${e.content}`)
-      .join('\n\n');
+    if (!allEntries || allEntries.length === 0) return Response.json({ noKnowledge: true });
 
-    // Contacts shown to the model omit phone/email entirely - it only ever
-    // sees role labels, so it physically has no real number to copy or
-    // misremember. See resolveContactRoles() for how the app fills in the
-    // real details afterwards.
-    const contactsText = (contacts || [])
-      .map((c) => `- ${c.role_label}`)
-      .join('\n') || '(no contacts configured yet)';
+    let primary = null;
+    let attached = [];
+    let fallbackUsed = false;
+
+    if (testIntentId) {
+      const single = allEntries.find((e) => e.id === testIntentId);
+      if (single) {
+        primary = single;
+        attached = [single];
+      }
+    } else {
+      // Retrieval scores against intent_tags + tokenized example_user_queries
+      // for richer multilingual matching.
+      const entriesForRetrieval = allEntries.map((e) => ({ ...e, keywords: keywordPoolForEntry(e) }));
+      const retrieval = retrieveRelevantEntries(entriesForRetrieval, question);
+      fallbackUsed = retrieval.fallbackUsed;
+
+      const priorPrimaryCode = typeof clientState.primaryIntent === 'string' ? clientState.primaryIntent : null;
+      const priorRelatedCodes = Array.isArray(clientState.relatedIntents) ? clientState.relatedIntents : [];
+
+      const selection = selectAttachedEntries(allEntries, retrieval.entries, fallbackUsed, priorPrimaryCode, priorRelatedCodes);
+      primary = selection.primary;
+      attached = selection.attached;
+    }
+
+    const priorSourceStatus = ALLOWED_SOURCE_STATUS.includes(clientState.sourceStatus) ? clientState.sourceStatus : 'unknown';
 
     const configText = (config || [])
       .filter((c) => c.value && c.value !== '[TO FILL IN]')
-      .map((c) => `- ${c.label}: ${c.value}`)
+      .map((c) => `- ${c.key}: ${c.value}`)
       .join('\n') || '(no community facts configured yet)';
 
-    const systemPrompt = buildSystemPrompt({ rulesText, contactsText, configText, emergencyDetected });
+    // Candidate modules for this turn: whatever the attached scenarios
+    // themselves reference via followup_modules.
+    const candidateModuleCodes = new Set(attached.flatMap((e) => e.logic_json?.followup_modules || []));
+    const candidateModules = (allModules || []).filter((m) => candidateModuleCodes.has(m.module_code));
 
-    // Only the resident's own past QUESTIONS are folded into the prompt, as
-    // a single user turn - never a fabricated "assistant" turn built from
-    // client-supplied text. This keeps the Anthropic messages array trivially
-    // valid (single user message, no alternation to get wrong) and removes
-    // the prompt-injection surface entirely.
+    const systemPrompt = buildSystemPrompt({
+      primary,
+      attached,
+      moduleSummaries: candidateModules,
+      configText,
+      sourceStatus: priorSourceStatus,
+      emergencyDetected,
+    });
+
     const historyQuestions = clientHistory
       .map((h) => (h && typeof h.question === 'string' ? h.question.trim().slice(0, MAX_QUESTION_LENGTH) : null))
       .filter(Boolean);
-
     const userContent = historyQuestions.length > 0
       ? `${historyQuestions.map((q) => `Previous question: ${q}`).join('\n')}\nFollow-up question: ${question}`
       : question;
-
-    const messages = [{ role: 'user', content: userContent }];
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -211,11 +205,13 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 800,
+        max_tokens: 900,
         system: systemPrompt,
-        messages,
+        messages: [{ role: 'user', content: userContent }],
       }),
     });
+
+    const attachedCodes = attached.map((e) => e.intent_code || e.id);
 
     if (!res.ok) {
       const errText = await res.text();
@@ -223,21 +219,14 @@ export async function POST(request) {
       if (!testIntentId) {
         await logAiQuery(adminClient, {
           user_id: auth.user.id,
-          matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+          matched_sources: attachedCodes,
           emergency_detected: emergencyDetected,
           fallback_used: fallbackUsed,
           had_error: true,
           latency_ms: Date.now() - requestStartedAt,
         });
       }
-      return Response.json(
-        {
-          error: 'The Community Assistant is temporarily unavailable. Please try again later.',
-          emergencyDetected,
-          call112: emergencyDetected,
-        },
-        { status: 500 }
-      );
+      return Response.json({ error: 'The Community Assistant is temporarily unavailable. Please try again later.', emergencyDetected, call112: emergencyDetected }, { status: 500 });
     }
 
     const data = await res.json();
@@ -245,11 +234,19 @@ export async function POST(request) {
     const parsed = safeParseJson(rawText);
     const usage = data.usage || {};
 
+    // Deterministic, server-owned response content - never LLM-authored.
+    const primaryLogic = primary?.logic_json || {};
+    const immediateActions = resolvePlaceholdersInArray(primaryLogic.immediate_actions, contacts, config);
+    const doNot = resolvePlaceholdersInArray(primaryLogic.do_not, contacts, config);
+    const contactRoute = resolvePlaceholdersInArray(primaryLogic.contact_route, contacts, config);
+    const documentation = primaryLogic.documentation || [];
+    const followUp = resolvePlaceholdersInArray(primaryLogic.follow_up, contacts, config);
+
     if (!parsed || typeof parsed.answer !== 'string') {
       console.error('ask-ai: could not parse structured AI response:', rawText);
       const logId = testIntentId ? null : await logAiQuery(adminClient, {
         user_id: auth.user.id,
-        matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+        matched_sources: attachedCodes,
         emergency_detected: emergencyDetected,
         fallback_used: fallbackUsed,
         parse_error: true,
@@ -258,29 +255,31 @@ export async function POST(request) {
         output_tokens: usage.output_tokens || null,
       });
       return Response.json({
-        urgency: emergencyDetected ? 'red' : 'info',
+        urgency: clampUrgency(primary?.urgency, emergencyDetected ? 'red' : 'yellow'),
         answer: rawText || 'The Community Assistant could not generate a clear answer. Please contact the Board directly.',
-        immediateActions: [],
-        doNot: [],
-        contacts: [],
+        immediateActions, doNot, contactRoute, documentation, followUp,
+        primaryIntent: primary?.intent_code || null,
+        relatedIntents: computeRelatedIntents(primary, attached),
+        sourceStatus: priorSourceStatus,
+        modulesUsed: [],
         call112: emergencyDetected,
-        sources: [],
+        sources: attachedCodes,
         emergencyDetected,
         parseError: true,
         logId,
       });
     }
 
-    // Never trust the model's own claims about which sources/contacts it
-    // used - re-validate everything against what we actually retrieved and
-    // what actually exists in the contacts table.
-    const validatedSources = validateSources(parsed.sources, relevantEntries);
-    const validatedContacts = resolveContactRoles(parsed.contactRoles, contacts || []);
-    const validatedUrgency = clampUrgency(parsed.urgency, emergencyDetected ? 'red' : 'info');
+    const validatedSourceStatus = ALLOWED_SOURCE_STATUS.includes(parsed.source_status) ? parsed.source_status : priorSourceStatus;
+    const branchedModuleCodes = applyDeterministicBranching(primary, validatedSourceStatus);
+    const requestedModuleCodes = [...(Array.isArray(parsed.modules_used) ? parsed.modules_used : []), ...branchedModuleCodes];
+    const modulesUsed = resolveModules(requestedModuleCodes, candidateModules);
+    const validatedUrgency = clampUrgency(primary?.urgency, emergencyDetected ? 'red' : 'yellow');
+    const validatedSources = validateSources(attachedCodes, attached);
 
     const logId = testIntentId ? null : await logAiQuery(adminClient, {
       user_id: auth.user.id,
-      matched_sources: relevantEntries.map((e) => e.intent_code || e.id),
+      matched_sources: attachedCodes,
       urgency: validatedUrgency,
       emergency_detected: emergencyDetected,
       fallback_used: fallbackUsed,
@@ -292,10 +291,17 @@ export async function POST(request) {
     return Response.json({
       urgency: validatedUrgency,
       answer: parsed.answer,
-      immediateActions: Array.isArray(parsed.immediateActions) ? parsed.immediateActions : [],
-      doNot: Array.isArray(parsed.doNot) ? parsed.doNot : [],
-      contacts: validatedContacts,
+      immediateActions,
+      doNot,
+      contactRoute,
+      documentation,
+      followUp,
+      primaryIntent: primary?.intent_code || null,
+      relatedIntents: computeRelatedIntents(primary, attached),
+      sourceStatus: validatedSourceStatus,
+      modulesUsed,
       call112: Boolean(parsed.call112) || emergencyDetected,
+      clarifyingQuestion: typeof parsed.clarifying_question === 'string' ? parsed.clarifying_question : '',
       sources: validatedSources,
       emergencyDetected,
       logId,
