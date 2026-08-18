@@ -8,6 +8,17 @@ export const metadata = {
   description: 'Hacienda del Señorío de Cifuentes — community forum for owners',
 };
 
+// This was missing entirely. Without it, mobile browsers render the page
+// at a desktop-width viewport (~980px) and scale the whole thing down to
+// fit the screen, rather than actually laying it out responsively. Native
+// form controls (date/time inputs especially) keep their real minimum
+// size regardless of that scaling, which is exactly what caused them to
+// visually poke out of their containers on mobile.
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
