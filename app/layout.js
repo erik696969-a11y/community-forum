@@ -2,10 +2,11 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import Footer from './components/Footer';
 import BrandFooter from './components/BrandFooter';
+import { brandConfig } from '../lib/brandConfig';
 
 export const metadata = {
-  title: 'Mi Hacienda',
-  description: 'Hacienda del Señorío de Cifuentes — community forum for owners',
+  title: brandConfig.name,
+  description: `${brandConfig.fullLegalName} — community forum for owners`,
 };
 
 // This was missing entirely. Without it, mobile browsers render the page
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Mi Hacienda Owners App" />
+        <meta name="apple-mobile-web-app-title" content={`${brandConfig.name} Owners App`} />
         <meta name="theme-color" content="#143B4D" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
