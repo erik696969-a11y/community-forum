@@ -182,7 +182,7 @@ export default function AskAiPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ question: asked, history: recentHistory, state }),
+        body: JSON.stringify({ question: asked, history: recentHistory, state, lang }),
       });
       const data = await res.json();
 
