@@ -55,7 +55,14 @@ function buildSystemPrompt({ primary, attached, moduleSummaries, configText, sou
   const scenarioBlocks = attached
     .map((e) => {
       const l = e.logic_json || {};
-      return `[${e.intent_code}] ${e.title} (severity: ${e.urgency})\nImmediate actions (already shown to the resident verbatim - do not repeat them, just refer to them naturally): ${(l.immediate_actions || []).join(' | ')}\nDo not: ${(l.do_not || []).join(' | ')}`;
+      // Show the LLM the SAME localized terminology the resident will see
+      // in the structured sections below the answer - if we showed it the
+      // English source here while the resident's language is ES/DE/FR, the
+      // "reuse this terminology" instruction would backfire and nudge it
+      // toward English borrowings instead of preventing them.
+      const localizedActions = localizeField(l, 'immediate_actions', uiLang);
+      const localizedDoNot = localizeField(l, 'do_not', uiLang);
+      return `[${e.intent_code}] ${e.title} (severity: ${e.urgency})\nImmediate actions (already shown to the resident verbatim - do not repeat them, just refer to them naturally): ${localizedActions.join(' | ')}\nDo not: ${localizedDoNot.join(' | ')}`;
     })
     .join('\n\n');
 
@@ -65,8 +72,8 @@ function buildSystemPrompt({ primary, attached, moduleSummaries, configText, sou
 
   const LANG_NAMES = { en: 'English', es: 'Spanish', fr: 'French', de: 'German' };
   const languageInstruction = uiLang
-    ? `Write your "answer" in ${LANG_NAMES[uiLang]} — this is the language the resident has selected for the app. Only deviate from this if the resident's question is written in a different language AND clearly expects a reply in that language instead.`
-    : `Write your "answer" in the same language as the resident's question.`;
+    ? `Write your "answer" ENTIRELY in ${LANG_NAMES[uiLang]} — this is the language the resident has selected for the app. Only deviate from this if the resident's question is written in a different language AND clearly expects a reply in that language instead. Use natural, standard ${LANG_NAMES[uiLang]} throughout: no code-switching, and no untranslated English technical terms when a natural equivalent exists in that language (e.g. in Spanish, say "luminaria" not "fitting de luz"; in German, say "Steckdose" not "socket"; in French, say "prise électrique" not "electrical socket"). Where the ATTACHED SCENARIOS below already use specific terminology in this language for the same concept, reuse that same terminology rather than a different phrasing or a borrowed English word.`
+    : `Write your "answer" in the same language as the resident's question, using natural, standard wording with no code-switching or untranslated technical terms when a natural equivalent exists in that language.`;
 
   return `You are the Community Assistant for a residential complex in Spain. You must respond with a single valid JSON object and nothing else — no markdown, no code fences, no commentary outside the JSON.
 
