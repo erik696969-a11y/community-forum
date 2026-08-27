@@ -8,6 +8,9 @@ import {
   resolveModules,
   resolvePlaceholdersInText,
   resolvePlaceholdersInArray,
+  localizeField,
+  dedupeResolvedContactLines,
+  sanitizeUnresolvedPlaceholders,
   safeParseJson,
   clampUrgency,
   validateSources,
@@ -73,9 +76,11 @@ ${AI_BEHAVIOR_RULES.map((r, i) => `${i + 1}. ${r}`).join('\n')}
 ${emergencyDetected ? 'NOTE: the app has detected likely emergency language in this question independently of the rules above - treat this as potentially urgent.\n' : ''}
 LANGUAGE: ${languageInstruction}
 
+DO NOT expose internal/backend terminology to the resident: never write words like "orange risk", "red risk", "severity level", a scenario ID (e.g. "WAT-01"), or a confidence/score number in "answer". If you need to convey urgency, use plain language instead (e.g. "this needs attention right away" rather than naming a risk tier).
+
 PRIMARY SCENARIO: ${primary ? `[${primary.intent_code}] ${primary.title}` : '(no specific scenario matched - answer generally and cautiously, and say so if you cannot help)'}
 
-ATTACHED SCENARIOS (for context; their immediate_actions/do_not are already being shown to the resident by the app - your job is to write a short connecting narrative, not to restate these lists):
+ATTACHED SCENARIOS (for context; their immediate_actions/do_not are already being shown to the resident by the app in their own clearly-labelled section below your answer - your "answer" should be a SHORT orientation only: one or two sentences on what's happening and why it matters, never a restatement or paraphrase of the specific action items themselves, since that creates repetition the resident then reads twice):
 ${scenarioBlocks || '(none)'}
 
 AVAILABLE FOLLOW-UP MODULES (only reference these by module_code in "modules_used" if genuinely relevant to this turn; never invent a module not listed here):
@@ -89,7 +94,7 @@ ${configText}
 
 Respond ONLY with a JSON object in exactly this shape:
 {
-  "answer": "string, in the language specified above - a short narrative connecting the situation to the actions already shown, plus anything the attached lists don't cover",
+  "answer": "string, in the language specified above - a SHORT orientation (1-2 sentences) connecting the situation to the actions already shown below it, not a restatement of them",
   "urgency": "yellow" | "orange" | "red",
   "call112": true | false,
   "source_status": "unknown" | "private_own" | "private_other" | "communal" | "external_or_unknown" | "criminal_act" | "contractor" | "not_applicable",
@@ -254,12 +259,19 @@ export async function POST(request) {
     const usage = data.usage || {};
 
     // Deterministic, server-owned response content - never LLM-authored.
+    // localizeField() picks the resident's preferredLanguage version of
+    // each field when the scenario has been translated, falling back to
+    // English otherwise; resolvePlaceholdersInArray then fills in real
+    // contact/config values in that same language (including the
+    // fallback text for anything still unresolved).
     const primaryLogic = primary?.logic_json || {};
-    const immediateActions = resolvePlaceholdersInArray(primaryLogic.immediate_actions, contacts, config);
-    const doNot = resolvePlaceholdersInArray(primaryLogic.do_not, contacts, config);
-    const contactRoute = resolvePlaceholdersInArray(primaryLogic.contact_route, contacts, config);
-    const documentation = primaryLogic.documentation || [];
-    const followUp = resolvePlaceholdersInArray(primaryLogic.follow_up, contacts, config);
+    const immediateActions = resolvePlaceholdersInArray(localizeField(primaryLogic, 'immediate_actions', uiLang), contacts, config, uiLang || 'en');
+    const doNot = resolvePlaceholdersInArray(localizeField(primaryLogic, 'do_not', uiLang), contacts, config, uiLang || 'en');
+    const contactRoute = dedupeResolvedContactLines(
+      resolvePlaceholdersInArray(localizeField(primaryLogic, 'contact_route', uiLang), contacts, config, uiLang || 'en')
+    );
+    const documentation = resolvePlaceholdersInArray(localizeField(primaryLogic, 'documentation', uiLang), contacts, config, uiLang || 'en');
+    const followUp = resolvePlaceholdersInArray(localizeField(primaryLogic, 'follow_up', uiLang), contacts, config, uiLang || 'en');
 
     if (!parsed || typeof parsed.answer !== 'string') {
       console.error('ask-ai: could not parse structured AI response:', rawText);
@@ -275,8 +287,12 @@ export async function POST(request) {
       });
       return Response.json({
         urgency: clampUrgency(primary?.urgency, emergencyDetected ? 'red' : 'yellow'),
-        answer: rawText || 'The Community Assistant could not generate a clear answer. Please contact the Board directly.',
-        immediateActions, doNot, contactRoute, documentation, followUp,
+        answer: sanitizeUnresolvedPlaceholders(rawText, uiLang || 'en') || 'The Community Assistant could not generate a clear answer. Please contact the Board directly.',
+        immediateActions: immediateActions.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        doNot: doNot.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        contactRoute: contactRoute.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        documentation: documentation.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        followUp: followUp.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
         primaryIntent: primary?.intent_code || null,
         relatedIntents: computeRelatedIntents(primary, attached),
         sourceStatus: priorSourceStatus,
@@ -307,20 +323,31 @@ export async function POST(request) {
       output_tokens: usage.output_tokens || null,
     });
 
+    // Final defensive net (spec section 7.5): even if some future field or
+    // an entry with a typo'd token slips past normal resolution, no raw
+    // [SOMETHING] bracket pattern is ever shown to a resident.
+    const safeLang = uiLang || 'en';
+    const sanitizedAnswer = sanitizeUnresolvedPlaceholders(parsed.answer, safeLang);
+    const sanitizedImmediateActions = immediateActions.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedDoNot = doNot.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedContactRoute = contactRoute.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedDocumentation = documentation.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedFollowUp = followUp.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+
     return Response.json({
       urgency: validatedUrgency,
-      answer: parsed.answer,
-      immediateActions,
-      doNot,
-      contactRoute,
-      documentation,
-      followUp,
+      answer: sanitizedAnswer,
+      immediateActions: sanitizedImmediateActions,
+      doNot: sanitizedDoNot,
+      contactRoute: sanitizedContactRoute,
+      documentation: sanitizedDocumentation,
+      followUp: sanitizedFollowUp,
       primaryIntent: primary?.intent_code || null,
       relatedIntents: computeRelatedIntents(primary, attached),
       sourceStatus: validatedSourceStatus,
       modulesUsed,
       call112: Boolean(parsed.call112) || emergencyDetected,
-      clarifyingQuestion: typeof parsed.clarifying_question === 'string' ? parsed.clarifying_question : '',
+      clarifyingQuestion: typeof parsed.clarifying_question === 'string' ? sanitizeUnresolvedPlaceholders(parsed.clarifying_question, safeLang) : '',
       sources: validatedSources,
       emergencyDetected,
       logId,
