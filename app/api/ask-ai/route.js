@@ -1,7 +1,6 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 import {
   detectEmergency,
-  keywordPoolForEntry,
   retrieveRelevantEntries,
   selectAttachedEntries,
   computeRelatedIntents,
@@ -155,7 +154,7 @@ export async function POST(request) {
 
     const [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }] = await Promise.all([
       adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
-      adminClient.from('contacts').select('role_label, name, phone, email'),
+      adminClient.from('contacts').select('role_label, name, phone, email, notes'),
       adminClient.from('community_config').select('key, value'),
       adminClient.from('ai_response_modules').select('module_code, title, content_json').eq('active', true),
     ]);
@@ -173,10 +172,10 @@ export async function POST(request) {
         attached = [single];
       }
     } else {
-      // Retrieval scores against intent_tags + tokenized example_user_queries
-      // for richer multilingual matching.
-      const entriesForRetrieval = allEntries.map((e) => ({ ...e, keywords: keywordPoolForEntry(e) }));
-      const retrieval = retrieveRelevantEntries(entriesForRetrieval, question);
+      // scoreEntry() reads both entry.keywords (as real multi-word phrases,
+      // not pre-flattened) and entry.logic_json.example_user_queries
+      // directly, so entries are passed through untouched.
+      const retrieval = retrieveRelevantEntries(allEntries, question);
       fallbackUsed = retrieval.fallbackUsed;
 
       const priorPrimaryCode = typeof clientState.primaryIntent === 'string' ? clientState.primaryIntent : null;
