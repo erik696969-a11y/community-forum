@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useProfile } from '../../../../lib/useProfile';
-import { useLanguage } from '../../../../lib/useLanguage';
-import { supabase } from '../../../../lib/supabaseClient';
-import { t } from '../../../../lib/i18n';
-import Header from '../../../components/Header';
-import StorageImage from '../../../components/StorageImage';
-import { getSignedDownloadUrl } from '../../../../lib/storageClient';
+import { useProfile } from '../../../lib/useProfile';
+import { useLanguage } from '../../../lib/useLanguage';
+import { supabase } from '../../../lib/supabaseClient';
+import { t } from '../../../lib/i18n';
+import { LOCALE_MAP } from '../../../lib/formatDate';
+import Header from '../../components/Header';
 
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
@@ -17,130 +16,37 @@ function localizedField(item, field, lang) {
   return translations?.[lang] || item[field];
 }
 
-export default function EventDetailPage() {
+export default function EventsPage() {
   const { loading, session, profile } = useProfile();
   const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
-  const params = useParams();
-
-  const [event, setEvent] = useState(null);
-  const [photos, setPhotos] = useState([]);
-  const [rsvps, setRsvps] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [downloadingZip, setDownloadingZip] = useState(false);
 
   useEffect(() => {
     if (loading) return;
-    if (!session) router.replace('/login');
-  }, [loading, session, router]);
-
-  async function load() {
-    const { data: eventData } = await supabase.from('events').select('*').eq('id', params.id).single();
-    setEvent(eventData);
-
-    const { data: photoData } = await supabase
-      .from('event_photos')
-      .select('*, uploader:profiles(full_name)')
-      .eq('event_id', params.id)
-      .order('created_at', { ascending: false });
-    setPhotos(photoData || []);
-
-    const { data: rsvpData } = await supabase
-      .from('event_rsvps')
-      .select('*, profile:profiles(full_name, apartment_number)')
-      .eq('event_id', params.id);
-    setRsvps(rsvpData || []);
-
-    setLoadingData(false);
-  }
+    if (!session) {
+      router.replace('/login');
+      return;
+    }
+    if (!profile || profile.status !== 'approved') {
+      router.replace('/pending');
+    }
+  }, [loading, session, profile, router]);
 
   useEffect(() => {
-    if (profile?.status === 'approved') load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.id, profile]);
-
- async function handleDeleteEvent() {
-    if (!window.confirm(t(lang, 'confirmDeletePost'))) return;
-
-    // Clean up the actual photo files from storage first, so deleting an
-    // event doesn't leave orphaned files behind in the bucket.
-    if (photos.length > 0) {
-      const paths = photos.map((p) => p.image_url);
-      await supabase.storage.from('event-photos').remove(paths);
+    async function loadEvents() {
+      const { data } = await supabase
+        .from('events')
+        .select('*, event_photos(id)')
+        .order('event_date', { ascending: false });
+      setEvents(data || []);
+      setLoadingData(false);
     }
+    if (profile?.status === 'approved') loadEvents();
+  }, [profile]);
 
-    await supabase.from('events').delete().eq('id', params.id);
-    router.push('/dashboard/events');
-  }
-
-  async function handleDownloadZip() {
-    setDownloadingZip(true);
-    try {
-      const res = await fetch(`/api/download-event-photos?eventId=${params.id}`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (!res.ok) throw new Error('Download failed');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'event-photos.zip';
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (e) {
-      // silently ignore - button just won't trigger a download
-    }
-    setDownloadingZip(false);
-  }
-
-  async function handleUpload(e) {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    setUploading(true);
-
-    for (const file of files) {
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${params.id}/${session.user.id}-${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage.from('event-photos').upload(filePath, file);
-      if (!uploadError) {
-        // Store the bare storage path (bucket is private) - a signed URL
-        // is generated on demand whenever the photo is displayed.
-        await supabase.from('event_photos').insert({
-          event_id: params.id,
-          uploaded_by: session.user.id,
-          image_url: filePath,
-        });
-      }
-    }
-
-    setUploading(false);
-    load();
-  }
-
-  async function handleRsvp(status) {
-    await supabase
-      .from('event_rsvps')
-      .upsert({ event_id: params.id, user_id: session.user.id, status }, { onConflict: 'event_id,user_id' });
-    load();
-  }
-
-  function exportRsvpCsv() {
-    const rows = [['Name', 'Apartment', 'Status']];
-    rsvps.forEach((r) => {
-      rows.push([r.profile?.full_name || '', r.profile?.apartment_number || '', r.status]);
-    });
-    const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'rsvp-list.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  if (loading || !profile || loadingData) {
+  if (loading || !profile) {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <p className="text-harbor">{t(lang, 'loading')}</p>
@@ -148,14 +54,33 @@ export default function EventDetailPage() {
     );
   }
 
-  if (!event) {
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = events.filter((e) => e.event_date && e.event_date >= today).reverse();
+  const past = events.filter((e) => !e.event_date || e.event_date < today);
+  const isBoard = profile.role === 'board';
+
+  function EventCard({ ev }) {
     return (
-      <main className="min-h-screen">
-        <Header profile={profile} lang={lang} onLanguageChange={setLang} />
-        <div className="max-w-2xl mx-auto px-4 py-8">
-          <p className="text-ink">{t(lang, 'postNotFound')}</p>
-        </div>
-      </main>
+      <Link href={`/dashboard/events/${ev.id}`} className="card p-5 block hover:border-ochre transition-colors">
+        <h3 className="font-display text-lg text-harbor flex items-center gap-2">
+          {(ev.event_type === 'agm' || ev.event_type === 'egm') && (
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
+              {t(lang, ev.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
+            </span>
+          )}
+          {localizedField(ev, 'title', lang)}
+        </h3>
+        {ev.event_date && (
+          <p className="text-sm text-ochre font-semibold mt-1">
+            {new Date(ev.event_date).toLocaleDateString(LOCALE_MAP[lang] || 'en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        )}
+        {ev.location && <p className="text-sm text-ink/60">{ev.location}</p>}
+        <p className="text-sm text-ink/70 mt-1 line-clamp-2">{localizedField(ev, 'description', lang)}</p>
+        <p className="text-xs text-ink/50 mt-2">
+          {ev.event_photos.length} {t(lang, 'photosLabel').toLowerCase()}
+        </p>
+      </Link>
     );
   }
 
@@ -163,136 +88,50 @@ export default function EventDetailPage() {
     <main className="min-h-screen">
       <Header profile={profile} lang={lang} onLanguageChange={setLang} />
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <Link href="/dashboard/events" className="text-sm text-harbor/70 hover:text-harbor">
-          {t(lang, 'backToEvents')}
+        <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
+          {t(lang, 'backToDashboard')}
         </Link>
-
-        <div className="card p-6 mt-3 mb-8">
-          <div className="flex items-center justify-between gap-3">
-            <h1 className="font-display text-2xl text-harbor mb-1 flex items-center gap-2">
-              {(event.event_type === 'agm' || event.event_type === 'egm') && (
-                <span className="text-xs font-semibold px-2 py-0.5 rounded bg-harbor text-white">
-                  {t(lang, event.event_type === 'agm' ? 'eventTypeBadgeAGM' : 'eventTypeBadgeEGM')}
-                </span>
-              )}
-              {localizedField(event, 'title', lang)}
-            </h1>
-            {profile.role === 'board' && (
-              <button
-                onClick={handleDeleteEvent}
-                className="text-xs text-red-500 hover:text-red-700 whitespace-nowrap flex-shrink-0"
-              >
-                {t(lang, 'delete')}
-              </button>
-            )}
-          </div>
-          {event.event_date && (
-            <p className="text-sm text-ochre font-semibold">
-              {new Date(event.event_date).toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </p>
-          )}
-          {event.location && <p className="text-sm text-ink/60 mb-3">{event.location}</p>}
-          {event.description && (
-            <p className="text-ink whitespace-pre-wrap mt-2">{localizedField(event, 'description', lang)}</p>
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h1 className="font-display text-2xl text-harbor">{t(lang, 'eventsTitle')}</h1>
+          {isBoard && (
+            <Link href="/dashboard/events/new" className="btn-primary">
+              {t(lang, 'addEvent')}
+            </Link>
           )}
         </div>
 
-        {(() => {
-          const myRsvp = rsvps.find((r) => r.user_id === session.user.id);
-          const going = rsvps.filter((r) => r.status === 'going');
-          const maybe = rsvps.filter((r) => r.status === 'maybe');
-          const cantCome = rsvps.filter((r) => r.status === 'cant_come');
-          return (
-            <div className="card p-5 mb-8">
-              <div className="flex gap-2 flex-wrap mb-4">
-                <button
-                  onClick={() => handleRsvp('going')}
-                  className={myRsvp?.status === 'going' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpGoing')}
-                </button>
-                <button
-                  onClick={() => handleRsvp('maybe')}
-                  className={myRsvp?.status === 'maybe' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpMaybe')}
-                </button>
-                <button
-                  onClick={() => handleRsvp('cant_come')}
-                  className={myRsvp?.status === 'cant_come' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpCantCome')}
-                </button>
-              </div>
-              <p className="text-sm text-ink/70">
-                <strong>{going.length}</strong> {t(lang, 'rsvpGoingLabel').toLowerCase()}
-                {going.length > 0 && `: ${going.map((r) => r.profile?.full_name).filter(Boolean).join(', ')}`}
-              </p>
-              <p className="text-sm text-ink/50 mt-1">
-                {maybe.length} {t(lang, 'rsvpMaybeLabel').toLowerCase()} · {cantCome.length}{' '}
-                {t(lang, 'rsvpCantComeLabel').toLowerCase()}
-              </p>
-              {profile.role === 'board' && rsvps.length > 0 && (
-                <button onClick={exportRsvpCsv} className="text-xs text-harbor/60 hover:text-harbor underline mt-3">
-                  {t(lang, 'exportRsvpList')}
-                </button>
-              )}
-            </div>
-          );
-        })()}
-
-        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
-          <h2 className="font-display text-lg text-harbor">{t(lang, 'photosLabel')}</h2>
-          <div className="flex items-center gap-3">
-            {photos.length > 0 && (
-              <button
-                onClick={handleDownloadZip}
-                disabled={downloadingZip}
-                className="text-xs text-harbor/60 hover:text-harbor underline whitespace-nowrap"
-              >
-                {downloadingZip ? t(lang, 'saving') : t(lang, 'downloadAllPhotos')}
-              </button>
-            )}
-            <label className="btn-primary text-sm cursor-pointer">
-              {uploading ? t(lang, 'saving') : t(lang, 'uploadPhoto')}
-              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
-            </label>
-          </div>
-        </div>
-
-        {photos.length === 0 ? (
-          <p className="text-ink/60">{t(lang, 'noPhotosYet')}</p>
+        {loadingData ? (
+          <p className="text-ink/60">{t(lang, 'loading')}</p>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {photos.map((photo) => (
-              <GalleryPhoto key={photo.id} photo={photo} lang={lang} />
-            ))}
-          </div>
+          <>
+            {upcoming.length > 0 && (
+              <div className="mb-8">
+                <h2 className="text-xs font-semibold text-ochre uppercase tracking-wide mb-3">
+                  {t(lang, 'upcomingEvent')}
+                </h2>
+                <div className="space-y-3">
+                  {upcoming.map((ev) => (
+                    <EventCard key={ev.id} ev={ev} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <h2 className="text-xs font-semibold text-harbor/60 uppercase tracking-wide mb-3">
+              {t(lang, 'pastEvents')}
+            </h2>
+            {past.length === 0 ? (
+              <p className="text-ink/60">{t(lang, 'noEventsYet')}</p>
+            ) : (
+              <div className="space-y-3">
+                {past.map((ev) => (
+                  <EventCard key={ev.id} ev={ev} />
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>
-  );
-}
-
-function GalleryPhoto({ photo, lang }) {
-  async function handleDownload() {
-    const url = await getSignedDownloadUrl('event-photos', photo.image_url, `photo-${photo.id}.jpg`);
-    if (url) window.open(url, '_blank');
-  }
-
-  return (
-    <div className="relative group">
-      <StorageImage bucket="event-photos" path={photo.image_url} alt="" className="w-full h-32 object-cover rounded-lg" />
-      <button
-        onClick={handleDownload}
-        className="absolute bottom-1 right-1 bg-harbor/80 text-sand text-xs px-2 py-1 rounded"
-      >
-        {t(lang, 'download')}
-      </button>
-    </div>
   );
 }
