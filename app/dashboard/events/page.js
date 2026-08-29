@@ -7,6 +7,7 @@ import { useProfile } from '../../../lib/useProfile';
 import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
+import { LOCALE_MAP } from '../../../lib/formatDate';
 import Header from '../../components/Header';
 
 function localizedField(item, field, lang) {
@@ -71,7 +72,7 @@ export default function EventsPage() {
         </h3>
         {ev.event_date && (
           <p className="text-sm text-ochre font-semibold mt-1">
-            {new Date(ev.event_date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+            {new Date(ev.event_date).toLocaleDateString(LOCALE_MAP[lang] || 'en-GB', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         )}
         {ev.location && <p className="text-sm text-ink/60">{ev.location}</p>}
