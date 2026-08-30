@@ -246,7 +246,7 @@ export default function AskAiPage() {
             <div className="space-y-4 mb-6">
               {history.map((h, i) => (
                 <div key={i}>
-                  <div className="card p-4 bg-harbor text-white mb-2 ml-8">
+                  <div className="rounded-xl p-4 bg-harbor text-white mb-2 ml-8">
                     <p className="text-sm">{h.question}</p>
                   </div>
                   <AnswerCard
