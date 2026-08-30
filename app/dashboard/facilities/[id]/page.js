@@ -7,7 +7,7 @@ import { useProfile } from '../../../../lib/useProfile';
 import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
-import { formatFacilityDate, formatFacilityTime, zonedTimeToUtc, utcToZonedDateTimeParts } from '../../../../lib/formatDate';
+import { formatFacilityDate, formatFacilityTime, zonedTimeToUtc, utcToZonedDateTimeParts, InvalidLocalTimeError } from '../../../../lib/formatDate';
 import Header from '../../../components/Header';
 import { fetchAuthorProfiles, attachAuthors } from '../../../../lib/authorProfiles';
 
@@ -62,8 +62,21 @@ export default function FacilityDetailPage() {
 
     // Bookings are always interpreted as Europe/Madrid local time, not the
     // booking member's own browser timezone (see lib/formatDate.js).
-    const startsAt = zonedTimeToUtc(date, startTime);
-    const endsAt = zonedTimeToUtc(date, endTime);
+    // zonedTimeToUtc throws InvalidLocalTimeError for a local time that
+    // never existed on the clock (DST spring-forward gap) - caught here
+    // so nothing is ever written to the database for an invalid time.
+    let startsAt;
+    let endsAt;
+    try {
+      startsAt = zonedTimeToUtc(date, startTime);
+      endsAt = zonedTimeToUtc(date, endTime);
+    } catch (err) {
+      if (err instanceof InvalidLocalTimeError) {
+        setError(t(lang, 'bookingInvalidLocalTimeError'));
+        return;
+      }
+      throw err;
+    }
 
     if (endsAt <= startsAt) {
       setError(t(lang, 'bookingOverlapError'));
