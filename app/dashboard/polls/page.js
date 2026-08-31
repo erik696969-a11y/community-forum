@@ -49,15 +49,35 @@ export default function PollsPage() {
       const { data } = await supabase.from('polls').select('*').order('created_at', { ascending: false });
       let pollsData = data || [];
 
-      // Auto-close any open polls whose closing date has passed
+      // Auto-close any open polls whose closing date has passed - via the
+      // narrow close_expired_poll() RPC, not a direct .update() call, so
+      // the DB-level authorization/expiry check is enforced server-side
+      // regardless of what the client sends. Three distinct outcomes:
+      //   error        -> log it, leave local status untouched (do NOT
+      //                    invent a state we don't actually know)
+      //   data === true  -> RPC confirmed it closed the poll, reflect that
+      //   data === false -> RPC ran but did not close this poll (e.g. a
+      //                    race - someone/something else already closed
+      //                    it, or eligibility no longer holds). We keep
+      //                    the already-fetched status for this listing
+      //                    view rather than issuing a per-poll refetch;
+      //                    the next normal reload/navigation will show
+      //                    the authoritative DB status.
       const expired = pollsData.filter(
         (p) => p.status === 'open' && p.closes_at && new Date(p.closes_at) < new Date()
       );
       if (expired.length > 0) {
-        await Promise.all(
-          expired.map((p) => supabase.from('polls').update({ status: 'closed' }).eq('id', p.id))
+        const results = await Promise.all(
+          expired.map(async (p) => {
+            const { data, error } = await supabase.rpc('close_expired_poll', { p_poll_id: p.id });
+            if (error) {
+              console.error('close_expired_poll failed for poll', p.id, error);
+            }
+            return { id: p.id, data, error };
+          })
         );
-        pollsData = pollsData.map((p) => (expired.some((e) => e.id === p.id) ? { ...p, status: 'closed' } : p));
+        const actuallyClosedIds = new Set(results.filter((r) => !r.error && r.data === true).map((r) => r.id));
+        pollsData = pollsData.map((p) => (actuallyClosedIds.has(p.id) ? { ...p, status: 'closed' } : p));
       }
 
       setPolls(pollsData);
