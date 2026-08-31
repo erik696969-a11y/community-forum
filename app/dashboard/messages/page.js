@@ -137,15 +137,34 @@ export default function MessagesPage() {
                     {' · '}
                     {formatDate(m.created_at, lang)}
                   </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(m.id);
-                    }}
-                    className="text-xs text-red-500 hover:text-red-700 flex-shrink-0 ml-2"
-                  >
-                    {t(lang, 'delete')}
-                  </button>
+                  <div className="flex items-center gap-3 flex-shrink-0 ml-2">
+                    {tab === 'inbox' && m.sender_id && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const replySubject = m.subject && !m.subject.startsWith('Re:') ? `Re: ${m.subject}` : m.subject || '';
+                          const params = new URLSearchParams({
+                            to: m.sender_id,
+                            name: m.sender?.full_name || '',
+                          });
+                          if (replySubject) params.set('subject', replySubject);
+                          router.push(`/dashboard/messages/new?${params.toString()}`);
+                        }}
+                        className="text-xs text-harbor hover:text-ochre"
+                      >
+                        {t(lang, 'replyPrivately')}
+                      </button>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(m.id);
+                      }}
+                      className="text-xs text-red-500 hover:text-red-700"
+                    >
+                      {t(lang, 'delete')}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
