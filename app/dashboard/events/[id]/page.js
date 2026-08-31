@@ -26,7 +26,15 @@ export default function EventDetailPage() {
 
   const [event, setEvent] = useState(null);
   const [photos, setPhotos] = useState([]);
-  const [rsvps, setRsvps] = useState([]);
+  // RSVP data is split into privacy-safe sources instead of one broad
+  // query that returned every participant's identity for every status:
+  //  - myRsvp: self-scoped raw read (RLS allows reading your own row)
+  //  - rsvpCounts: aggregate RPC, no identities at all
+  //  - goingList: RPC that only ever returns "going" participants -
+  //    maybe/cant_come identities never reach a normal owner's browser
+  const [myRsvp, setMyRsvp] = useState(null);
+  const [rsvpCounts, setRsvpCounts] = useState({ going_count: 0, maybe_count: 0, cant_come_count: 0 });
+  const [goingList, setGoingList] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [downloadingZip, setDownloadingZip] = useState(false);
@@ -42,16 +50,24 @@ export default function EventDetailPage() {
 
     const { data: photoData } = await supabase
       .from('event_photos')
-      .select('*, uploader:profiles(full_name)')
+      .select('*')
       .eq('event_id', params.id)
       .order('created_at', { ascending: false });
     setPhotos(photoData || []);
 
-    const { data: rsvpData } = await supabase
+    const { data: myRsvpData } = await supabase
       .from('event_rsvps')
-      .select('*, profile:profiles(full_name, apartment_number)')
-      .eq('event_id', params.id);
-    setRsvps(rsvpData || []);
+      .select('status')
+      .eq('event_id', params.id)
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+    setMyRsvp(myRsvpData);
+
+    const { data: countsData } = await supabase.rpc('get_event_rsvp_counts', { p_event_id: params.id });
+    setRsvpCounts(countsData?.[0] || { going_count: 0, maybe_count: 0, cant_come_count: 0 });
+
+    const { data: goingData } = await supabase.rpc('get_event_rsvp_going', { p_event_id: params.id });
+    setGoingList(goingData || []);
 
     setLoadingData(false);
   }
@@ -126,10 +142,13 @@ export default function EventDetailPage() {
     load();
   }
 
-  function exportRsvpCsv() {
+  async function exportRsvpCsv() {
+    // Fetched on-demand from the Board-only admin RPC - never from the
+    // normal-owner state, which no longer contains hidden identities.
+    const { data } = await supabase.rpc('get_event_rsvps_admin', { p_event_id: params.id });
     const rows = [['Name', 'Apartment', 'Status']];
-    rsvps.forEach((r) => {
-      rows.push([r.profile?.full_name || '', r.profile?.apartment_number || '', r.status]);
+    (data || []).forEach((r) => {
+      rows.push([r.full_name || '', r.apartment_number || '', r.status]);
     });
     const csv = rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -202,49 +221,41 @@ export default function EventDetailPage() {
           )}
         </div>
 
-        {(() => {
-          const myRsvp = rsvps.find((r) => r.user_id === session.user.id);
-          const going = rsvps.filter((r) => r.status === 'going');
-          const maybe = rsvps.filter((r) => r.status === 'maybe');
-          const cantCome = rsvps.filter((r) => r.status === 'cant_come');
-          return (
-            <div className="card p-5 mb-8">
-              <div className="flex gap-2 flex-wrap mb-4">
-                <button
-                  onClick={() => handleRsvp('going')}
-                  className={myRsvp?.status === 'going' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpGoing')}
-                </button>
-                <button
-                  onClick={() => handleRsvp('maybe')}
-                  className={myRsvp?.status === 'maybe' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpMaybe')}
-                </button>
-                <button
-                  onClick={() => handleRsvp('cant_come')}
-                  className={myRsvp?.status === 'cant_come' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
-                >
-                  {t(lang, 'rsvpCantCome')}
-                </button>
-              </div>
-              <p className="text-sm text-ink/70">
-                <strong>{going.length}</strong> {t(lang, 'rsvpGoingLabel').toLowerCase()}
-                {going.length > 0 && `: ${going.map((r) => r.profile?.full_name).filter(Boolean).join(', ')}`}
-              </p>
-              <p className="text-sm text-ink/50 mt-1">
-                {maybe.length} {t(lang, 'rsvpMaybeLabel').toLowerCase()} · {cantCome.length}{' '}
-                {t(lang, 'rsvpCantComeLabel').toLowerCase()}
-              </p>
-              {profile.role === 'board' && rsvps.length > 0 && (
-                <button onClick={exportRsvpCsv} className="text-xs text-harbor/60 hover:text-harbor underline mt-3">
-                  {t(lang, 'exportRsvpList')}
-                </button>
-              )}
-            </div>
-          );
-        })()}
+        <div className="card p-5 mb-8">
+          <div className="flex gap-2 flex-wrap mb-4">
+            <button
+              onClick={() => handleRsvp('going')}
+              className={myRsvp?.status === 'going' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+            >
+              {t(lang, 'rsvpGoing')}
+            </button>
+            <button
+              onClick={() => handleRsvp('maybe')}
+              className={myRsvp?.status === 'maybe' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+            >
+              {t(lang, 'rsvpMaybe')}
+            </button>
+            <button
+              onClick={() => handleRsvp('cant_come')}
+              className={myRsvp?.status === 'cant_come' ? 'btn-primary text-sm' : 'btn-secondary text-sm'}
+            >
+              {t(lang, 'rsvpCantCome')}
+            </button>
+          </div>
+          <p className="text-sm text-ink/70">
+            <strong>{rsvpCounts.going_count}</strong> {t(lang, 'rsvpGoingLabel').toLowerCase()}
+            {goingList.length > 0 && `: ${goingList.map((r) => r.full_name).filter(Boolean).join(', ')}`}
+          </p>
+          <p className="text-sm text-ink/50 mt-1">
+            {rsvpCounts.maybe_count} {t(lang, 'rsvpMaybeLabel').toLowerCase()} · {rsvpCounts.cant_come_count}{' '}
+            {t(lang, 'rsvpCantComeLabel').toLowerCase()}
+          </p>
+          {profile.role === 'board' && (
+            <button onClick={exportRsvpCsv} className="text-xs text-harbor/60 hover:text-harbor underline mt-3">
+              {t(lang, 'exportRsvpList')}
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
           <h2 className="font-display text-lg text-harbor">{t(lang, 'photosLabel')}</h2>
