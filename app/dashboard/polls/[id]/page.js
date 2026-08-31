@@ -50,10 +50,23 @@ export default function PollDetailPage() {
   async function load() {
     const { data: pollData } = await supabase.from('polls').select('*').eq('id', params.id).single();
 
-    // Auto-close if the closing date has passed
+    // Auto-close if the closing date has passed - via the narrow
+    // close_expired_poll() RPC, not a direct .update() call.
     if (pollData && pollData.status === 'open' && pollData.closes_at && new Date(pollData.closes_at) < new Date()) {
-      await supabase.from('polls').update({ status: 'closed' }).eq('id', pollData.id);
-      pollData.status = 'closed';
+      const { data: didClose, error: closeError } = await supabase.rpc('close_expired_poll', { p_poll_id: pollData.id });
+      if (closeError) {
+        // Do not invent local state on error - leave pollData as fetched.
+        console.error('close_expired_poll failed', closeError);
+      } else if (didClose) {
+        pollData.status = 'closed';
+      } else {
+        // RPC ran but did not close this poll (e.g. a race - already
+        // closed by someone/something else). Re-fetch the single row
+        // (cheap - one poll) rather than assuming the client's stale
+        // status is authoritative.
+        const { data: refreshed } = await supabase.from('polls').select('status').eq('id', pollData.id).single();
+        if (refreshed) pollData.status = refreshed.status;
+      }
     }
 
     setPoll(pollData);
