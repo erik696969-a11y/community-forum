@@ -8,6 +8,7 @@ import { useLanguage } from '../../../lib/useLanguage';
 import { supabase } from '../../../lib/supabaseClient';
 import { t } from '../../../lib/i18n';
 import { formatDate, formatTime } from '../../../lib/formatDate';
+import { fetchAuthorProfiles } from '../../../lib/authorProfiles';
 import Header from '../../components/Header';
 
 export default function MessagesPage() {
@@ -37,7 +38,7 @@ export default function MessagesPage() {
 
     let query = supabase
       .from('messages')
-      .select('*, sender:profiles!messages_sender_id_fkey(full_name, apartment_number), recipient:profiles!messages_recipient_id_fkey(full_name)')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (tab === 'sent') {
@@ -50,7 +51,23 @@ export default function MessagesPage() {
     }
 
     const { data } = await query;
-    setMessages(data || []);
+    const rows = data || [];
+
+    // Display names no longer come from an embedded "profiles" join
+    // (that required broad direct SELECT permission on profiles, which
+    // Phase 2 removes for normal owners). Instead, fetch the small set of
+    // sender/recipient profiles through the existing, already-safe
+    // get_author_profiles(uuid[]) RPC and attach them client-side - same
+    // approach already used for Forum/Groups author display.
+    const ids = [...new Set(rows.flatMap((m) => [m.sender_id, m.recipient_id]).filter(Boolean))];
+    const profileMap = await fetchAuthorProfiles(ids);
+    const withProfiles = rows.map((m) => ({
+      ...m,
+      sender: profileMap.get(m.sender_id) || null,
+      recipient: m.recipient_id ? profileMap.get(m.recipient_id) || null : null,
+    }));
+
+    setMessages(withProfiles);
     setLoadingData(false);
   }
 
