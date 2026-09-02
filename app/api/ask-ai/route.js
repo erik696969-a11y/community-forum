@@ -1,6 +1,6 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 import {
-  detectEmergency,
+  detectEmergencyExcludingWaterElectrical,
   retrieveRelevantEntries,
   selectAttachedEntries,
   computeRelatedIntents,
@@ -16,6 +16,7 @@ import {
   validateSources,
   ALLOWED_SOURCE_STATUS,
 } from '../../../lib/aiAssistant';
+import { resolveWaterElectricalHybrid } from '../../../lib/waterElectricalClassifier';
 import { retrieveRelevantDocumentChunks, formatDocumentExcerptsForPrompt } from '../../../lib/documentRetrieval';
 
 const DAILY_LIMIT = 30;
@@ -166,7 +167,47 @@ export async function POST(request) {
 
     if (!process.env.ANTHROPIC_API_KEY) return Response.json({ error: 'AI assistant is not configured yet' }, { status: 500 });
 
-    const emergencyDetected = detectEmergency(question);
+    // Phase 3B (r2 correction): water/electrical (ELE-05) emergency
+    // detection is decided by the hybrid classifier pipeline, not the
+    // standalone deterministic parser. The structured model classifier
+    // is invoked for EVERY question that reaches this point (subject
+    // only to an API key being configured at all) - it is never skipped
+    // by a lexical hint filter or overridden outright by the
+    // deterministic fast path; see ARCHITECTURE_DECISION.md for why
+    // both of those were removed in this correction round. Every OTHER
+    // hazard family (fire, gas, medical, structural, intruder, threat)
+    // is still decided exactly as before, unchanged.
+    const historyQuestionsForClassifier = clientHistory
+      .map((h) => (h && typeof h.question === 'string' ? h.question.trim().slice(0, MAX_QUESTION_LENGTH) : null))
+      .filter(Boolean);
+    const weHybrid = await resolveWaterElectricalHybrid({
+      question,
+      historyQuestions: historyQuestionsForClassifier,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+    const otherEmergencyDetected = detectEmergencyExcludingWaterElectrical(question);
+    const emergencyDetected = otherEmergencyDetected || weHybrid.decision.emergencyDetected;
+    // Observability only (no DB schema change) - see VALIDATION_REPORT.md
+    // for aggregated latency/token measurements from a live test run.
+    // r3: added validationIssues (which specific required classifier
+    // field(s) were invalid/missing when classifierStatus='incomplete' -
+    // see LIVE_R2A_FAILURE_ANALYSIS.md, this was previously
+    // undiagnosable from the live output alone) and fallbackShape (the
+    // Phase 3A pair-bound evaluator's classification, only meaningful
+    // when the classifier itself failed).
+    console.log('ask-ai water-electrical classifier telemetry:', {
+      invoked: weHybrid.classifierInvoked,
+      status: weHybrid.classifierStatus,
+      failureReason: weHybrid.classifierFailureReason,
+      validationIssues: weHybrid.classifierValidationIssues,
+      latencyMs: weHybrid.latencyMs,
+      inputTokens: weHybrid.usage?.input_tokens ?? null,
+      outputTokens: weHybrid.usage?.output_tokens ?? null,
+      deterministicResult: weHybrid.deterministicResult,
+      hasWaterElectricalHint: weHybrid.hasWaterElectricalHint,
+      fallbackShape: weHybrid.fallbackShape,
+      state: weHybrid.decision.state,
+    });
 
     const [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }, { data: documentChunks }] = await Promise.all([
       adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
@@ -201,6 +242,24 @@ export async function POST(request) {
       const selection = selectAttachedEntries(allEntries, retrieval.entries, fallbackUsed, priorPrimaryCode, priorRelatedCodes);
       primary = selection.primary;
       attached = selection.attached;
+    }
+
+    // Phase 3B: the hybrid decision matrix, not raw keyword retrieval,
+    // has final authority over whether ELE-05 specifically is presented
+    // - this is the only scenario code this route ever adds/removes
+    // based on the classifier; all other keyword-matched scenarios are
+    // untouched. The admin "test a specific scenario" path (testIntentId)
+    // is deliberately left alone.
+    if (!testIntentId) {
+      const ele05Entry = allEntries.find((e) => e.intent_code === 'ELE-05');
+      const alreadyHasEle05 = attached.some((e) => e.intent_code === 'ELE-05');
+      if (weHybrid.decision.routeToEle05 && ele05Entry && !alreadyHasEle05) {
+        attached = [...attached, ele05Entry];
+        if (!primary) primary = ele05Entry;
+      } else if (!weHybrid.decision.routeToEle05 && alreadyHasEle05) {
+        attached = attached.filter((e) => e.intent_code !== 'ELE-05');
+        if (primary && primary.intent_code === 'ELE-05') primary = attached[0] || null;
+      }
     }
 
     const priorSourceStatus = ALLOWED_SOURCE_STATUS.includes(clientState.sourceStatus) ? clientState.sourceStatus : 'unknown';
@@ -354,6 +413,17 @@ export async function POST(request) {
     const sanitizedDocumentation = documentation.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
     const sanitizedFollowUp = followUp.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
 
+    const conversationalClarifyingQuestion = typeof parsed.clarifying_question === 'string'
+      ? sanitizeUnresolvedPlaceholders(parsed.clarifying_question, safeLang)
+      : '';
+    // At most one clarifying question is ever shown: prefer whatever the
+    // conversational answer already produced, and only fall back to the
+    // classifier's own question (already length-capped and validated) if
+    // the hybrid layer determined clarification is needed and the
+    // conversational answer did not itself ask anything.
+    const finalClarifyingQuestion = conversationalClarifyingQuestion
+      || (weHybrid.decision.state === 'needs_clarification' ? weHybrid.decision.clarifyingQuestion : '');
+
     return Response.json({
       urgency: validatedUrgency,
       answer: sanitizedAnswer,
@@ -366,11 +436,19 @@ export async function POST(request) {
       relatedIntents: computeRelatedIntents(primary, attached),
       sourceStatus: validatedSourceStatus,
       modulesUsed,
-      call112: Boolean(parsed.call112) || emergencyDetected,
-      clarifyingQuestion: typeof parsed.clarifying_question === 'string' ? sanitizeUnresolvedPlaceholders(parsed.clarifying_question, safeLang) : '',
+      // r2 correction (bug D): call112 was previously
+      // `Boolean(parsed.call112) || emergencyDetected`, letting the
+      // free-text conversational model's own JSON output independently
+      // set call112=true. It is now derived EXCLUSIVELY from the
+      // server-owned emergencyDetected (deterministic non-water/
+      // electrical hazard families OR the validated hybrid decision) -
+      // parsed.call112 is never read.
+      call112: emergencyDetected,
+      clarifyingQuestion: finalClarifyingQuestion,
       sources: validatedSources,
       documentsUsed: [...new Set(matchedDocumentChunks.map((c) => c.document_title))],
       emergencyDetected,
+      waterElectricalState: weHybrid.decision.state,
       logId,
     });
   } catch (error) {
