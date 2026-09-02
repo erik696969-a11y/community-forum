@@ -235,7 +235,7 @@ export default function AskAiPage() {
         <Link href="/dashboard" className="text-sm text-harbor/70 hover:text-harbor block mb-3">
           {t(lang, 'backToDashboard')}
         </Link>
-        <h1 className="font-display text-2xl text-harbor mb-2">🤖 {t(lang, 'askAiTitle')}</h1>
+        <h1 className="font-display text-2xl text-harbor mb-2 flex items-center gap-2"><img src="/mia-icon.png" alt="" className="h-8 w-auto inline-block" />{t(lang, 'askAiTitle')}</h1>
         <p className="text-sm text-ink/60 mb-1">{t(lang, 'askAiNote')}</p>
         <p className="text-xs text-ink/40 mb-6">{t(lang, 'askAiSensitiveNote')}</p>
 
