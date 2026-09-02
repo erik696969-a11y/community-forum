@@ -1,7 +1,6 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
 import {
   detectEmergency,
-  detectEmergencyExcludingWaterElectrical,
   retrieveRelevantEntries,
   selectAttachedEntries,
   computeRelatedIntents,
@@ -17,12 +16,15 @@ import {
   validateSources,
   ALLOWED_SOURCE_STATUS,
 } from '../../../lib/aiAssistant';
-import { resolveWaterElectricalHybrid } from '../../../lib/waterElectricalClassifier';
 import { retrieveRelevantDocumentChunks, formatDocumentExcerptsForPrompt } from '../../../lib/documentRetrieval';
 
 const DAILY_LIMIT = 30;
-// Board members regularly need to test the assistant or demo the product.
-// Their higher cap does not change the resident-facing cost-control limit.
+// Board members regularly need to test the assistant (as happened here)
+// or demo the product to prospective residents/partners - hitting the
+// same daily cap as an ordinary resident mid-demo is a bad experience
+// and not what the limit is actually for. Board members get a much
+// higher daily limit instead of the resident-facing cost-control cap;
+// residents are unaffected.
 const BOARD_DAILY_LIMIT = 500;
 const MAX_QUESTION_LENGTH = 1000;
 const MAX_HISTORY_TURNS = 2;
@@ -61,6 +63,11 @@ function buildSystemPrompt({ primary, attached, moduleSummaries, configText, doc
   const scenarioBlocks = attached
     .map((e) => {
       const l = e.logic_json || {};
+      // Show the LLM the SAME localized terminology the resident will see
+      // in the structured sections below the answer - if we showed it the
+      // English source here while the resident's language is ES/DE/FR, the
+      // "reuse this terminology" instruction would backfire and nudge it
+      // toward English borrowings instead of preventing them.
       const localizedActions = localizeField(l, 'immediate_actions', uiLang);
       const localizedDoNot = localizeField(l, 'do_not', uiLang);
       return `[${e.intent_code}] ${e.title} (severity: ${e.urgency})\nImmediate actions (already shown to the resident verbatim - do not repeat them, just refer to them naturally): ${localizedActions.join(' | ')}\nDo not: ${localizedDoNot.join(' | ')}`;
@@ -121,4 +128,267 @@ async function logAiQuery(adminClient, fields) {
   } catch (err) {
     console.error('ask-ai: telemetry logging failed (non-fatal):', err);
     return null;
- 
+  }
+}
+
+export async function POST(request) {
+  const requestStartedAt = Date.now();
+  try {
+    const auth = await getAuthedProfile(request);
+    if (!auth) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (auth.profile.status !== 'approved') return Response.json({ error: 'Forbidden' }, { status: 403 });
+    const adminClient = auth.adminClient;
+
+    const body = await request.json();
+    const question = (body.question || '').trim();
+    const clientHistory = Array.isArray(body.history) ? body.history.slice(-MAX_HISTORY_TURNS) : [];
+    // The client's own PRIOR STATE (what our server returned last turn) -
+    // treated as an untrusted hint only; every field is re-validated below
+    // against real data before use.
+    const clientState = body.state && typeof body.state === 'object' ? body.state : {};
+    const ALLOWED_LANGS = ['en', 'es', 'fr', 'de'];
+    // The app's own language selector (EN/ES/FR/DE) - the resident may have
+    // set this deliberately, and a short/ambiguous question isn't always
+    // enough for the model to reliably detect the intended language on its
+    // own, so we tell it explicitly rather than relying purely on guessing
+    // from the question text.
+    const uiLang = ALLOWED_LANGS.includes(body.lang) ? body.lang : null;
+    const testIntentId = auth.profile.role === 'board' ? body.testIntentId : null;
+
+    if (!question) return Response.json({ error: 'No question provided' }, { status: 400 });
+    if (question.length > MAX_QUESTION_LENGTH) return Response.json({ error: 'Question is too long' }, { status: 400 });
+
+    // Computed BEFORE the rate limit check (moved up from further below)
+    // specifically so a resident in a genuine emergency - who may be
+    // asking many rapid-fire questions under stress during an actual
+    // crisis - is never blocked by the daily question cap. The cap
+    // exists for cost control on ordinary usage, not to stand between
+    // someone and safety information during a real incident.
+    const emergencyDetected = detectEmergency(question);
+
+    if (!testIntentId && !emergencyDetected) {
+      const applicableLimit = auth.profile.role === 'board' ? BOARD_DAILY_LIMIT : DAILY_LIMIT;
+      const { data: allowed, error: rateLimitError } = await adminClient.rpc('check_and_increment_rate_limit', {
+        p_user_id: auth.user.id,
+        p_endpoint: 'ask-ai',
+        p_limit: applicableLimit,
+      });
+      if (rateLimitError) {
+        console.error('ask-ai rate limit check failed:', rateLimitError);
+        return Response.json({ error: 'MIA is temporarily unavailable. Please try again later.' }, { status: 503 });
+      }
+      if (!allowed) return Response.json({ error: 'Daily question limit reached. Please try again tomorrow.' }, { status: 429 });
+    }
+
+    if (!process.env.ANTHROPIC_API_KEY) return Response.json({ error: 'AI assistant is not configured yet' }, { status: 500 });
+
+    const [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }, { data: documentChunks }] = await Promise.all([
+      adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
+      adminClient.from('contacts').select('role_label, name, phone, email, notes'),
+      adminClient.from('community_config').select('key, value'),
+      adminClient.from('ai_response_modules').select('module_code, title, content_json').eq('active', true),
+      adminClient.from('community_documents').select('document_title, document_type, document_year, chunk_index, chunk_title, chunk_text, keywords, active').eq('active', true),
+    ]);
+
+    if (!allEntries || allEntries.length === 0) return Response.json({ noKnowledge: true });
+
+    let primary = null;
+    let attached = [];
+    let fallbackUsed = false;
+
+    if (testIntentId) {
+      const single = allEntries.find((e) => e.id === testIntentId);
+      if (single) {
+        primary = single;
+        attached = [single];
+      }
+    } else {
+      // scoreEntry() reads both entry.keywords (as real multi-word phrases,
+      // not pre-flattened) and entry.logic_json.example_user_queries
+      // directly, so entries are passed through untouched.
+      const retrieval = retrieveRelevantEntries(allEntries, question);
+      fallbackUsed = retrieval.fallbackUsed;
+
+      const priorPrimaryCode = typeof clientState.primaryIntent === 'string' ? clientState.primaryIntent : null;
+      const priorRelatedCodes = Array.isArray(clientState.relatedIntents) ? clientState.relatedIntents : [];
+
+      const selection = selectAttachedEntries(allEntries, retrieval.entries, fallbackUsed, priorPrimaryCode, priorRelatedCodes);
+      primary = selection.primary;
+      attached = selection.attached;
+    }
+
+    const priorSourceStatus = ALLOWED_SOURCE_STATUS.includes(clientState.sourceStatus) ? clientState.sourceStatus : 'unknown';
+
+    const configText = (config || [])
+      .filter((c) => c.value && c.value !== '[TO FILL IN]')
+      .map((c) => `- ${c.key}: ${c.value}`)
+      .join('\n') || '(no community facts configured yet)';
+
+    // documentChunks may be null/undefined if the community_documents
+    // table doesn't exist yet in a given deployment (migration not yet
+    // applied) - degrade gracefully to "no matches" rather than erroring
+    // the whole request.
+    const matchedDocumentChunks = retrieveRelevantDocumentChunks(documentChunks || [], question);
+    const documentExcerptsText = formatDocumentExcerptsForPrompt(matchedDocumentChunks);
+
+    // Candidate modules for this turn: whatever the attached scenarios
+    // themselves reference via followup_modules.
+    const candidateModuleCodes = new Set(attached.flatMap((e) => e.logic_json?.followup_modules || []));
+    const candidateModules = (allModules || []).filter((m) => candidateModuleCodes.has(m.module_code));
+
+    const systemPrompt = buildSystemPrompt({
+      primary,
+      attached,
+      moduleSummaries: candidateModules,
+      configText,
+      documentExcerptsText,
+      sourceStatus: priorSourceStatus,
+      emergencyDetected,
+      uiLang,
+    });
+
+    const historyQuestions = clientHistory
+      .map((h) => (h && typeof h.question === 'string' ? h.question.trim().slice(0, MAX_QUESTION_LENGTH) : null))
+      .filter(Boolean);
+    const userContent = historyQuestions.length > 0
+      ? `${historyQuestions.map((q) => `Previous question: ${q}`).join('\n')}\nFollow-up question: ${question}`
+      : question;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 900,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userContent }],
+      }),
+    });
+
+    const attachedCodes = attached.map((e) => e.intent_code || e.id);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('ask-ai Anthropic request failed:', errText);
+      if (!testIntentId) {
+        await logAiQuery(adminClient, {
+          user_id: auth.user.id,
+          matched_sources: attachedCodes,
+          emergency_detected: emergencyDetected,
+          fallback_used: fallbackUsed,
+          had_error: true,
+          latency_ms: Date.now() - requestStartedAt,
+        });
+      }
+      return Response.json({ error: 'MIA is temporarily unavailable. Please try again later.', emergencyDetected, call112: emergencyDetected }, { status: 500 });
+    }
+
+    const data = await res.json();
+    const rawText = data.content?.[0]?.text || '';
+    const parsed = safeParseJson(rawText);
+    const usage = data.usage || {};
+
+    // Deterministic, server-owned response content - never LLM-authored.
+    // localizeField() picks the resident's preferredLanguage version of
+    // each field when the scenario has been translated, falling back to
+    // English otherwise; resolvePlaceholdersInArray then fills in real
+    // contact/config values in that same language (including the
+    // fallback text for anything still unresolved).
+    const primaryLogic = primary?.logic_json || {};
+    const immediateActions = resolvePlaceholdersInArray(localizeField(primaryLogic, 'immediate_actions', uiLang), contacts, config, uiLang || 'en');
+    const doNot = resolvePlaceholdersInArray(localizeField(primaryLogic, 'do_not', uiLang), contacts, config, uiLang || 'en');
+    const contactRoute = dedupeResolvedContactLines(
+      resolvePlaceholdersInArray(localizeField(primaryLogic, 'contact_route', uiLang), contacts, config, uiLang || 'en')
+    );
+    const documentation = resolvePlaceholdersInArray(localizeField(primaryLogic, 'documentation', uiLang), contacts, config, uiLang || 'en');
+    const followUp = resolvePlaceholdersInArray(localizeField(primaryLogic, 'follow_up', uiLang), contacts, config, uiLang || 'en');
+
+    if (!parsed || typeof parsed.answer !== 'string') {
+      console.error('ask-ai: could not parse structured AI response:', rawText);
+      const logId = testIntentId ? null : await logAiQuery(adminClient, {
+        user_id: auth.user.id,
+        matched_sources: attachedCodes,
+        emergency_detected: emergencyDetected,
+        fallback_used: fallbackUsed,
+        parse_error: true,
+        latency_ms: Date.now() - requestStartedAt,
+        input_tokens: usage.input_tokens || null,
+        output_tokens: usage.output_tokens || null,
+      });
+      return Response.json({
+        urgency: clampUrgency(primary?.urgency, emergencyDetected ? 'red' : 'yellow'),
+        answer: sanitizeUnresolvedPlaceholders(rawText, uiLang || 'en') || 'MIA could not generate a clear answer. Please contact the Board directly.',
+        immediateActions: immediateActions.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        doNot: doNot.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        contactRoute: contactRoute.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        documentation: documentation.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        followUp: followUp.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
+        primaryIntent: primary?.intent_code || null,
+        relatedIntents: computeRelatedIntents(primary, attached),
+        sourceStatus: priorSourceStatus,
+        modulesUsed: [],
+        call112: emergencyDetected,
+        sources: attachedCodes,
+        emergencyDetected,
+        parseError: true,
+        logId,
+      });
+    }
+
+    const validatedSourceStatus = ALLOWED_SOURCE_STATUS.includes(parsed.source_status) ? parsed.source_status : priorSourceStatus;
+    const branchedModuleCodes = applyDeterministicBranching(primary, validatedSourceStatus);
+    const requestedModuleCodes = [...(Array.isArray(parsed.modules_used) ? parsed.modules_used : []), ...branchedModuleCodes];
+    const modulesUsed = resolveModules(requestedModuleCodes, candidateModules);
+    const validatedUrgency = clampUrgency(primary?.urgency, emergencyDetected ? 'red' : 'yellow');
+    const validatedSources = validateSources(attachedCodes, attached);
+
+    const logId = testIntentId ? null : await logAiQuery(adminClient, {
+      user_id: auth.user.id,
+      matched_sources: attachedCodes,
+      urgency: validatedUrgency,
+      emergency_detected: emergencyDetected,
+      fallback_used: fallbackUsed,
+      latency_ms: Date.now() - requestStartedAt,
+      input_tokens: usage.input_tokens || null,
+      output_tokens: usage.output_tokens || null,
+    });
+
+    // Final defensive net (spec section 7.5): even if some future field or
+    // an entry with a typo'd token slips past normal resolution, no raw
+    // [SOMETHING] bracket pattern is ever shown to a resident.
+    const safeLang = uiLang || 'en';
+    const sanitizedAnswer = sanitizeUnresolvedPlaceholders(parsed.answer, safeLang);
+    const sanitizedImmediateActions = immediateActions.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedDoNot = doNot.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedContactRoute = contactRoute.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedDocumentation = documentation.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+    const sanitizedFollowUp = followUp.map((t) => sanitizeUnresolvedPlaceholders(t, safeLang));
+
+    return Response.json({
+      urgency: validatedUrgency,
+      answer: sanitizedAnswer,
+      immediateActions: sanitizedImmediateActions,
+      doNot: sanitizedDoNot,
+      contactRoute: sanitizedContactRoute,
+      documentation: sanitizedDocumentation,
+      followUp: sanitizedFollowUp,
+      primaryIntent: primary?.intent_code || null,
+      relatedIntents: computeRelatedIntents(primary, attached),
+      sourceStatus: validatedSourceStatus,
+      modulesUsed,
+      call112: Boolean(parsed.call112) || emergencyDetected,
+      clarifyingQuestion: typeof parsed.clarifying_question === 'string' ? sanitizeUnresolvedPlaceholders(parsed.clarifying_question, safeLang) : '',
+      sources: validatedSources,
+      documentsUsed: [...new Set(matchedDocumentChunks.map((c) => c.document_title))],
+      emergencyDetected,
+      logId,
+    });
+  } catch (error) {
+    console.error('ask-ai unexpected error:', error);
+    return Response.json({ error: 'MIA is temporarily unavailable. Please try again later.' }, { status: 500 });
+  }
+}
