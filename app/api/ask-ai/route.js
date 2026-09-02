@@ -206,6 +206,7 @@ export async function POST(request) {
       deterministicResult: weHybrid.deterministicResult,
       hasWaterElectricalHint: weHybrid.hasWaterElectricalHint,
       fallbackShape: weHybrid.fallbackShape,
+      epistemicCurrentUncertainty: weHybrid.epistemicCurrentUncertainty,
       state: weHybrid.decision.state,
     });
 
