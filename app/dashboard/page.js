@@ -148,6 +148,10 @@ export default function DashboardPage() {
                 <h2 className="font-display text-lg text-harbor mb-1 flex items-center gap-2"><img src="/mia-icon.png" alt="" className="h-5 w-auto inline-block" />{t(lang, 'askAiTitle')}</h2>
                 <p className="text-sm text-ink/70">{t(lang, 'askAiNote')}</p>
               </Link>
+              <Link href="/dashboard/report-issue" className="card p-5 hover:border-ochre transition-colors block">
+                <h2 className="font-display text-lg text-harbor mb-1">🛠️ {t(lang, 'reportIssueTitle')}</h2>
+                <p className="text-sm text-ink/70">{t(lang, 'reportIssueTileDesc')}</p>
+              </Link>
             </div>
           </>
         )}
