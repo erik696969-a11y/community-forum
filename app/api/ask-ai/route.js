@@ -122,6 +122,59 @@ Respond ONLY with a JSON object in exactly this shape:
 }`;
 }
 
+// Translates the resident's question into English purely for internal
+// scenario/document retrieval matching - the knowledge_base's keywords
+// and community_documents' text are predominantly English-only, so
+// non-English questions frequently fail to match the right scenario or
+// match the wrong one via accidental weak-word overlap (confirmed
+// repeatedly via live multilingual testing: e.g. a Spanish facility-
+// booking question matching nothing, a French "car damaged in garage"
+// question matching a garage FIRE scenario instead). This translation
+// is NEVER used for the actual answer - MIA continues to respond from
+// the resident's original question, in their own language, exactly as
+// before.
+//
+// Runs only for non-English UI languages, in parallel with the main
+// data fetch below (see the combined Promise.all), so it adds no
+// latency beyond whichever of the two happens to be slower.
+//
+// On ANY failure - network error, non-OK response, empty or malformed
+// content - this returns null. Callers MUST fall back to using the
+// original, untranslated question for retrieval in that case, exactly
+// matching pre-existing behaviour. A failed translation must never
+// block, delay beyond its own timeout, or otherwise degrade the main
+// request.
+async function translateForRetrieval(question, uiLang) {
+  if (!uiLang || uiLang === 'en') return null;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
+        system: 'You are a precise, literal translation tool. Translate the given text into English. Preserve the EXACT meaning, especially any negation words (not, no, never, nobody, none, nothing, isn\'t, doesn\'t, hasn\'t) - never drop, add, or invert a negation; this is safety-critical. Do not paraphrase, summarize, answer the question, or add any commentary. Output ONLY the English translation and nothing else - no quotes, no preamble. If the text is already in English, output it unchanged.',
+        messages: [{ role: 'user', content: question }],
+      }),
+    });
+    if (!res.ok) {
+      console.error('translateForRetrieval: Anthropic request failed:', res.status);
+      return null;
+    }
+    const data = await res.json();
+    const translated = data.content?.[0]?.text?.trim();
+    if (!translated || typeof translated !== 'string') return null;
+    return translated;
+  } catch (error) {
+    console.error('translateForRetrieval: unexpected error:', error);
+    return null;
+  }
+}
+
 async function logAiQuery(adminClient, fields) {
   try {
     const { data } = await adminClient.from('ai_query_log').insert(fields).select('id').single();
@@ -233,13 +286,26 @@ export async function POST(request) {
       state: weHybrid.decision.state,
     });
 
-    const [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }, { data: documentChunks }] = await Promise.all([
-      adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
-      adminClient.from('contacts').select('role_label, name, phone, email, notes'),
-      adminClient.from('community_config').select('key, value'),
-      adminClient.from('ai_response_modules').select('module_code, title, content_json').eq('active', true),
-      adminClient.from('community_documents').select('document_title, document_type, document_year, chunk_index, chunk_title, chunk_text, keywords, active').eq('active', true),
+    const [
+      [{ data: allEntries }, { data: contacts }, { data: config }, { data: allModules }, { data: documentChunks }],
+      translatedQuestionForRetrieval,
+    ] = await Promise.all([
+      Promise.all([
+        adminClient.from('ai_knowledge_base').select('id, intent_code, title, category, urgency, keywords, logic_json').eq('active', true),
+        adminClient.from('contacts').select('role_label, name, phone, email, notes'),
+        adminClient.from('community_config').select('key, value'),
+        adminClient.from('ai_response_modules').select('module_code, title, content_json').eq('active', true),
+        adminClient.from('community_documents').select('document_title, document_type, document_year, chunk_index, chunk_title, chunk_text, keywords, active').eq('active', true),
+      ]),
+      translateForRetrieval(question, uiLang),
     ]);
+
+    // Used ONLY for scenario/document matching below - never for the
+    // actual prompt/answer, which always uses the original `question`.
+    // Falls back to the original question, unchanged, if translation
+    // was skipped (English) or failed for any reason - this preserves
+    // exactly the pre-existing behaviour in both of those cases.
+    const retrievalQuestion = translatedQuestionForRetrieval || question;
 
     if (!allEntries || allEntries.length === 0) return Response.json({ noKnowledge: true });
 
@@ -257,7 +323,7 @@ export async function POST(request) {
       // scoreEntry() reads both entry.keywords (as real multi-word phrases,
       // not pre-flattened) and entry.logic_json.example_user_queries
       // directly, so entries are passed through untouched.
-      const retrieval = retrieveRelevantEntries(allEntries, question);
+      const retrieval = retrieveRelevantEntries(allEntries, retrievalQuestion);
       fallbackUsed = retrieval.fallbackUsed;
 
       const priorPrimaryCode = typeof clientState.primaryIntent === 'string' ? clientState.primaryIntent : null;
@@ -297,7 +363,7 @@ export async function POST(request) {
     // table doesn't exist yet in a given deployment (migration not yet
     // applied) - degrade gracefully to "no matches" rather than erroring
     // the whole request.
-    const matchedDocumentChunks = retrieveRelevantDocumentChunks(documentChunks || [], question);
+    const matchedDocumentChunks = retrieveRelevantDocumentChunks(documentChunks || [], retrievalQuestion);
     const documentExcerptsText = formatDocumentExcerptsForPrompt(matchedDocumentChunks);
 
     // Candidate modules for this turn: whatever the attached scenarios
