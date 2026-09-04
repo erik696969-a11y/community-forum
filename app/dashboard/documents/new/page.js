@@ -41,6 +41,14 @@ export default function NewDocumentPage() {
       setError(t(lang, 'chooseFileError'));
       return;
     }
+    if (docType === 'file' && file) {
+      const isPdfExtension = file.name.toLowerCase().endsWith('.pdf');
+      const isPdfMimeType = !file.type || file.type === 'application/pdf';
+      if (!isPdfExtension || !isPdfMimeType) {
+        setError(t(lang, 'pdfOnlyError'));
+        return;
+      }
+    }
     if (docType === 'link' && !externalUrl.trim()) {
       setError(t(lang, 'enterLinkError'));
       return;
@@ -164,7 +172,7 @@ export default function NewDocumentPage() {
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'documentFileLabel')}</label>
               <input
                 type="file"
-                accept=".pdf,.doc,.docx"
+                accept=".pdf"
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
                 className="input-field"
               />
