@@ -185,7 +185,7 @@ export default function ContactsPage() {
               <div key={c.id} className="card p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold text-ochre uppercase tracking-wide">{c.role_label}</p>
+                    <p className="text-xs font-semibold text-ochre uppercase tracking-wide">{c[`role_label_${lang}`] || c.role_label}</p>
                     {c.name && <p className="font-display text-lg text-harbor">{c.name}</p>}
                     {c.phone && (
                       <p className="text-sm text-ink mt-1">
@@ -197,7 +197,7 @@ export default function ContactsPage() {
                         <a href={`mailto:${c.email}`} className="hover:text-ochre">{c.email}</a>
                       </p>
                     )}
-                    {c.notes && <p className="text-sm text-ink/70 mt-1">{c.notes}</p>}
+                    {(c[`notes_${lang}`] || c.notes) && <p className="text-sm text-ink/70 mt-1">{c[`notes_${lang}`] || c.notes}</p>}
                   </div>
                   {isBoard && (
                     <div className="flex gap-2 flex-shrink-0">
