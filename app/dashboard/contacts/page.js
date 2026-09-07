@@ -24,8 +24,33 @@ export default function ContactsPage() {
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [notes, setNotes] = useState('');
+  // Translated variants. The list below falls back to the base (English)
+  // column when one of these is empty, so they stay genuinely optional.
+  const [tr, setTr] = useState({
+    role_label_es: '',
+    role_label_fr: '',
+    role_label_de: '',
+    notes_es: '',
+    notes_fr: '',
+    notes_de: '',
+  });
+  const [showTranslations, setShowTranslations] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
+
+  const EMPTY_TR = {
+    role_label_es: '',
+    role_label_fr: '',
+    role_label_de: '',
+    notes_es: '',
+    notes_fr: '',
+    notes_de: '',
+  };
+
+  // Store an untouched optional field as NULL rather than '', so the
+  // `value || fallback` rendering behaves the same either way and the
+  // table does not accumulate empty strings.
+  const orNull = (v) => (typeof v === 'string' && v.trim() === '' ? null : v);
 
   useEffect(() => {
     if (loading) return;
@@ -54,6 +79,8 @@ export default function ContactsPage() {
     setPhone('');
     setEmail('');
     setNotes('');
+    setTr(EMPTY_TR);
+    setShowTranslations(false);
     setEditingId(null);
     setShowForm(false);
     setSaveError('');
@@ -65,6 +92,13 @@ export default function ContactsPage() {
     setPhone(contact.phone || '');
     setEmail(contact.email || '');
     setNotes(contact.notes || '');
+    const loaded = Object.fromEntries(
+      Object.keys(EMPTY_TR).map((k) => [k, contact[k] || ''])
+    );
+    setTr(loaded);
+    // Open the section straight away when this contact already has
+    // translations, so they are visible rather than hidden behind a click.
+    setShowTranslations(Object.values(loaded).some((v) => v !== ''));
     setEditingId(contact.id);
     setShowForm(true);
   }
@@ -74,19 +108,22 @@ export default function ContactsPage() {
     setSaving(true);
     setSaveError('');
 
+    const translated = Object.fromEntries(
+      Object.entries(tr).map(([k, v]) => [k, orNull(v)])
+    );
+
+    const payload = {
+      role_label: roleLabel.trim(),
+      name: orNull(name),
+      phone: orNull(phone),
+      email: orNull(email),
+      notes: orNull(notes),
+      ...translated,
+    };
+
     const { error } = editingId
-      ? await supabase
-          .from('contacts')
-          .update({ role_label: roleLabel, name, phone, email, notes })
-          .eq('id', editingId)
-      : await supabase.from('contacts').insert({
-          role_label: roleLabel,
-          name,
-          phone,
-          email,
-          notes,
-          sort_order: contacts.length,
-        });
+      ? await supabase.from('contacts').update(payload).eq('id', editingId)
+      : await supabase.from('contacts').insert({ ...payload, sort_order: contacts.length });
 
     setSaving(false);
 
@@ -163,6 +200,46 @@ export default function ContactsPage() {
               <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'notesLabel')}</label>
               <textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className="input-field" />
             </div>
+
+            <div className="border-t border-harbor/10 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowTranslations((v) => !v)}
+                className="text-sm font-semibold text-harbor hover:text-ochre"
+              >
+                {showTranslations ? '▾' : '▸'} {t(lang, 'contactTranslations')}
+              </button>
+
+              {showTranslations && (
+                <div className="mt-3 space-y-4">
+                  <p className="text-xs text-ink/60">{t(lang, 'contactTranslationsHint')}</p>
+                  {[
+                    { code: 'es', name: 'Español' },
+                    { code: 'fr', name: 'Français' },
+                    { code: 'de', name: 'Deutsch' },
+                  ].map(({ code, name: langName }) => (
+                    <div key={code} className="space-y-2">
+                      <p className="text-xs font-semibold text-ochre uppercase tracking-wide">{langName}</p>
+                      <input
+                        type="text"
+                        value={tr[`role_label_${code}`]}
+                        onChange={(e) => setTr((p) => ({ ...p, [`role_label_${code}`]: e.target.value }))}
+                        className="input-field"
+                        placeholder={t(lang, 'roleLabel')}
+                      />
+                      <textarea
+                        rows={2}
+                        value={tr[`notes_${code}`]}
+                        onChange={(e) => setTr((p) => ({ ...p, [`notes_${code}`]: e.target.value }))}
+                        className="input-field"
+                        placeholder={t(lang, 'notesLabel')}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {saveError && <p className="text-sm text-red-600">{saveError}</p>}
             <div className="flex gap-2">
               <button type="submit" disabled={saving} className="btn-primary">
