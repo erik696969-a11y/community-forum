@@ -15,10 +15,17 @@ import Header from '../../components/Header';
 import DecisionsPanel from '../../components/memoria/DecisionsPanel';
 import SuppliersPanel from '../../components/memoria/SuppliersPanel';
 import ActivityFeed from '../../components/memoria/ActivityFeed';
+import ContractsPanel from '../../components/memoria/ContractsPanel';
+import TendersPanel from '../../components/memoria/TendersPanel';
+import InvoicesPanel from '../../components/memoria/InvoicesPanel';
+import AlertsBar from '../../components/memoria/AlertsBar';
 
 const TABS = [
   { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
   { key: 'suppliers', label: 'tabSuppliers', icon: '🏢' },
+  { key: 'contracts', label: 'tabContracts', icon: '📑' },
+  { key: 'tenders', label: 'tabTenders', icon: '🧾' },
+  { key: 'invoices', label: 'tabInvoices', icon: '💶' },
   { key: 'activity', label: 'tabActivity', icon: '🕒' },
 ];
 
@@ -58,6 +65,8 @@ export default function MemoriaPage() {
         <h1 className="font-display text-2xl text-harbor mt-2">🧠 {mt(lang, 'memoriaTitle')}</h1>
         <p className="text-sm text-ink/60 mt-1 mb-6">{mt(lang, 'memoriaSubtitle')}</p>
 
+        <AlertsBar lang={lang} refreshKey={refreshKey} onOpenTab={setTab} />
+
         <div className="flex gap-1 border-b border-sand-dark mb-6 overflow-x-auto">
           {TABS.map((tb) => (
             <button
@@ -74,6 +83,9 @@ export default function MemoriaPage() {
 
         {tab === 'decisions' && <DecisionsPanel lang={lang} onChanged={bump} />}
         {tab === 'suppliers' && <SuppliersPanel lang={lang} onChanged={bump} />}
+        {tab === 'contracts' && <ContractsPanel lang={lang} onChanged={bump} />}
+        {tab === 'tenders' && <TendersPanel lang={lang} onChanged={bump} />}
+        {tab === 'invoices' && <InvoicesPanel lang={lang} onChanged={bump} />}
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
       </div>
     </main>

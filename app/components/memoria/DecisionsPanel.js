@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
-import { mt, cleanFormValues, DECISION_BODIES, DECISION_STATUSES } from '../../../lib/memoriaI18n';
+import { mt, cleanFormValues, todayIso, DECISION_BODIES, DECISION_STATUSES } from '../../../lib/memoriaI18n';
 import { Field, Pill, ErrorBox, DetailRow } from './MemoriaUi';
+import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
   title: '',
@@ -90,7 +91,7 @@ export default function DecisionsPanel({ lang, onChanged }) {
   });
 
   function openNew() {
-    setForm({ ...EMPTY_FORM, decided_on: new Date().toISOString().slice(0, 10) });
+    setForm({ ...EMPTY_FORM, decided_on: todayIso() });
     setFormSuppliers([]);
     setFormError('');
     setEditingId('new');
@@ -175,6 +176,7 @@ export default function DecisionsPanel({ lang, onChanged }) {
       window.alert(mt(lang, 'saveError', { error: error.message }));
       return;
     }
+    await removeEntityExtras('decision', decision.id);
     await load();
     onChanged?.();
   }
@@ -376,6 +378,7 @@ export default function DecisionsPanel({ lang, onChanged }) {
                         ? `${d.outcome_review}${d.outcome_reviewed_on ? ` (${formatDate(d.outcome_reviewed_on, lang)})` : ''}`
                         : null}
                     </DetailRow>
+                    <Attachments lang={lang} entityType="decision" entityId={d.id} defaultType="minutes" />
                   </div>
                 )}
               </div>

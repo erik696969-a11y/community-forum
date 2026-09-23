@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
-import { mt, cleanFormValues, SUPPLIER_CATEGORIES, SUPPLIER_STATUSES } from '../../../lib/memoriaI18n';
+import { mt, cleanFormValues, todayIso, SUPPLIER_CATEGORIES, SUPPLIER_STATUSES } from '../../../lib/memoriaI18n';
 import { Field, Pill, ErrorBox, DetailRow, Stars } from './MemoriaUi';
+import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
   name: '',
@@ -172,15 +173,15 @@ export default function SuppliersPanel({ lang, onChanged }) {
       window.alert(friendlyError(lang, error));
       return;
     }
-    // Väzby rozhodnutí sú polymorfné (bez cudzieho kľúča), preto ich upraceme ručne.
-    await supabase.from('memoria_decision_links').delete().eq('entity_type', 'supplier').eq('entity_id', supplier.id);
+    // Prílohy a väzby rozhodnutí sú polymorfné (bez cudzieho kľúča), preto ich upraceme ručne.
+    await removeEntityExtras('supplier', supplier.id);
     await load();
     onChanged?.();
   }
 
   function openRating(supplierId) {
     setRatingFor(supplierId);
-    setRatingForm({ rating: '4', comment: '', rated_on: new Date().toISOString().slice(0, 10) });
+    setRatingForm({ rating: '4', comment: '', rated_on: todayIso() });
     setRatingError('');
   }
 
@@ -431,6 +432,8 @@ export default function SuppliersPanel({ lang, onChanged }) {
                         </button>
                       )}
                     </div>
+
+                    <Attachments lang={lang} entityType="supplier" entityId={s.id} defaultType="correspondence" />
                   </div>
                 )}
               </div>
