@@ -486,6 +486,7 @@ export async function POST(request) {
         documentation: documentation.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
         followUp: followUp.map((t) => sanitizeUnresolvedPlaceholders(t, uiLang || 'en')),
         primaryIntent: primary?.intent_code || null,
+        informational: primary?.urgency === 'info' && !emergencyDetected,
         relatedIntents: computeRelatedIntents(primary, attached),
         sourceStatus: priorSourceStatus,
         modulesUsed: [],
@@ -546,6 +547,10 @@ export async function POST(request) {
       documentation: sanitizedDocumentation,
       followUp: sanitizedFollowUp,
       primaryIntent: primary?.intent_code || null,
+      // Informational scenarios (urgency 'info', e.g. "how do I install an
+      // EV charger?") are rule questions, not incidents: the UI shows
+      // neutral headings and hides the post-incident section for them.
+      informational: primary?.urgency === 'info' && !emergencyDetected,
       relatedIntents: computeRelatedIntents(primary, attached),
       sourceStatus: validatedSourceStatus,
       modulesUsed,
