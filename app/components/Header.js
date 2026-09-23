@@ -39,6 +39,11 @@ export default function Header({ profile, lang, onLanguageChange }) {
             {t(lang, 'settingsTitle')}
           </Link>
           {profile?.role === 'board' && (
+            <Link href="/admin/memoria" className="hover:text-ochre whitespace-nowrap" title="Memoria">
+              🧠 Memoria
+            </Link>
+          )}
+          {profile?.role === 'board' && (
             <Link href="/admin" className="hover:text-ochre whitespace-nowrap">
               {t(lang, 'admin')}
             </Link>
