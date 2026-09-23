@@ -19,6 +19,7 @@ import ContractsPanel from '../../components/memoria/ContractsPanel';
 import TendersPanel from '../../components/memoria/TendersPanel';
 import InvoicesPanel from '../../components/memoria/InvoicesPanel';
 import AlertsBar from '../../components/memoria/AlertsBar';
+import ReportPanel from '../../components/memoria/ReportPanel';
 
 const TABS = [
   { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
@@ -26,6 +27,7 @@ const TABS = [
   { key: 'contracts', label: 'tabContracts', icon: '📑' },
   { key: 'tenders', label: 'tabTenders', icon: '🧾' },
   { key: 'invoices', label: 'tabInvoices', icon: '💶' },
+  { key: 'report', label: 'tabReport', icon: '📊' },
   { key: 'activity', label: 'tabActivity', icon: '🕒' },
 ];
 
@@ -59,15 +61,21 @@ export default function MemoriaPage() {
 
   return (
     <main className="min-h-screen">
-      <Header profile={profile} lang={lang} onLanguageChange={setLang} />
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
+      <div className="print:hidden">
+        <Header profile={profile} lang={lang} onLanguageChange={setLang} />
+      </div>
+      <div className="max-w-4xl mx-auto px-4 py-8 print:py-0">
+        <div className="print:hidden">
+          <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
+        </div>
         <h1 className="font-display text-2xl text-harbor mt-2">🧠 {mt(lang, 'memoriaTitle')}</h1>
-        <p className="text-sm text-ink/60 mt-1 mb-6">{mt(lang, 'memoriaSubtitle')}</p>
+        <p className="text-sm text-ink/60 mt-1 mb-6 print:hidden">{mt(lang, 'memoriaSubtitle')}</p>
 
-        <AlertsBar lang={lang} refreshKey={refreshKey} onOpenTab={setTab} />
+        <div className="print:hidden">
+          <AlertsBar lang={lang} refreshKey={refreshKey} onOpenTab={setTab} />
+        </div>
 
-        <div className="flex gap-1 border-b border-sand-dark mb-6 overflow-x-auto">
+        <div className="flex gap-1 border-b border-sand-dark mb-6 overflow-x-auto print:hidden">
           {TABS.map((tb) => (
             <button
               key={tb.key}
@@ -86,6 +94,7 @@ export default function MemoriaPage() {
         {tab === 'contracts' && <ContractsPanel lang={lang} onChanged={bump} />}
         {tab === 'tenders' && <TendersPanel lang={lang} onChanged={bump} />}
         {tab === 'invoices' && <InvoicesPanel lang={lang} onChanged={bump} />}
+        {tab === 'report' && <ReportPanel lang={lang} />}
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
       </div>
     </main>

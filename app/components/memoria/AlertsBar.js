@@ -19,9 +19,9 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
     (async () => {
       const today = todayIso();
       const [cRes, iRes, tRes, qRes, sRes] = await Promise.all([
-        supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status').eq('status', 'active'),
+        supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status, tender_id').eq('status', 'active'),
         supabase.from('memoria_invoices').select('id, invoice_number, description, total_amount, currency, due_date, payment_status, is_urgent_unbudgeted, ratified_by_decision_id'),
-        supabase.from('memoria_tenders').select('id, title, status').eq('status', 'decided'),
+        supabase.from('memoria_tenders').select('id, title, status, selection_reason').eq('status', 'decided'),
         supabase.from('memoria_quotes').select('tender_id'),
         supabase.from('memoria_suppliers').select('id, name, status, conflict_of_interest_checked').eq('status', 'active'),
       ]);
@@ -29,6 +29,9 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
       const list = [];
 
       for (const c of cRes.data || []) {
+        if (!c.tender_id) {
+          list.push({ key: `ct-${c.id}`, tone: 'neutral', tab: 'contracts', sort: '98', text: mt(lang, 'alertContractNoTender', { name: c.subject }) });
+        }
         if (c.auto_renew && c.ends_on && c.notice_period_days !== null) {
           const deadline = addDaysIso(c.ends_on, -Number(c.notice_period_days || 0));
           if (deadline >= today && deadline <= addDaysIso(today, NOTICE_WINDOW_DAYS)) {
@@ -54,6 +57,9 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
       const quoteCount = {};
       for (const q of qRes.data || []) quoteCount[q.tender_id] = (quoteCount[q.tender_id] || 0) + 1;
       for (const t of tRes.data || []) {
+        if (!t.selection_reason || !t.selection_reason.trim()) {
+          list.push({ key: `tr-${t.id}`, tone: 'neutral', tab: 'tenders', sort: '98', text: mt(lang, 'alertTenderNoReason', { name: t.title }) });
+        }
         if ((quoteCount[t.id] || 0) < 2) {
           list.push({ key: `t-${t.id}`, tone: 'ochre', tab: 'tenders', sort: '9', text: mt(lang, 'alertSingleQuote', { name: t.title }) });
         }
