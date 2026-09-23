@@ -9,6 +9,7 @@ import { t } from '../../../lib/i18n';
 import Header from '../../components/Header';
 
 const URGENCY_COLORS = {
+  info: 'border-harbor/40',
   yellow: 'border-yellow-400',
   orange: 'border-orange-400',
   red: 'border-red-500',
@@ -16,6 +17,8 @@ const URGENCY_COLORS = {
 
 function StageB({ h, lang, expanded, onToggle }) {
   const a = h.answer;
+  // Rule/how-to questions have no "after the incident" stage.
+  if (a.informational) return null;
   const hasContent = a.documentation?.length > 0 || a.followUp?.length > 0 || a.modulesUsed?.length > 0;
   if (!hasContent) return null;
 
@@ -71,7 +74,9 @@ function StageB({ h, lang, expanded, onToggle }) {
 
 function AnswerCard({ h, lang, onFeedback, expanded, onToggleStageB }) {
   const a = h.answer;
-  const borderClass = URGENCY_COLORS[a.urgency] || URGENCY_COLORS.yellow;
+  const borderClass = a.informational
+    ? URGENCY_COLORS.info
+    : (URGENCY_COLORS[a.urgency] || URGENCY_COLORS.yellow);
   return (
     <div className={`card p-4 mr-8 border-l-4 ${borderClass}`}>
       {a.call112 && (
@@ -83,7 +88,7 @@ function AnswerCard({ h, lang, onFeedback, expanded, onToggleStageB }) {
 
       {a.immediateActions?.length > 0 && (
         <div className="mt-3">
-          <p className="text-xs font-semibold text-harbor uppercase tracking-wide">{t(lang, 'askAiDoNow')}</p>
+          <p className="text-xs font-semibold text-harbor uppercase tracking-wide">{t(lang, a.informational ? 'askAiHowTo' : 'askAiDoNow')}</p>
           <ul className="list-disc list-inside text-sm text-ink mt-1 space-y-0.5">
             {a.immediateActions.map((item, i) => <li key={i}>{item}</li>)}
           </ul>
