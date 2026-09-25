@@ -27,6 +27,7 @@ import HandoverPanel from '../../components/memoria/HandoverPanel';
 import AskPanel from '../../components/memoria/AskPanel';
 import MandatesPanel from '../../components/memoria/MandatesPanel';
 import ExportPanel from '../../components/memoria/ExportPanel';
+import BudgetPanel from '../../components/memoria/BudgetPanel';
 import { supabase } from '../../../lib/supabaseClient';
 
 // Karty v troch skupinách, aby sa v module dalo ľahko zorientovať.
@@ -49,6 +50,7 @@ const TAB_GROUPS = [
       { key: 'tenders', label: 'tabTenders', icon: '🧾' },
       { key: 'contracts', label: 'tabContracts', icon: '📑' },
       { key: 'invoices', label: 'tabInvoices', icon: '💶' },
+      { key: 'budget', label: 'tabBudget', icon: '💰' },
     ],
   },
   {
@@ -163,6 +165,7 @@ export default function MemoriaPage() {
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
         {tab === 'mandates' && <MandatesPanel lang={lang} profile={profile} onChanged={bump} />}
         {tab === 'export' && <ExportPanel lang={lang} profile={profile} />}
+        {tab === 'budget' && <BudgetPanel lang={lang} onChanged={bump} />}
       </div>
     </main>
   );

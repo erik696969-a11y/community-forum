@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { mandateState } from '../../../lib/memoriaMandates';
+import { budgetStatus, reserveStatus } from '../../../lib/memoriaBudget';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, todayIso, addDaysIso, addMonthsIso, formatMoney, OPEN_TASK_STATUSES } from '../../../lib/memoriaI18n';
 import { DemoPill } from './MemoriaUi';
@@ -55,7 +56,8 @@ export default function HandoverPanel({ lang, profile }) {
     let active = true;
     (async () => {
       const since = addMonthsIso(todayIso(), -12);
-      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes, mdRes] = await Promise.all([
+      const yr = Number(todayIso().slice(0, 4));
+      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes, mdRes, bRes, blRes, rmRes, yiRes, riRes] = await Promise.all([
         supabase.from('memoria_tasks').select('*').in('status', OPEN_TASK_STATUSES).order('due_date', { ascending: true, nullsFirst: false }),
         supabase.from('memoria_obligations').select('*').eq('active', true),
         supabase.from('memoria_meetings').select('*').order('meeting_on', { ascending: false }),
@@ -67,6 +69,11 @@ export default function HandoverPanel({ lang, profile }) {
         supabase.from('memoria_invoices').select('*').gte('invoice_date', since),
         supabase.from('memoria_decisions').select('*').order('decided_on', { ascending: false }).limit(15),
         supabase.from('memoria_mandates').select('*').order('starts_on', { ascending: false }),
+        supabase.from('memoria_budgets').select('*').order('year', { ascending: false }),
+        supabase.from('memoria_budget_lines').select('*'),
+        supabase.from('memoria_reserve_movements').select('moved_on, kind, amount'),
+        supabase.from('memoria_invoices').select('invoice_date, total_amount, category, funding_source').gte('invoice_date', `${yr}-01-01`).range(0, 9999),
+        supabase.from('memoria_invoices').select('total_amount').eq('funding_source', 'reserve_fund'),
       ]);
       const { count: decisionCount } = await supabase.from('memoria_decisions').select('id', { count: 'exact', head: true });
       if (!active) return;
@@ -83,6 +90,11 @@ export default function HandoverPanel({ lang, profile }) {
         decisions: dRes.data || [],
         decisionCount: decisionCount || 0,
         mandates: (mdRes.data || []).filter((m) => mandateState(m, todayIso()) !== 'past'),
+        budget: (() => {
+          const b = (bRes.data || []).find((x) => Number(x.year) === yr);
+          return b ? { b, st: budgetStatus({ budget: b, lines: (blRes.data || []).filter((l) => l.budget_id === b.id), invoices: yiRes.data || [] }) } : null;
+        })(),
+        reserve: reserveStatus({ movements: rmRes.data || [], reserveInvoices: riRes.data || [], budget: (bRes.data || [])[0] }),
       });
     })();
     return () => {
@@ -243,6 +255,37 @@ export default function HandoverPanel({ lang, profile }) {
               i.is_urgent_unbudgeted && !i.ratified_by_decision_id ? mt(lang, 'notRatified') : mt(lang, `payment_${i.payment_status}`),
             ])}
           />
+        </Section>
+
+        <Section title={`${mt(lang, 'tabBudget')}`}>
+          {d.budget ? (
+            <>
+              <p className="text-sm text-ink mb-2">
+                {d.budget.b.title}:{' '}
+                {mt(lang, 'budgetSpent', {
+                  actual: formatMoney(d.budget.st.actualTotal, 'EUR', lang),
+                  total: formatMoney(d.budget.b.total_amount, 'EUR', lang),
+                  pct: `${Math.round((d.budget.st.totalPct || 0) * 100)} %`,
+                })}
+                {d.budget.st.coverageDate ? ` · ${mt(lang, 'invoiceDataUntil', { date: date(d.budget.st.coverageDate) })}` : ''}
+              </p>
+              <Table
+                head={[mt(lang, 'category'), mt(lang, 'planned'), mt(lang, 'spent'), mt(lang, 'status')]}
+                empty={mt(lang, 'h_none')}
+                rows={d.budget.st.rows
+                  .filter((r) => r.status !== 'ok')
+                  .map((r) => [mt(lang, `invcat_${r.category}`), r.status === 'unplanned' ? dash : formatMoney(r.planned, 'EUR', lang), formatMoney(r.actual, 'EUR', lang), mt(lang, `bs_${r.status}`)])}
+              />
+            </>
+          ) : (
+            <p className="text-sm text-ink/60">{mt(lang, 'h_none')}</p>
+          )}
+          {d.reserve.hasData && (
+            <p className="text-sm text-ink mt-2">
+              🏦 {mt(lang, 'reserveBalance')}: <strong>{formatMoney(d.reserve.balance, 'EUR', lang)}</strong>
+              {d.reserve.minimum !== null ? ` · ${mt(lang, 'reserveMinimum')}: ${formatMoney(d.reserve.minimum, 'EUR', lang)} (${d.reserve.belowMinimum ? mt(lang, 'reserveBelow') : mt(lang, 'reserveOk')})` : ''}
+            </p>
+          )}
         </Section>
 
         <Section title={mt(lang, 'h_spend')}>

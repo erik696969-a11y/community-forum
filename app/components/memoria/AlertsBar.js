@@ -9,6 +9,7 @@ import { formatDate } from '../../../lib/formatDate';
 import { mt, todayIso, addDaysIso, formatMoney, OPEN_TASK_STATUSES } from '../../../lib/memoriaI18n';
 import { meetingChecks } from './MeetingsPanel';
 import { mandateChecks } from '../../../lib/memoriaMandates';
+import { budgetStatus, reserveStatus } from '../../../lib/memoriaBudget';
 
 const CONTRACT_WINDOW_DAYS = 90;
 const NOTICE_WINDOW_DAYS = 60;
@@ -20,7 +21,8 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
     let active = true;
     (async () => {
       const today = todayIso();
-      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes, mandRes, profRes] = await Promise.all([
+      const year = Number(today.slice(0, 4));
+      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes, mandRes, profRes, bRes, blRes, rmRes, yiRes, riRes] = await Promise.all([
         supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status, tender_id').eq('status', 'active'),
         supabase.from('memoria_invoices').select('id, invoice_number, description, total_amount, currency, due_date, payment_status, is_urgent_unbudgeted, ratified_by_decision_id'),
         supabase.from('memoria_tenders').select('id, title, status, selection_reason').eq('status', 'decided'),
@@ -31,6 +33,11 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
         supabase.from('memoria_meetings').select('*').neq('status', 'cancelled'),
         supabase.from('memoria_mandates').select('*'),
         supabase.from('profiles').select('id, full_name, role, status').eq('role', 'board'),
+        supabase.from('memoria_budgets').select('*').order('year', { ascending: false }),
+        supabase.from('memoria_budget_lines').select('*'),
+        supabase.from('memoria_reserve_movements').select('moved_on, kind, amount'),
+        supabase.from('memoria_invoices').select('invoice_date, total_amount, category, funding_source').gte('invoice_date', `${year}-01-01`).range(0, 9999),
+        supabase.from('memoria_invoices').select('total_amount').eq('funding_source', 'reserve_fund'),
       ]);
       if (!active) return;
       const list = [];
@@ -102,6 +109,24 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
         } else {
           list.push({ key: `mn-${c.profileId}`, tone: 'neutral', tab: 'mandates', sort: '97', text: mt(lang, 'alertNoMandate', { name: c.name }) });
         }
+      }
+
+      const budgets = bRes.data || [];
+      const budget = budgets.find((b) => Number(b.year) === year);
+      if (budget) {
+        const st = budgetStatus({ budget, lines: (blRes.data || []).filter((l) => l.budget_id === budget.id), invoices: yiRes.data || [] });
+        for (const r of st.rows) {
+          const name = mt(lang, `invcat_${r.category}`);
+          if (r.status === 'over') {
+            list.push({ key: `bo-${r.category}`, tone: 'red', tab: 'budget', sort: '2', text: mt(lang, 'alertBudgetOver', { name, actual: formatMoney(r.actual, 'EUR', lang), planned: formatMoney(r.planned, 'EUR', lang) }) });
+          } else if (r.status === 'at_risk') {
+            list.push({ key: `br-${r.category}`, tone: 'ochre', tab: 'budget', sort: '8', text: mt(lang, 'alertBudgetAtRisk', { name, projection: formatMoney(r.projection, 'EUR', lang), planned: formatMoney(r.planned, 'EUR', lang) }) });
+          }
+        }
+      }
+      const rs = reserveStatus({ movements: rmRes.data || [], reserveInvoices: riRes.data || [], budget: budget || budgets[0] });
+      if (rs.belowMinimum) {
+        list.push({ key: 'reserve', tone: 'red', tab: 'budget', sort: '2', text: mt(lang, 'alertReserveBelow', { balance: formatMoney(rs.balance, 'EUR', lang), minimum: formatMoney(rs.minimum, 'EUR', lang) }) });
       }
 
       const quoteCount = {};

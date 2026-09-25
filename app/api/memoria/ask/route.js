@@ -70,13 +70,13 @@ export async function POST(request) {
     if (rlError) return Response.json({ error: 'Temporarily unavailable' }, { status: 503 });
     if (!allowed) return Response.json({ error: 'Daily limit reached' }, { status: 429 });
 
-    const [s, r, c, t, q, i, d, tk, o, m, mi, docs, md] = await Promise.all([
+    const [s, r, c, t, q, i, d, tk, o, m, mi, docs, md, bg, bl, rm] = await Promise.all([
       db.from('memoria_suppliers').select('*'),
       db.from('memoria_supplier_ratings').select('*'),
       db.from('memoria_contracts').select('*'),
       db.from('memoria_tenders').select('*'),
       db.from('memoria_quotes').select('*'),
-      db.from('memoria_invoices').select('supplier_id, invoice_number, invoice_date, due_date, paid_on, total_amount, category, payment_status, description, is_urgent_unbudgeted, urgency_reason, ratified_by_decision_id, is_demo'),
+      db.from('memoria_invoices').select('supplier_id, invoice_number, invoice_date, due_date, paid_on, total_amount, category, funding_source, payment_status, description, is_urgent_unbudgeted, urgency_reason, ratified_by_decision_id, is_demo'),
       db.from('memoria_decisions').select('*'),
       db.from('memoria_tasks').select('*'),
       db.from('memoria_obligations').select('*'),
@@ -84,12 +84,15 @@ export async function POST(request) {
       db.from('memoria_meeting_items').select('*'),
       db.from('community_documents').select('document_title, document_type, document_year, chunk_index, chunk_title, chunk_text, keywords, active').eq('active', true).in('document_type', ['statutes', 'community_rules']),
       db.from('memoria_mandates').select('person_name, position, starts_on, ends_on, ended_on, appointed_by, access_removed_on, is_demo'),
+      db.from('memoria_budgets').select('*'),
+      db.from('memoria_budget_lines').select('*'),
+      db.from('memoria_reserve_movements').select('*'),
     ]);
     const today = new Date().toISOString().slice(0, 10);
     const context = buildMemoriaContext(
       {
         suppliers: s.data, ratings: r.data, contracts: c.data, tenders: t.data, quotes: q.data, invoices: i.data,
-        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data, mandates: md.data,
+        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data, mandates: md.data, budgets: bg.data, budgetLines: bl.data, reserveMovements: rm.data,
       },
       today
     );
