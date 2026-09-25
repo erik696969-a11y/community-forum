@@ -7,12 +7,14 @@ import { useLanguage } from '../../lib/useLanguage';
 import { t } from '../../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { safeNext, takeStoredNext, LOGIN_NEXT_KEY } from '../../lib/safeNext';
+import { BLOCKS, FLOORS, DOORS, formatApartment, isValidApartment } from '../../lib/apartment';
 
 export default function LoginPage() {
   const [lang, setLang] = useLanguage(null);
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
-  const [apartmentNumber, setApartmentNumber] = useState('');
+  const [apt, setApt] = useState({ block: '', floor: '', door: '' });
+  const apartmentNumber = formatApartment(apt);
   const [consent, setConsent] = useState(false);
   const [sent, setSent] = useState(false);
   const [code, setCode] = useState('');
@@ -39,6 +41,11 @@ export default function LoginPage() {
 
     if (!consent) {
       setError(t(lang, 'consentRequired'));
+      return;
+    }
+
+    if (!isValidApartment(apartmentNumber)) {
+      setError(t(lang, 'apartmentChooseAll'));
       return;
     }
 
@@ -159,14 +166,34 @@ export default function LoginPage() {
 
           <div>
             <label className="block text-sm font-semibold text-harbor mb-1">{t(lang, 'apartmentNumber')}</label>
-            <input
-              type="text"
-              required
-              value={apartmentNumber}
-              onChange={(e) => setApartmentNumber(e.target.value)}
-              className="input-field"
-              placeholder={t(lang, 'apartmentPlaceholder')}
-            />
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                ['block', 'apartmentBlock', BLOCKS],
+                ['floor', 'apartmentFloor', FLOORS],
+                ['door', 'apartmentDoor', DOORS],
+              ].map(([field, labelKey, values]) => (
+                <select
+                  key={field}
+                  required
+                  aria-label={t(lang, labelKey)}
+                  value={apt[field]}
+                  onChange={(e) => setApt((a) => ({ ...a, [field]: e.target.value }))}
+                  className="input-field"
+                >
+                  <option value="">{t(lang, labelKey)}</option>
+                  {values.map((v) => (
+                    <option key={v} value={v}>
+                      {field === 'floor' && v === 'G' ? t(lang, 'apartmentGround') : v}
+                    </option>
+                  ))}
+                </select>
+              ))}
+            </div>
+            <p className="text-xs text-ink/60 mt-1">
+              {apartmentNumber
+                ? `${t(lang, 'apartmentYours')}: ${apartmentNumber}`
+                : t(lang, 'apartmentPlaceholder')}
+            </p>
           </div>
 
           <div>

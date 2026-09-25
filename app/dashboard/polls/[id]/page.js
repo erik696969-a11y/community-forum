@@ -8,6 +8,8 @@ import { useLanguage } from '../../../../lib/useLanguage';
 import { supabase } from '../../../../lib/supabaseClient';
 import { t } from '../../../../lib/i18n';
 import Header from '../../../components/Header';
+import { TOTAL_APARTMENTS } from '../../../../lib/apartment';
+import { formatDate } from '../../../../lib/formatDate';
 
 function localizedField(item, field, lang) {
   if (item.original_lang === lang) return item[field];
@@ -41,6 +43,8 @@ export default function PollDetailPage() {
   const [myVote, setMyVote] = useState(null);
   const [loadingData, setLoadingData] = useState(true);
   const [voting, setVoting] = useState(false);
+  const [household, setHousehold] = useState(null);
+  const [voteError, setVoteError] = useState('');
 
   useEffect(() => {
     if (loading) return;
@@ -91,6 +95,10 @@ export default function PollDetailPage() {
       .maybeSingle();
     setMyVote(myVoteData || null);
 
+    // Hlas za apartmán: kto z domácnosti už hlasoval (meno a dátum, nikdy nie za čo).
+    const { data: householdData } = await supabase.rpc('poll_household_vote', { p_poll_id: params.id });
+    setHousehold(householdData?.[0] || null);
+
     setLoadingData(false);
   }
 
@@ -99,24 +107,29 @@ export default function PollDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id, profile]);
 
-  async function handleVote(optionId) {
-    if (voting || poll.status === 'closed') return;
-    setVoting(true);
+  const householdBlocked = !!household && !household.is_me;
 
+  async function handleVote(optionId) {
+    if (voting || poll.status === 'closed' || householdBlocked) return;
+    setVoting(true);
+    setVoteError('');
+
+    let error;
     if (myVote) {
-      await supabase
+      ({ error } = await supabase
         .from('poll_votes')
         .update({ option_id: optionId })
         .eq('poll_id', params.id)
-        .eq('user_id', session.user.id);
+        .eq('user_id', session.user.id));
     } else {
-      await supabase.from('poll_votes').insert({
+      ({ error } = await supabase.from('poll_votes').insert({
         poll_id: params.id,
         option_id: optionId,
         user_id: session.user.id,
-      });
+      }));
     }
 
+    if (error) setVoteError(t(lang, 'voteFailed'));
     setVoting(false);
     load();
   }
@@ -177,7 +190,18 @@ export default function PollDetailPage() {
           <div className="bg-sand-dark/60 border border-ochre/30 rounded-lg px-4 py-3 mt-3">
             <p className="text-sm text-harbor font-medium">📋 {t(lang, 'strawPollNote')}</p>
             <p className="text-xs text-ink/60 mt-1">{t(lang, 'anonymousVoteNote')}</p>
+            <p className="text-sm text-harbor font-semibold mt-2">🏠 {t(lang, 'oneVotePerApartment')}</p>
           </div>
+          {householdBlocked && (
+            <div className="border-2 border-ochre bg-ochre/10 rounded-lg px-4 py-3 mt-3">
+              <p className="text-sm text-harbor font-medium">
+                {t(lang, 'householdVoted')
+                  .replace('{name}', household.voter_name || '—')
+                  .replace('{date}', formatDate(household.voted_at, lang))}
+              </p>
+            </div>
+          )}
+          {voteError && <p className="text-sm text-red-700 mt-3">{voteError}</p>}
         </div>
 
         {poll.status === 'closed' ? (
@@ -214,7 +238,7 @@ export default function PollDetailPage() {
               });
             })()}
             <p className="text-xs text-ink/50 text-center pt-2">
-              {totalVotes} {t(lang, 'votesLabel')} {t(lang, 'totalLabel')}
+              {t(lang, 'apartmentsVotedOf').replace('{n}', totalVotes).replace('{total}', TOTAL_APARTMENTS)}
             </p>
           </div>
         ) : (
@@ -229,10 +253,10 @@ export default function PollDetailPage() {
                 <button
                   key={opt.id}
                   onClick={() => handleVote(opt.id)}
-                  disabled={voting}
+                  disabled={voting || householdBlocked}
                   className={`card p-4 w-full text-left relative overflow-hidden ${
                     isMine ? 'border-ochre' : ''
-                  } hover:border-ochre`}
+                  } ${householdBlocked ? 'opacity-70 cursor-not-allowed' : 'hover:border-ochre'}`}
                 >
                   <div className="absolute inset-y-0 left-0 bg-ochre/10" style={{ width: `${pct}%` }} />
                   <div className="relative flex items-center justify-between gap-3">
@@ -245,6 +269,9 @@ export default function PollDetailPage() {
                 </button>
               );
             })}
+            <p className="text-xs text-ink/50 text-center pt-2">
+              {t(lang, 'apartmentsVotedOf').replace('{n}', totalVotes).replace('{total}', TOTAL_APARTMENTS)}
+            </p>
           </div>
         )}
 
