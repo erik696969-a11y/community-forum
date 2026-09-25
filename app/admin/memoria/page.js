@@ -126,7 +126,7 @@ export default function MemoriaPage() {
             {TAB_GROUPS.map((g) => (
               <div key={g.label} className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-ink/40 font-semibold px-1">{mt(lang, g.label)}</p>
-                <div className="flex gap-1 overflow-x-auto">
+                <div className="flex flex-wrap gap-1">
                   {g.tabs.map((tb) => (
                     <button
                       key={tb.key}

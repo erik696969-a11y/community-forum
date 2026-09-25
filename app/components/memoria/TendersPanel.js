@@ -7,6 +7,7 @@ import { mt, cleanFormValues, formatMoney, todayIso, TENDER_STATUSES } from '../
 import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 import QuoteUploader from './QuoteUploader';
+import TenderAnalysis from './TenderAnalysis';
 import { getSignedUrl } from '../../../lib/storageClient';
 
 const EMPTY_FORM = {
@@ -399,6 +400,17 @@ export default function TendersPanel({ lang, onChanged }) {
                         <button className="text-xs text-harbor hover:underline mt-2" onClick={() => setCompareFor(compareFor === t.id ? null : t.id)}>
                           ⇆ {mt(lang, 'aiCompare')}
                         </button>
+                      )}
+                      {tq.length >= 2 && (
+                        <TenderAnalysis
+                          lang={lang}
+                          tender={t}
+                          quotes={tq}
+                          onSaved={async () => {
+                            await load();
+                            onChanged?.();
+                          }}
+                        />
                       )}
                       {compareFor === t.id && (
                         <div className="mt-2 overflow-x-auto">
