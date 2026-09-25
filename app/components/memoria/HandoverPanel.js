@@ -6,6 +6,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
+import { mandateState } from '../../../lib/memoriaMandates';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, todayIso, addDaysIso, addMonthsIso, formatMoney, OPEN_TASK_STATUSES } from '../../../lib/memoriaI18n';
 import { DemoPill } from './MemoriaUi';
@@ -54,7 +55,7 @@ export default function HandoverPanel({ lang, profile }) {
     let active = true;
     (async () => {
       const since = addMonthsIso(todayIso(), -12);
-      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes] = await Promise.all([
+      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes, mdRes] = await Promise.all([
         supabase.from('memoria_tasks').select('*').in('status', OPEN_TASK_STATUSES).order('due_date', { ascending: true, nullsFirst: false }),
         supabase.from('memoria_obligations').select('*').eq('active', true),
         supabase.from('memoria_meetings').select('*').order('meeting_on', { ascending: false }),
@@ -65,6 +66,7 @@ export default function HandoverPanel({ lang, profile }) {
         supabase.from('memoria_quotes').select('tender_id'),
         supabase.from('memoria_invoices').select('*').gte('invoice_date', since),
         supabase.from('memoria_decisions').select('*').order('decided_on', { ascending: false }).limit(15),
+        supabase.from('memoria_mandates').select('*').order('starts_on', { ascending: false }),
       ]);
       const { count: decisionCount } = await supabase.from('memoria_decisions').select('id', { count: 'exact', head: true });
       if (!active) return;
@@ -80,6 +82,7 @@ export default function HandoverPanel({ lang, profile }) {
         invoices: iRes.data || [],
         decisions: dRes.data || [],
         decisionCount: decisionCount || 0,
+        mandates: (mdRes.data || []).filter((m) => mandateState(m, todayIso()) !== 'past'),
       });
     })();
     return () => {
@@ -151,6 +154,20 @@ export default function HandoverPanel({ lang, profile }) {
               decisions: d.decisionCount,
             })}
           </p>
+        </Section>
+
+        <Section title={mt(lang, 'mandatesCurrent')}>
+          <Table
+            head={[mt(lang, 'personName'), mt(lang, 'position'), mt(lang, 'mandateStarts'), mt(lang, 'mandateEndsPlanned'), mt(lang, 'appointedBy')]}
+            empty={mt(lang, 'h_none')}
+            rows={d.mandates.map((m) => [
+              `${m.person_name}${m.is_demo ? ' (DEMO)' : ''}`,
+              mt(lang, `pos_${m.position}`),
+              date(m.starts_on),
+              date(m.ended_on || m.ends_on),
+              m.appointed_by || dash,
+            ])}
+          />
         </Section>
 
         <Section title={mt(lang, 'h_openTasks')}>

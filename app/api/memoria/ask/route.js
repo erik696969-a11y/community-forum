@@ -28,6 +28,7 @@ How to answer:
 - When asked what to do, you may list the options and the steps the Statutes require, but you never make or recommend a strategic, financial or legal decision. End such answers with one line saying the decision belongs to the board.
 - Records marked [DEMO] are fictional sample data for a presentation. If your answer relies on them, add a short final note: "(based on DEMO sample data)".
 - Amounts are in EUR; invoice totals include VAT unless stated otherwise.
+- When you answer about invoices or spending, add one short line with the date the invoice data covers (section INVOICE DATA COVERAGE), because the administrator's data arrives about one month late.
 - NEVER calculate dates or day counts yourself. Use the values already given in the records: "(in N days)", "(N days ago)", "LAST DAY TO GIVE NOTICE …" and the section DATES ALREADY CALCULATED. A contract "renews within X months" when its end date falls within that window; its notice deadline is the listed LAST DAY TO GIVE NOTICE. Something is overdue only when the records say "days ago", "PAST" or "OVERDUE".
 - Before answering, check that your first sentence does not contradict the details you list afterwards.
 
@@ -69,7 +70,7 @@ export async function POST(request) {
     if (rlError) return Response.json({ error: 'Temporarily unavailable' }, { status: 503 });
     if (!allowed) return Response.json({ error: 'Daily limit reached' }, { status: 429 });
 
-    const [s, r, c, t, q, i, d, tk, o, m, mi, docs] = await Promise.all([
+    const [s, r, c, t, q, i, d, tk, o, m, mi, docs, md] = await Promise.all([
       db.from('memoria_suppliers').select('*'),
       db.from('memoria_supplier_ratings').select('*'),
       db.from('memoria_contracts').select('*'),
@@ -82,12 +83,13 @@ export async function POST(request) {
       db.from('memoria_meetings').select('*'),
       db.from('memoria_meeting_items').select('*'),
       db.from('community_documents').select('document_title, document_type, document_year, chunk_index, chunk_title, chunk_text, keywords, active').eq('active', true).in('document_type', ['statutes', 'community_rules']),
+      db.from('memoria_mandates').select('person_name, position, starts_on, ends_on, ended_on, appointed_by, access_removed_on, is_demo'),
     ]);
     const today = new Date().toISOString().slice(0, 10);
     const context = buildMemoriaContext(
       {
         suppliers: s.data, ratings: r.data, contracts: c.data, tenders: t.data, quotes: q.data, invoices: i.data,
-        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data,
+        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data, mandates: md.data,
       },
       today
     );

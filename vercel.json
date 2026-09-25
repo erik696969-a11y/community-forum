@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/memoria/digest", "schedule": "0 5 * * *" }
+  ]
+}

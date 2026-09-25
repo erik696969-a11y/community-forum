@@ -25,6 +25,8 @@ import MeetingsPanel from '../../components/memoria/MeetingsPanel';
 import HomePanel from '../../components/memoria/HomePanel';
 import HandoverPanel from '../../components/memoria/HandoverPanel';
 import AskPanel from '../../components/memoria/AskPanel';
+import MandatesPanel from '../../components/memoria/MandatesPanel';
+import ExportPanel from '../../components/memoria/ExportPanel';
 import { supabase } from '../../../lib/supabaseClient';
 
 // Karty v troch skupinách, aby sa v module dalo ľahko zorientovať.
@@ -37,6 +39,7 @@ const TAB_GROUPS = [
       { key: 'calendar', label: 'tabCalendar', icon: '📅' },
       { key: 'meetings', label: 'tabMeetings', icon: '🗓️' },
       { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
+      { key: 'mandates', label: 'tabMandates', icon: '👥' },
     ],
   },
   {
@@ -55,6 +58,7 @@ const TAB_GROUPS = [
       { key: 'report', label: 'tabReport', icon: '📊' },
       { key: 'handover', label: 'tabHandover', icon: '📦' },
       { key: 'activity', label: 'tabActivity', icon: '🕒' },
+      { key: 'export', label: 'tabExport', icon: '💾' },
     ],
   },
 ];
@@ -157,6 +161,8 @@ export default function MemoriaPage() {
         {tab === 'invoices' && <InvoicesPanel lang={lang} onChanged={bump} />}
         {tab === 'report' && <ReportPanel lang={lang} />}
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
+        {tab === 'mandates' && <MandatesPanel lang={lang} profile={profile} onChanged={bump} />}
+        {tab === 'export' && <ExportPanel lang={lang} profile={profile} />}
       </div>
     </main>
   );

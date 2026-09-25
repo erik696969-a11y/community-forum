@@ -338,8 +338,13 @@ export default function InvoicesPanel({ lang, onChanged }) {
     </form>
   );
 
+  const lastInvoiceDate = invoices.reduce((mx, i) => (i.invoice_date && i.invoice_date > mx ? i.invoice_date : mx), '');
+
   return (
     <div>
+      {lastInvoiceDate && (
+        <p className="text-xs text-ink/50 mb-2">ℹ️ {mt(lang, 'invoiceDataUntil', { date: formatDate(lastInvoiceDate, lang) })}</p>
+      )}
       <div className="flex flex-wrap items-center gap-2 mb-2">
         <input className="input-field !w-auto flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
         <select className="input-field !w-auto" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>

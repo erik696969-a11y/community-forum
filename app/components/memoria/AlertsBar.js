@@ -8,6 +8,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, todayIso, addDaysIso, formatMoney, OPEN_TASK_STATUSES } from '../../../lib/memoriaI18n';
 import { meetingChecks } from './MeetingsPanel';
+import { mandateChecks } from '../../../lib/memoriaMandates';
 
 const CONTRACT_WINDOW_DAYS = 90;
 const NOTICE_WINDOW_DAYS = 60;
@@ -19,7 +20,7 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
     let active = true;
     (async () => {
       const today = todayIso();
-      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes] = await Promise.all([
+      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes, mandRes, profRes] = await Promise.all([
         supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status, tender_id').eq('status', 'active'),
         supabase.from('memoria_invoices').select('id, invoice_number, description, total_amount, currency, due_date, payment_status, is_urgent_unbudgeted, ratified_by_decision_id'),
         supabase.from('memoria_tenders').select('id, title, status, selection_reason').eq('status', 'decided'),
@@ -28,6 +29,8 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
         supabase.from('memoria_tasks').select('id, title, due_date, status, priority').in('status', OPEN_TASK_STATUSES),
         supabase.from('memoria_obligations').select('id, title, next_due_on, remind_days').eq('active', true),
         supabase.from('memoria_meetings').select('*').neq('status', 'cancelled'),
+        supabase.from('memoria_mandates').select('*'),
+        supabase.from('profiles').select('id, full_name, role, status').eq('role', 'board'),
       ]);
       if (!active) return;
       const list = [];
@@ -88,6 +91,16 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
                   ? mt(lang, 'alertMeetingInvitation', { name: m.title, date: formatDate(c.date, lang) })
                   : `${m.title}: ${c.text}`;
           list.push({ key: `m-${m.id}-${c.key}`, tone: c.tone, tab: 'meetings', sort: c.date || '1', text });
+        }
+      }
+
+      for (const c of mandateChecks(mandRes.data || [], profRes.data || [], today)) {
+        if (c.kind === 'ending') {
+          list.push({ key: `me-${c.mandateId}`, tone: 'ochre', tab: 'mandates', sort: c.date, text: mt(lang, 'alertMandateEnding', { name: c.name, position: mt(lang, `pos_${c.position}`), date: formatDate(c.date, lang) }) });
+        } else if (c.kind === 'leftover_access') {
+          list.push({ key: `ml-${c.profileId}`, tone: 'red', tab: 'mandates', sort: '0', text: mt(lang, 'alertLeftoverAccess', { name: c.name, date: formatDate(c.date, lang) }) });
+        } else {
+          list.push({ key: `mn-${c.profileId}`, tone: 'neutral', tab: 'mandates', sort: '97', text: mt(lang, 'alertNoMandate', { name: c.name }) });
         }
       }
 
