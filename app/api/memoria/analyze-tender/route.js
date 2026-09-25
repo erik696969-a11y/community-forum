@@ -49,9 +49,10 @@ const PROC_TEXT = {
 function fallbackProcedure(lang, tender, suppliers) {
   const t = PROC_TEXT[lang] || PROC_TEXT.en;
   const parts = [t.who];
-  parts.push(tender.approved_budget != null ? t.budget(tender.approved_budget, tender.currency || 'EUR') : t.noBudget);
+  const loc = { en: 'en-GB', es: 'es-ES', fr: 'fr-FR', de: 'de-DE' }[lang] || 'en-GB';
+  parts.push(tender.approved_budget != null ? t.budget(Number(tender.approved_budget).toLocaleString(loc), tender.currency || 'EUR') : t.noBudget);
   const unchecked = suppliers.filter((s) => !s.conflict_of_interest_checked).map((s) => s.name);
-  parts.push(unchecked.length ? t.coi(unchecked.join(', ')) : t.coiOk);
+  parts.push(unchecked.length ? t.coi(unchecked.join(', ').replace(/\.$/, '')).replace(/\.\.$/, '.') : t.coiOk);
   return parts.join(' ');
 }
 
@@ -62,6 +63,11 @@ const TOOL = {
     type: 'object',
     properties: {
       summary: { type: 'string', description: 'Two or three neutral sentences: what differs between the offers and what the board should weigh. No winner, no recommendation.' },
+      procedure: {
+        type: 'string',
+        minLength: 40,
+        description: 'REQUIRED, never empty: 2-4 short sentences on what the Statutes and resolutions require for this decision — who decides (board or general meeting), whether the quotes fit the approved budget limit, which suppliers still need the conflict-of-interest check, and that the decision and its reason must be recorded in the decision log. Facts only, no recommendation.',
+      },
       normalized: {
         type: 'array',
         description: 'One row per quote, prices made comparable.',
@@ -106,13 +112,8 @@ const TOOL = {
         description: 'Facts from Memoria about each supplier: past contracts, ratings, invoices, notes. Empty if none.',
         items: { type: 'object', properties: { supplier: { type: 'string' }, fact: { type: 'string' } }, required: ['supplier', 'fact'] },
       },
-      procedure: {
-        type: 'string',
-        minLength: 40,
-        description: 'REQUIRED, never empty: 2-4 short sentences on what the Statutes and resolutions require for this decision — who decides (board or general meeting), whether the quotes fit the approved budget limit, which suppliers still need the conflict-of-interest check, and that the decision and its reason must be recorded in the decision log. Facts only, no recommendation.',
-      },
     },
-    required: ['summary', 'normalized', 'best_by_criterion', 'risks', 'missing_info', 'questions', 'history', 'procedure'],
+    required: ['summary', 'procedure', 'normalized', 'best_by_criterion', 'risks', 'missing_info', 'questions', 'history'],
   },
 };
 
@@ -208,7 +209,7 @@ ${GOVERNANCE_RULES}`;
         },
         body: JSON.stringify({
           model,
-          max_tokens: 3000,
+          max_tokens: 8000,
           system,
           tools: [TOOL],
           tool_choice: { type: 'tool', name: 'record_analysis' },
@@ -226,7 +227,7 @@ ${GOVERNANCE_RULES}`;
     if (!tool) return Response.json({ error: 'AI request failed' }, { status: 502 });
     const analysis = { ...tool.input, lang };
     if (!analysis.procedure || String(analysis.procedure).trim().length < 10) {
-      console.error('analyze-tender empty procedure', json.model);
+      console.error('analyze-tender empty procedure', json.model, json.stop_reason);
       analysis.procedure = fallbackProcedure(lang, tender, Object.values(suppliers));
     }
 

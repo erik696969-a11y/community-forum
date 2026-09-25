@@ -67,7 +67,7 @@ describe('analyze-tender route', () => {
       json: async () => ({ content: [{ type: 'tool_use', input: { summary: 's', normalized: [], best_by_criterion: [], risks: [], missing_info: [], questions: [], history: [], procedure: '' } }] }),
     }));
     const json = await (await POST(req({ tenderId: T, lang: 'es' }))).json();
-    expect(json.analysis.procedure).toContain('42000 EUR');
+    expect(json.analysis.procedure).toContain('42.000 EUR');
     expect(json.analysis.procedure).toContain('conflicto de intereses para: A, B');
   });
 });
