@@ -93,7 +93,7 @@ export default function MemoriaPage() {
   useEffect(() => {
     if (loading) return;
     if (!session) {
-      router.replace('/login');
+      router.replace('/login?next=/admin/memoria');
       return;
     }
     if (profile && (profile.role !== 'board' || profile.status !== 'approved')) {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient';
 import { useLanguage } from '../../../lib/useLanguage';
 import { t } from '../../../lib/i18n';
+import { takeStoredNext } from '../../../lib/safeNext';
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -13,11 +14,12 @@ export default function AuthCallback() {
 
   useEffect(() => {
     let handled = false;
+    const target = takeStoredNext() || '/';
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && !handled) {
         handled = true;
-        router.replace('/');
+        router.replace(target);
       }
     });
 
@@ -29,7 +31,7 @@ export default function AuthCallback() {
       if (session) {
         if (!handled) {
           handled = true;
-          router.replace('/');
+          router.replace(target);
         }
         return;
       }
@@ -40,7 +42,7 @@ export default function AuthCallback() {
         if (!error) {
           if (!handled) {
             handled = true;
-            router.replace('/');
+            router.replace(target);
           }
           return;
         }

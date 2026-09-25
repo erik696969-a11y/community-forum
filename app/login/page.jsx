@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { useLanguage } from '../../lib/useLanguage';
 import { t } from '../../lib/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { safeNext, takeStoredNext, LOGIN_NEXT_KEY } from '../../lib/safeNext';
 
 export default function LoginPage() {
   const [lang, setLang] = useLanguage(null);
@@ -24,6 +25,11 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
       const savedEmail = window.localStorage.getItem('lastEmail');
       if (savedEmail) setEmail(savedEmail);
+      // Kam sa vrátiť po prihlásení (napr. odkaz „Otvoriť Memoriu“ z e-mailu).
+      const next = safeNext(new URLSearchParams(window.location.search).get('next'));
+      try {
+        if (next) window.localStorage.setItem(LOGIN_NEXT_KEY, next);
+      } catch {}
     }
   }, []);
 
@@ -88,7 +94,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.replace('/');
+    router.replace(takeStoredNext() || '/');
   }
 
   if (sent) {
