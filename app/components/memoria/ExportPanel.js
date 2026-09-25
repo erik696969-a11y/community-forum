@@ -28,6 +28,7 @@ export const EXPORT_TABLES = [
   'memoria_quotes',
   'memoria_contracts',
   'memoria_invoices',
+  'memoria_imports',
   'memoria_documents',
   'memoria_activity',
 ];
@@ -95,6 +96,18 @@ export default function ExportPanel({ lang, profile }) {
         const folder = d.entity_type || 'general';
         const base = d.storage_path.split('/').pop();
         zip.file(`documents/${folder}/${d.id.slice(0, 8)}-${safeFileName(base)}`, data);
+        docCount += 1;
+      }
+      const importFiles = tables.memoria_imports.filter((i) => i.storage_path);
+      for (let i = 0; i < importFiles.length; i++) {
+        const imp = importFiles[i];
+        setStep(`imports ${i + 1}/${importFiles.length}`);
+        const { data, error: dlErr } = await supabase.storage.from(BUCKET).download(imp.storage_path);
+        if (dlErr || !data) {
+          failed.push(`${imp.id} · ${imp.file_name} · ${imp.storage_path}`);
+          continue;
+        }
+        zip.file(`documents/imports/${imp.id.slice(0, 8)}-${safeFileName(imp.storage_path.split('/').pop())}`, data);
         docCount += 1;
       }
       const links = tables.memoria_documents.filter((d) => !d.storage_path && d.external_url);

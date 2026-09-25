@@ -9,6 +9,8 @@ import {
 } from '../../../lib/memoriaI18n';
 import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
+import InvoiceImport from './InvoiceImport';
+import ImportHistory from './ImportHistory';
 
 const EMPTY_FORM = {
   supplier_id: '',
@@ -65,6 +67,8 @@ export default function InvoicesPanel({ lang, onChanged }) {
   const [paymentFilter, setPaymentFilter] = useState('');
   const [fundingFilter, setFundingFilter] = useState('');
   const [onlyUnratified, setOnlyUnratified] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importKey, setImportKey] = useState(0);
   const [expanded, setExpanded] = useState({});
 
   const [editingId, setEditingId] = useState(null);
@@ -378,9 +382,34 @@ export default function InvoicesPanel({ lang, onChanged }) {
           {mt(lang, 'onlyUnratified')}
         </label>
         {editingId === null && (
-          <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newInvoice')}</button>
+          <div className="flex gap-2 flex-wrap">
+            {!importOpen && (
+              <button className="btn-secondary text-sm" onClick={() => setImportOpen(true)}>📥 {mt(lang, 'importOpen')}</button>
+            )}
+            <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newInvoice')}</button>
+          </div>
         )}
       </div>
+
+      {importOpen && (
+        <InvoiceImport
+          lang={lang}
+          onClose={() => setImportOpen(false)}
+          onImported={async () => {
+            setImportKey((k) => k + 1);
+            await load();
+            onChanged?.();
+          }}
+        />
+      )}
+      <ImportHistory
+        lang={lang}
+        refreshKey={importKey}
+        onChanged={async () => {
+          await load();
+          onChanged?.();
+        }}
+      />
 
       {editingId === 'new' && formBlock}
       <ErrorBox message={loadError} />
