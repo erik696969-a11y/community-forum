@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, cleanFormValues, todayIso, SUPPLIER_CATEGORIES, SUPPLIER_STATUSES } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow, Stars } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, Stars, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
@@ -284,18 +284,18 @@ export default function SuppliersPanel({ lang, onChanged }) {
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <input
-          className="input-field flex-1 min-w-[12rem]"
+          className="input-field !w-auto flex-1 min-w-[12rem]"
           placeholder={mt(lang, 'search')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <select className="input-field w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
           <option value="">{mt(lang, 'category')}: {mt(lang, 'all')}</option>
           {SUPPLIER_CATEGORIES.map((c) => (
             <option key={c} value={c}>{mt(lang, `cat_${c}`)}</option>
           ))}
         </select>
-        <select className="input-field w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">{mt(lang, 'status')}: {mt(lang, 'all')}</option>
           {SUPPLIER_STATUSES.map((s) => (
             <option key={s} value={s}>{mt(lang, `supplierStatus_${s}`)}</option>
@@ -326,7 +326,7 @@ export default function SuppliersPanel({ lang, onChanged }) {
               <div key={s.id} className="card p-4">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
-                    <p className="font-semibold text-ink">{s.name}</p>
+                    <p className="font-semibold text-ink">{s.name} <DemoPill show={s.is_demo} /></p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Pill tone="harbor">{mt(lang, `cat_${s.category}`)}</Pill>
                       <Pill tone={STATUS_TONE[s.status]}>{mt(lang, `supplierStatus_${s.status}`)}</Pill>

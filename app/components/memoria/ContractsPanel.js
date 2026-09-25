@@ -7,7 +7,7 @@ import {
   mt, cleanFormValues, formatMoney, todayIso, addDaysIso,
   CONTRACT_STATUSES, PAYMENT_FREQUENCIES,
 } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
@@ -261,8 +261,8 @@ export default function ContractsPanel({ lang, onChanged }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <input className="input-field flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="input-field w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <input className="input-field !w-auto flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <select className="input-field !w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">{mt(lang, 'status')}: {mt(lang, 'all')}</option>
           {CONTRACT_STATUSES.map((s) => (
             <option key={s} value={s}>{mt(lang, `contractStatus_${s}`)}</option>
@@ -294,7 +294,7 @@ export default function ContractsPanel({ lang, onChanged }) {
               <div key={c.id} className="card p-4">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
-                    <p className="font-semibold text-ink">{c.subject}</p>
+                    <p className="font-semibold text-ink">{c.subject} <DemoPill show={c.is_demo} /></p>
                     <p className="text-sm text-ink/70">{supplierName[c.supplier_id] || '—'}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Pill tone={STATUS_TONE[c.status]}>{mt(lang, `contractStatus_${c.status}`)}</Pill>

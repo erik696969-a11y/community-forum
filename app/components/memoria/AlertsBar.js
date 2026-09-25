@@ -6,7 +6,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
-import { mt, todayIso, addDaysIso, formatMoney } from '../../../lib/memoriaI18n';
+import { mt, todayIso, addDaysIso, formatMoney, OPEN_TASK_STATUSES } from '../../../lib/memoriaI18n';
+import { meetingChecks } from './MeetingsPanel';
 
 const CONTRACT_WINDOW_DAYS = 90;
 const NOTICE_WINDOW_DAYS = 60;
@@ -18,12 +19,15 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
     let active = true;
     (async () => {
       const today = todayIso();
-      const [cRes, iRes, tRes, qRes, sRes] = await Promise.all([
+      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes] = await Promise.all([
         supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status, tender_id').eq('status', 'active'),
         supabase.from('memoria_invoices').select('id, invoice_number, description, total_amount, currency, due_date, payment_status, is_urgent_unbudgeted, ratified_by_decision_id'),
         supabase.from('memoria_tenders').select('id, title, status, selection_reason').eq('status', 'decided'),
         supabase.from('memoria_quotes').select('tender_id'),
         supabase.from('memoria_suppliers').select('id, name, status, conflict_of_interest_checked').eq('status', 'active'),
+        supabase.from('memoria_tasks').select('id, title, due_date, status, priority').in('status', OPEN_TASK_STATUSES),
+        supabase.from('memoria_obligations').select('id, title, next_due_on, remind_days').eq('active', true),
+        supabase.from('memoria_meetings').select('*').neq('status', 'cancelled'),
       ]);
       if (!active) return;
       const list = [];
@@ -51,6 +55,39 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
         }
         if (inv.due_date && inv.due_date < today && (inv.payment_status === 'pending' || inv.payment_status === 'overdue')) {
           list.push({ key: `o-${inv.id}`, tone: 'ochre', tab: 'invoices', sort: inv.due_date, text: mt(lang, 'alertOverdue', { name, date: formatDate(inv.due_date, lang) }) });
+        }
+      }
+
+      for (const t of taskRes.data || []) {
+        if (t.status === 'blocked') {
+          list.push({ key: `tb-${t.id}`, tone: 'ochre', tab: 'tasks', sort: '1', text: mt(lang, 'alertTaskBlocked', { name: t.title }) });
+        } else if (t.due_date && t.due_date < today) {
+          list.push({ key: `to-${t.id}`, tone: 'red', tab: 'tasks', sort: t.due_date, text: mt(lang, 'alertTaskOverdue', { name: t.title, date: formatDate(t.due_date, lang) }) });
+        }
+      }
+
+      for (const o of oRes.data || []) {
+        if (o.next_due_on < today) {
+          list.push({ key: `oo-${o.id}`, tone: 'red', tab: 'calendar', sort: o.next_due_on, text: mt(lang, 'alertObligationOverdue', { name: o.title, date: formatDate(o.next_due_on, lang) }) });
+        } else if (o.next_due_on <= addDaysIso(today, o.remind_days ?? 30)) {
+          list.push({ key: `os-${o.id}`, tone: 'ochre', tab: 'calendar', sort: o.next_due_on, text: mt(lang, 'alertObligationSoon', { name: o.title, date: formatDate(o.next_due_on, lang) }) });
+        }
+      }
+
+      for (const m of mRes.data || []) {
+        for (const c of meetingChecks(m, lang)) {
+          if (c.tone === 'green') continue;
+          // Pozvánku pripomíname až 14 dní pred lehotou, aby lišta nebola preplnená.
+          if (c.tone === 'ochre' && c.date && c.date > addDaysIso(today, 14)) continue;
+          const text =
+            c.key === 'minutes' && c.date
+              ? mt(lang, 'alertMinutes', { name: m.title, date: formatDate(c.date, lang) })
+              : c.date && c.tone === 'red'
+                ? mt(lang, 'alertMeetingInvitationMissed', { name: m.title, date: formatDate(c.date, lang) })
+                : c.date
+                  ? mt(lang, 'alertMeetingInvitation', { name: m.title, date: formatDate(c.date, lang) })
+                  : `${m.title}: ${c.text}`;
+          list.push({ key: `m-${m.id}-${c.key}`, tone: c.tone, tab: 'meetings', sort: c.date || '1', text });
         }
       }
 

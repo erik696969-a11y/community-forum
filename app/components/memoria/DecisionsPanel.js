@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, cleanFormValues, todayIso, DECISION_BODIES, DECISION_STATUSES } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
@@ -41,6 +41,7 @@ export default function DecisionsPanel({ lang, onChanged }) {
   const [decisions, setDecisions] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [links, setLinks] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
   const [loadError, setLoadError] = useState('');
 
@@ -56,16 +57,18 @@ export default function DecisionsPanel({ lang, onChanged }) {
   const [formError, setFormError] = useState('');
 
   async function load() {
-    const [decRes, supRes, linkRes] = await Promise.all([
+    const [decRes, supRes, linkRes, taskRes] = await Promise.all([
       supabase.from('memoria_decisions').select('*').order('decided_on', { ascending: false }).order('created_at', { ascending: false }),
       supabase.from('memoria_suppliers').select('id, name, status').order('name', { ascending: true }),
       supabase.from('memoria_decision_links').select('id, decision_id, entity_id').eq('entity_type', 'supplier'),
+      supabase.from('memoria_tasks').select('id, decision_id, title, status, due_date').not('decision_id', 'is', null),
     ]);
     const firstError = decRes.error || supRes.error || linkRes.error;
     setLoadError(firstError ? firstError.message : '');
     setDecisions(decRes.data || []);
     setSuppliers(supRes.data || []);
     setLinks(linkRes.data || []);
+    setTasks(taskRes.data || []);
     setLoadingData(false);
   }
 
@@ -293,18 +296,18 @@ export default function DecisionsPanel({ lang, onChanged }) {
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <input
-          className="input-field flex-1 min-w-[12rem]"
+          className="input-field !w-auto flex-1 min-w-[12rem]"
           placeholder={mt(lang, 'search')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <select className="input-field w-auto" value={bodyFilter} onChange={(e) => setBodyFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={bodyFilter} onChange={(e) => setBodyFilter(e.target.value)}>
           <option value="">{mt(lang, 'body')}: {mt(lang, 'all')}</option>
           {DECISION_BODIES.map((b) => (
             <option key={b} value={b}>{mt(lang, `body_${b}`)}</option>
           ))}
         </select>
-        <select className="input-field w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">{mt(lang, 'status')}: {mt(lang, 'all')}</option>
           {DECISION_STATUSES.map((s) => (
             <option key={s} value={s}>{mt(lang, `decisionStatus_${s}`)}</option>
@@ -333,7 +336,17 @@ export default function DecisionsPanel({ lang, onChanged }) {
               <div key={d.id} className="card p-4">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
-                    <p className="font-semibold text-ink">{d.title}</p>
+                    <p className="font-semibold text-ink">{d.title} <DemoPill show={d.is_demo} /></p>
+                    {(() => {
+                      const own = tasks.filter((t) => t.decision_id === d.id && t.status !== 'cancelled');
+                      if (own.length === 0) return null;
+                      const done = own.filter((t) => t.status === 'done').length;
+                      return (
+                        <p className="text-xs text-ink/60 mt-0.5">
+                          ✅ {mt(lang, 'tasksForDecision')}: {done}/{own.length}
+                        </p>
+                      );
+                    })()}
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <span className="text-xs text-ink/60">{formatDate(d.decided_on, lang)}</span>
                       <Pill tone="harbor">{mt(lang, `body_${d.body}`)}</Pill>
@@ -378,6 +391,25 @@ export default function DecisionsPanel({ lang, onChanged }) {
                         ? `${d.outcome_review}${d.outcome_reviewed_on ? ` (${formatDate(d.outcome_reviewed_on, lang)})` : ''}`
                         : null}
                     </DetailRow>
+                    {tasks.some((t) => t.decision_id === d.id) && (
+                      <div>
+                        <p className="text-xs font-semibold text-ink/50 uppercase tracking-wide">{mt(lang, 'tasksForDecision')}</p>
+                        <ul className="text-sm text-ink space-y-0.5 mt-1">
+                          {tasks
+                            .filter((t) => t.decision_id === d.id)
+                            .map((t) => (
+                              <li key={t.id}>
+                                {t.status === 'done' ? '✅' : t.status === 'blocked' ? '⛔' : t.due_date && t.due_date < todayIso() && t.status !== 'cancelled' ? '⚠️' : '▫️'}{' '}
+                                {t.title}
+                                <span className="text-xs text-ink/50">
+                                  {' '}· {mt(lang, `taskStatus_${t.status}`)}
+                                  {t.due_date ? ` · ${formatDate(t.due_date, lang)}` : ''}
+                                </span>
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
                     <Attachments lang={lang} entityType="decision" entityId={d.id} defaultType="minutes" />
                   </div>
                 )}

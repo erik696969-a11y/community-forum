@@ -55,3 +55,36 @@ export function Stars({ value }) {
     </span>
   );
 }
+
+// Značka pre ukážkové (vymyslené) záznamy — musí byť viditeľná vždy.
+export function DemoPill({ show }) {
+  if (!show) return null;
+  return (
+    <span
+      className="inline-block text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded border border-dashed border-ochre text-ochre align-middle"
+      title="DEMO"
+    >
+      DEMO
+    </span>
+  );
+}
+
+// Súhrnné číslo (dlaždica) v hlavičke panelu.
+export function StatTile({ label, value, tone = 'neutral', active, onClick }) {
+  const tones = {
+    neutral: 'text-harbor',
+    red: 'text-red-700',
+    ochre: 'text-ochre',
+    green: 'text-sea',
+  };
+  const Tag = onClick ? 'button' : 'div';
+  return (
+    <Tag
+      onClick={onClick}
+      className={`card px-3 py-2 text-left ${onClick ? 'hover:border-ochre cursor-pointer' : ''} ${active ? 'ring-2 ring-ochre' : ''}`}
+    >
+      <p className={`text-2xl font-display ${tones[tone] || tones.neutral}`}>{value}</p>
+      <p className="text-xs text-ink/60">{label}</p>
+    </Tag>
+  );
+}

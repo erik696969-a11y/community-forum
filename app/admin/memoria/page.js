@@ -18,25 +18,69 @@ import ActivityFeed from '../../components/memoria/ActivityFeed';
 import ContractsPanel from '../../components/memoria/ContractsPanel';
 import TendersPanel from '../../components/memoria/TendersPanel';
 import InvoicesPanel from '../../components/memoria/InvoicesPanel';
-import AlertsBar from '../../components/memoria/AlertsBar';
 import ReportPanel from '../../components/memoria/ReportPanel';
+import TasksPanel from '../../components/memoria/TasksPanel';
+import CalendarPanel from '../../components/memoria/CalendarPanel';
+import MeetingsPanel from '../../components/memoria/MeetingsPanel';
+import HomePanel from '../../components/memoria/HomePanel';
+import HandoverPanel from '../../components/memoria/HandoverPanel';
+import AskPanel from '../../components/memoria/AskPanel';
+import { supabase } from '../../../lib/supabaseClient';
 
-const TABS = [
-  { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
-  { key: 'suppliers', label: 'tabSuppliers', icon: '🏢' },
-  { key: 'contracts', label: 'tabContracts', icon: '📑' },
-  { key: 'tenders', label: 'tabTenders', icon: '🧾' },
-  { key: 'invoices', label: 'tabInvoices', icon: '💶' },
-  { key: 'report', label: 'tabReport', icon: '📊' },
-  { key: 'activity', label: 'tabActivity', icon: '🕒' },
+// Karty v troch skupinách, aby sa v module dalo ľahko zorientovať.
+const TAB_GROUPS = [
+  {
+    label: 'navGroupGovernance',
+    tabs: [
+      { key: 'home', label: 'tabHome', icon: '🏠' },
+      { key: 'tasks', label: 'tabTasks', icon: '✅' },
+      { key: 'calendar', label: 'tabCalendar', icon: '📅' },
+      { key: 'meetings', label: 'tabMeetings', icon: '🗓️' },
+      { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
+    ],
+  },
+  {
+    label: 'navGroupMoney',
+    tabs: [
+      { key: 'suppliers', label: 'tabSuppliers', icon: '🏢' },
+      { key: 'tenders', label: 'tabTenders', icon: '🧾' },
+      { key: 'contracts', label: 'tabContracts', icon: '📑' },
+      { key: 'invoices', label: 'tabInvoices', icon: '💶' },
+    ],
+  },
+  {
+    label: 'navGroupReports',
+    tabs: [
+      { key: 'ask', label: 'tabAsk', icon: '💬' },
+      { key: 'report', label: 'tabReport', icon: '📊' },
+      { key: 'handover', label: 'tabHandover', icon: '📦' },
+      { key: 'activity', label: 'tabActivity', icon: '🕒' },
+    ],
+  },
 ];
 
 export default function MemoriaPage() {
   const { loading, session, profile } = useProfile();
   const [lang, setLang] = useLanguage(profile);
   const router = useRouter();
-  const [tab, setTab] = useState('decisions');
+  const [tab, setTab] = useState('home');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [hasDemo, setHasDemo] = useState(false);
+
+  const isBoard = profile?.role === 'board' && profile?.status === 'approved';
+
+  // Upozornenie, že v Memorii sú ukážkové dáta (DEMO).
+  useEffect(() => {
+    if (!isBoard) return;
+    (async () => {
+      const [a, b, c] = await Promise.all([
+        supabase.from('memoria_tasks').select('id').eq('is_demo', true).limit(1),
+        supabase.from('memoria_suppliers').select('id').eq('is_demo', true).limit(1),
+        supabase.from('memoria_decisions').select('id').eq('is_demo', true).limit(1),
+      ]);
+      setHasDemo([a, b, c].some((r) => (r.data || []).length > 0));
+    })();
+  }, [isBoard, refreshKey]);
 
   useEffect(() => {
     if (loading) return;
@@ -68,27 +112,44 @@ export default function MemoriaPage() {
         <div className="print:hidden">
           <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
         </div>
-        <h1 className="font-display text-2xl text-harbor mt-2">🧠 {mt(lang, 'memoriaTitle')}</h1>
+        <h1 className={`font-display text-2xl text-harbor mt-2 ${tab === 'meetings' || tab === 'handover' ? 'print:hidden' : ''}`}>🧠 {mt(lang, 'memoriaTitle')}</h1>
         <p className="text-sm text-ink/60 mt-1 mb-6 print:hidden">{mt(lang, 'memoriaSubtitle')}</p>
 
-        <div className="print:hidden">
-          <AlertsBar lang={lang} refreshKey={refreshKey} onOpenTab={setTab} />
-        </div>
+        {hasDemo && (
+          <p className="text-xs text-ochre border border-dashed border-ochre rounded-md px-3 py-2 mb-4 print:hidden">
+            DEMO · {mt(lang, 'demoNotice')}
+          </p>
+        )}
 
-        <div className="flex gap-1 border-b border-sand-dark mb-6 overflow-x-auto print:hidden">
-          {TABS.map((tb) => (
-            <button
-              key={tb.key}
-              onClick={() => setTab(tb.key)}
-              className={`px-4 py-2 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px ${
-                tab === tb.key ? 'border-ochre text-harbor' : 'border-transparent text-ink/50 hover:text-harbor'
-              }`}
-            >
-              {tb.icon} {mt(lang, tb.label)}
-            </button>
-          ))}
-        </div>
+        <nav className="border-b border-sand-dark mb-6 print:hidden">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            {TAB_GROUPS.map((g) => (
+              <div key={g.label} className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wider text-ink/40 font-semibold px-1">{mt(lang, g.label)}</p>
+                <div className="flex gap-1 overflow-x-auto">
+                  {g.tabs.map((tb) => (
+                    <button
+                      key={tb.key}
+                      onClick={() => setTab(tb.key)}
+                      className={`px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px ${
+                        tab === tb.key ? 'border-ochre text-harbor' : 'border-transparent text-ink/50 hover:text-harbor'
+                      }`}
+                    >
+                      {tb.icon} {mt(lang, tb.label)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </nav>
 
+        {tab === 'home' && <HomePanel lang={lang} profile={profile} refreshKey={refreshKey} onOpenTab={setTab} />}
+        {tab === 'ask' && <AskPanel lang={lang} />}
+        {tab === 'handover' && <HandoverPanel lang={lang} profile={profile} />}
+        {tab === 'tasks' && <TasksPanel lang={lang} onChanged={bump} />}
+        {tab === 'calendar' && <CalendarPanel lang={lang} onChanged={bump} onOpenTab={setTab} />}
+        {tab === 'meetings' && <MeetingsPanel lang={lang} onChanged={bump} />}
         {tab === 'decisions' && <DecisionsPanel lang={lang} onChanged={bump} />}
         {tab === 'suppliers' && <SuppliersPanel lang={lang} onChanged={bump} />}
         {tab === 'contracts' && <ContractsPanel lang={lang} onChanged={bump} />}

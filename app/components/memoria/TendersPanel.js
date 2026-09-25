@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, cleanFormValues, formatMoney, todayIso, TENDER_STATUSES } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
+import QuoteUploader from './QuoteUploader';
+import { getSignedUrl } from '../../../lib/storageClient';
 
 const EMPTY_FORM = {
   title: '',
@@ -51,14 +53,19 @@ export default function TendersPanel({ lang, onChanged }) {
   const [quoteFor, setQuoteFor] = useState(null);
   const [quoteForm, setQuoteForm] = useState(EMPTY_QUOTE);
   const [quoteError, setQuoteError] = useState('');
+  const [aiFor, setAiFor] = useState(null);
+  const [compareFor, setCompareFor] = useState(null);
+  const [quoteDocs, setQuoteDocs] = useState({});
 
   async function load() {
-    const [tRes, qRes, sRes, dRes] = await Promise.all([
+    const [tRes, qRes, sRes, dRes, docRes] = await Promise.all([
       supabase.from('memoria_tenders').select('*').order('created_at', { ascending: false }),
       supabase.from('memoria_quotes').select('*').order('amount', { ascending: true }),
       supabase.from('memoria_suppliers').select('id, name').order('name', { ascending: true }),
       supabase.from('memoria_decisions').select('id, title, decided_on').order('decided_on', { ascending: false }),
+      supabase.from('memoria_documents').select('entity_id, storage_path, title').eq('entity_type', 'quote').not('storage_path', 'is', null),
     ]);
+    setQuoteDocs(Object.fromEntries((docRes.data || []).map((d) => [d.entity_id, d])));
     const firstError = tRes.error || qRes.error || sRes.error || dRes.error;
     setLoadError(firstError ? firstError.message : '');
     setTenders(tRes.data || []);
@@ -263,8 +270,8 @@ export default function TendersPanel({ lang, onChanged }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-4">
-        <input className="input-field flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="input-field w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+        <input className="input-field !w-auto flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <select className="input-field !w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">{mt(lang, 'status')}: {mt(lang, 'all')}</option>
           {TENDER_STATUSES.map((s) => (
             <option key={s} value={s}>{mt(lang, `tenderStatus_${s}`)}</option>
@@ -295,7 +302,7 @@ export default function TendersPanel({ lang, onChanged }) {
               <div key={t.id} className="card p-4">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
-                    <p className="font-semibold text-ink">{t.title}</p>
+                    <p className="font-semibold text-ink">{t.title} <DemoPill show={t.is_demo} /></p>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Pill tone={STATUS_TONE[t.status]}>{mt(lang, `tenderStatus_${t.status}`)}</Pill>
                       <Pill tone={tq.length < 2 ? 'ochre' : 'neutral'}>{mt(lang, 'quotes')}: {tq.length}</Pill>
@@ -342,7 +349,23 @@ export default function TendersPanel({ lang, onChanged }) {
                                 const chosen = t.selected_supplier_id === q.supplier_id;
                                 return (
                                   <tr key={q.id} className={`border-b border-ink/5 ${chosen ? 'bg-sea/10' : ''}`}>
-                                    <td className="py-2 pr-3 font-semibold text-ink">{supplierName[q.supplier_id] || '—'}</td>
+                                    <td className="py-2 pr-3 font-semibold text-ink">
+                                      {supplierName[q.supplier_id] || '—'}
+                                      {quoteDocs[q.id] && (
+                                        <button
+                                          className="ml-2 text-xs font-normal text-harbor hover:underline"
+                                          title={quoteDocs[q.id].title}
+                                          onClick={async () => {
+                                            const win = window.open('', '_blank');
+                                            const url = await getSignedUrl('memoria', quoteDocs[q.id].storage_path, 300);
+                                            if (url && win) win.location.href = url;
+                                            else win?.close();
+                                          }}
+                                        >
+                                          📄 PDF
+                                        </button>
+                                      )}
+                                    </td>
                                     <td className="py-2 pr-3 whitespace-nowrap">
                                       {formatMoney(q.amount, q.currency, lang)}{' '}
                                       <span className="text-xs text-ink/50">{q.vat_included ? mt(lang, 'vatIncluded') : mt(lang, 'vatExcluded')}</span>
@@ -372,6 +395,26 @@ export default function TendersPanel({ lang, onChanged }) {
                         </div>
                       )}
                       {mixedVat && <p className="text-xs text-ochre mt-2">⚠ {mt(lang, 'mixedVat')}</p>}
+                      {tq.length >= 2 && tq.some((q) => q.notes) && (
+                        <button className="text-xs text-harbor hover:underline mt-2" onClick={() => setCompareFor(compareFor === t.id ? null : t.id)}>
+                          ⇆ {mt(lang, 'aiCompare')}
+                        </button>
+                      )}
+                      {compareFor === t.id && (
+                        <div className="mt-2 overflow-x-auto">
+                          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${tq.length}, minmax(14rem, 1fr))` }}>
+                            {tq.map((q) => (
+                              <div key={q.id} className={`rounded-md border p-2 text-xs ${t.selected_supplier_id === q.supplier_id ? 'border-sea bg-sea/10' : 'border-ink/10 bg-white'}`}>
+                                <p className="font-semibold text-sm text-ink">{supplierName[q.supplier_id] || '—'}</p>
+                                <p className="text-ink/70 mb-1">
+                                  {formatMoney(q.amount, q.currency, lang)} · {q.vat_included ? mt(lang, 'vatIncluded') : mt(lang, 'vatExcluded')}
+                                </p>
+                                <p className="whitespace-pre-wrap text-ink/80">{q.notes || '—'}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       {quoteFor === t.id ? (
                         <form onSubmit={(e) => saveQuote(e, t)} className="mt-3 grid sm:grid-cols-4 gap-2 items-end bg-sand/60 rounded-lg p-3">
@@ -406,7 +449,24 @@ export default function TendersPanel({ lang, onChanged }) {
                           </div>
                         </form>
                       ) : (
-                        <button className="text-sm text-harbor hover:underline mt-2" onClick={() => openQuote(t.id)}>+ {mt(lang, 'addQuote')}</button>
+                        aiFor !== t.id && (
+                          <div className="flex flex-wrap gap-4 mt-2">
+                            <button className="text-sm text-harbor hover:underline" onClick={() => openQuote(t.id)}>+ {mt(lang, 'addQuote')}</button>
+                            <button className="text-sm font-semibold text-harbor hover:underline" onClick={() => setAiFor(t.id)}>🤖 {mt(lang, 'aiUpload')}</button>
+                          </div>
+                        )
+                      )}
+                      {aiFor === t.id && (
+                        <QuoteUploader
+                          lang={lang}
+                          tender={t}
+                          onDone={async () => {
+                            await load();
+                            onChanged?.();
+                          }}
+                          onCancel={() => setAiFor(null)}
+                          onClose={() => setAiFor(null)}
+                        />
                       )}
                     </div>
 

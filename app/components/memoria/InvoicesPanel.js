@@ -7,7 +7,7 @@ import {
   mt, cleanFormValues, formatMoney, todayIso,
   PAYMENT_STATUSES, FUNDING_SOURCES, INVOICE_CATEGORIES,
 } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
@@ -341,26 +341,26 @@ export default function InvoicesPanel({ lang, onChanged }) {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2 mb-2">
-        <input className="input-field flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
-        <select className="input-field w-auto" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
+        <input className="input-field !w-auto flex-1 min-w-[12rem]" placeholder={mt(lang, 'search')} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <select className="input-field !w-auto" value={yearFilter} onChange={(e) => setYearFilter(e.target.value)}>
           <option value="">{mt(lang, 'periodYear')}: {mt(lang, 'all')}</option>
           {years.map((y) => (
             <option key={y} value={String(y)}>{y}</option>
           ))}
         </select>
-        <select className="input-field w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
           <option value="">{mt(lang, 'category')}: {mt(lang, 'all')}</option>
           {INVOICE_CATEGORIES.map((c) => (
             <option key={c} value={c}>{mt(lang, `invcat_${c}`)}</option>
           ))}
         </select>
-        <select className="input-field w-auto" value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)}>
           <option value="">{mt(lang, 'paymentStatus')}: {mt(lang, 'all')}</option>
           {PAYMENT_STATUSES.map((p) => (
             <option key={p} value={p}>{mt(lang, `payment_${p}`)}</option>
           ))}
         </select>
-        <select className="input-field w-auto" value={fundingFilter} onChange={(e) => setFundingFilter(e.target.value)}>
+        <select className="input-field !w-auto" value={fundingFilter} onChange={(e) => setFundingFilter(e.target.value)}>
           <option value="">{mt(lang, 'fundingSource')}: {mt(lang, 'all')}</option>
           {FUNDING_SOURCES.map((f) => (
             <option key={f} value={f}>{mt(lang, `fund_${f}`)}</option>
@@ -402,7 +402,8 @@ export default function InvoicesPanel({ lang, onChanged }) {
                     <div className="min-w-0">
                       <p className="font-semibold text-ink">
                         {formatMoney(inv.total_amount, inv.currency, lang)}
-                        <span className="font-normal text-ink/70"> · {supplierName[inv.supplier_id] || '—'}</span>
+                        <span className="font-normal text-ink/70"> · {supplierName[inv.supplier_id] || '—'}</span>{' '}
+                        <DemoPill show={inv.is_demo} />
                       </p>
                       <p className="text-sm text-ink/70">
                         {[inv.invoice_number, inv.invoice_date ? formatDate(inv.invoice_date, lang) : null, inv.description].filter(Boolean).join(' · ')}
