@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { mt } from '../../../lib/memoriaI18n';
 import { ErrorBox } from './MemoriaUi';
+import { parseAnswer } from '../../../lib/answerFormat';
 
 // Jednoduché zobrazenie odpovede: odseky, odrážky a **tučné**.
 function Inline({ text }) {
@@ -15,39 +16,47 @@ function Inline({ text }) {
 }
 
 export function AnswerText({ text }) {
-  const blocks = [];
-  let list = null;
-  for (const raw of text.split('\n')) {
-    const line = raw.trimEnd();
-    const m = line.match(/^\s*(?:[-•*]|\d+\.)\s+(.*)$/);
-    if (m) {
-      if (!list) {
-        list = [];
-        blocks.push({ type: 'ul', items: list });
-      }
-      list.push(m[1]);
-      continue;
-    }
-    list = null;
-    if (!line.trim()) continue;
-    const h = line.match(/^#{1,4}\s+(.*)$/);
-    blocks.push(h ? { type: 'h', text: h[1] } : { type: 'p', text: line });
-  }
+  const blocks = parseAnswer(text);
   return (
     <div className="space-y-2 text-sm text-ink">
-      {blocks.map((b, i) =>
-        b.type === 'ul' ? (
-          <ul key={i} className="list-disc pl-5 space-y-1">
-            {b.items.map((it, j) => (
-              <li key={j}><Inline text={it} /></li>
-            ))}
-          </ul>
-        ) : b.type === 'h' ? (
-          <p key={i} className="font-semibold text-harbor"><Inline text={b.text} /></p>
-        ) : (
-          <p key={i}><Inline text={b.text} /></p>
-        )
-      )}
+      {blocks.map((b, i) => {
+        if (b.type === 'ul') {
+          return (
+            <ul key={i} className="list-disc pl-5 space-y-1">
+              {b.items.map((it, j) => (
+                <li key={j}><Inline text={it} /></li>
+              ))}
+            </ul>
+          );
+        }
+        if (b.type === 'table') {
+          return (
+            <div key={i} className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr>
+                    {b.head.map((c, j) => (
+                      <th key={j} className="text-left font-semibold text-harbor border-b border-ink/20 px-2 py-1"><Inline text={c} /></th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {b.rows.map((r, j) => (
+                    <tr key={j} className="border-b border-ink/10">
+                      {r.map((c, k) => (
+                        <td key={k} className="px-2 py-1 align-top"><Inline text={c} /></td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+        if (b.type === 'hr') return <hr key={i} className="border-ink/10" />;
+        if (b.type === 'h') return <p key={i} className="font-semibold text-harbor"><Inline text={b.text} /></p>;
+        return <p key={i}><Inline text={b.text} /></p>;
+      })}
     </div>
   );
 }

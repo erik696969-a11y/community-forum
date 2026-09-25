@@ -8,7 +8,8 @@ import { retrieveRelevantDocumentChunks, formatDocumentExcerptsForPrompt } from 
 
 export const maxDuration = 60;
 
-const MODEL = 'claude-haiku-4-5-20251001';
+// Presnejší model pre board (nízky počet otázok); ak nie je pre kľúč dostupný, použije sa Haiku ako pri MIA.
+const MODELS = ['claude-sonnet-5', 'claude-haiku-4-5-20251001'];
 const DAILY_LIMIT = 200;
 const MAX_QUESTION = 1000;
 const MAX_HISTORY = 4;
@@ -20,13 +21,15 @@ You answer questions from board members using ONLY the Memoria records and the c
 
 How to answer:
 - Answer in ${LANG_NAMES[lang] || 'the language of the question'} unless the question is clearly in another language; then use that language.
-- Start with the direct answer (numbers, dates, names), then the supporting facts. Keep it short and scannable: short paragraphs or bullet points, no tables.
+- Start with the direct answer (numbers, dates, names), then the supporting facts. Keep it short and scannable: short paragraphs, bullet points, or a small table when comparing several items.
 - Quote exact figures and dates from the records. Say which records you used (e.g. "contract 'Gardening maintenance…'", "decision of 24/09/2025").
 - If the records do not contain the answer, say so plainly and say what data is missing (e.g. invoices from the administrator). Never invent suppliers, amounts, dates, votes or rules.
 - You may point out facts and trends (price changes, missing quotes, deadlines, overdue tasks, missing conflict-of-interest checks) and describe the procedure the Statutes or the law set out (who decides, deadlines, majorities).
 - When asked what to do, you may list the options and the steps the Statutes require, but you never make or recommend a strategic, financial or legal decision. End such answers with one line saying the decision belongs to the board.
 - Records marked [DEMO] are fictional sample data for a presentation. If your answer relies on them, add a short final note: "(based on DEMO sample data)".
 - Amounts are in EUR; invoice totals include VAT unless stated otherwise.
+- NEVER calculate dates or day counts yourself. Use the values already given in the records: "(in N days)", "(N days ago)", "LAST DAY TO GIVE NOTICE …" and the section DATES ALREADY CALCULATED. A contract "renews within X months" when its end date falls within that window; its notice deadline is the listed LAST DAY TO GIVE NOTICE. Something is overdue only when the records say "days ago", "PAST" or "OVERDUE".
+- Before answering, check that your first sentence does not contradict the details you list afterwards.
 
 # COMMUNITY RULES (Statutes and law, summary)
 ${rules}
@@ -91,22 +94,29 @@ export async function POST(request) {
     const matched = retrieveRelevantDocumentChunks(docs.data || [], question, 3);
     const excerpts = matched.length ? formatDocumentExcerptsForPrompt(matched) : '';
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 1400,
-        system: systemPrompt(context, GOVERNANCE_RULES, excerpts, lang),
-        messages: [...history, { role: 'user', content: question }],
-      }),
-    });
-    if (!res.ok) {
-      console.error('memoria ask API error', res.status, await res.text().catch(() => ''));
+    let res = null;
+    for (const model of MODELS) {
+      res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 1600,
+          system: systemPrompt(context, GOVERNANCE_RULES, excerpts, lang),
+          messages: [...history, { role: 'user', content: question }],
+        }),
+      });
+      if (res.ok) break;
+      const errText = await res.text().catch(() => '');
+      console.error('memoria ask API error', model, res.status, errText);
+      // Neznámy / nedostupný model → skúsime ďalší; iné chyby hneď vrátime.
+      if (![400, 403, 404].includes(res.status)) break;
+    }
+    if (!res || !res.ok) {
       return Response.json({ error: 'AI request failed' }, { status: 502 });
     }
     const json = await res.json();
