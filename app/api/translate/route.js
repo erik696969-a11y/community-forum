@@ -1,46 +1,19 @@
 import { getAuthedProfile } from '../../../lib/serverAuth';
+import { TARGET_LANGS, translateAll } from '../../../lib/translation';
 
-const TARGET_LANGS = ['EN', 'ES', 'FR', 'DE'];
 const DAILY_LIMIT = 200;
 const MAX_ITEMS = 10;
 const MAX_TEXT_LENGTH = 5000;
 
-async function callDeepL(texts, targetLang, sourceLang) {
-  const apiKey = process.env.DEEPL_API_KEY;
-  const isFree = apiKey && apiKey.endsWith(':fx');
-  const url = isFree
-    ? 'https://api-free.deepl.com/v2/translate'
-    : 'https://api.deepl.com/v2/translate';
-
-  const params = new URLSearchParams();
-  texts.forEach((text) => params.append('text', text));
-  params.append('target_lang', targetLang);
-  if (sourceLang) params.append('source_lang', sourceLang);
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `DeepL-Auth-Key ${apiKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params.toString(),
-  });
-
-  if (!response.ok) {
-    throw new Error(`DeepL error: ${response.status}`);
-  }
-
-  const data = await response.json();
-  return data.translations;
-}
+export const maxDuration = 120;
 
 // POST body: { texts: string[], authorLang: 'en'|'es'|'fr'|'de' }
 // Returns: { originalLang: 'en', translations: { en: [...], es: [...], fr: [...], de: [...] } }
 //
 // Note: we deliberately use the AUTHOR'S OWN app language as the source
-// language, instead of letting DeepL auto-detect it. Auto-detection is
+// language, instead of letting the translator auto-detect it. Auto-detection is
 // unreliable for short or ambiguous text (e.g. the English word "gate"
-// is also a valid Swedish word meaning "street", which DeepL would
+// is also a valid Swedish word meaning "street", which a translator would
 // happily "detect" and mistranslate). Since we already know which of
 // our 4 supported languages the person is writing in, that's a far more
 // reliable signal than guessing from a few words.
@@ -69,7 +42,7 @@ export async function POST(request) {
     }
 
     // Per-user daily rate limit, so a single account can't rack up a large
-    // DeepL bill by hammering this endpoint.
+    // translation bill by hammering this endpoint.
     const { data: allowed, error: rateLimitError } = await auth.adminClient.rpc('check_and_increment_rate_limit', {
       p_user_id: auth.user.id,
       p_endpoint: 'translate',
@@ -88,24 +61,9 @@ export async function POST(request) {
       ? authorLang.toUpperCase()
       : 'EN';
 
-    if (!process.env.DEEPL_API_KEY) {
-      // No translation configured - just echo back originals for every language
-      const fallback = {};
-      TARGET_LANGS.forEach((l) => {
-        fallback[l.toLowerCase()] = texts;
-      });
-      return Response.json({ originalLang: sourceLang.toLowerCase(), translations: fallback });
-    }
-
-    const translations = {};
-    translations[sourceLang.toLowerCase()] = texts;
-
-    const remainingLangs = TARGET_LANGS.filter((l) => l !== sourceLang);
-
-    for (const targetLang of remainingLangs) {
-      const batch = await callDeepL(texts, targetLang, sourceLang);
-      translations[targetLang.toLowerCase()] = batch.map((t) => t.text);
-    }
+    // Hlavný poskytovateľ podľa TRANSLATION_PROVIDER, druhý ako záloha
+    // (lib/translation.js). Bez poskytovateľa sa vrátia originály.
+    const { translations } = await translateAll(texts, sourceLang);
 
     return Response.json({ originalLang: sourceLang.toLowerCase(), translations });
   } catch (error) {
