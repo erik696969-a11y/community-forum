@@ -10,6 +10,7 @@ import { mt, todayIso, addDaysIso, formatMoney, OPEN_TASK_STATUSES } from '../..
 import { meetingChecks } from './MeetingsPanel';
 import { mandateChecks } from '../../../lib/memoriaMandates';
 import { budgetStatus, reserveStatus } from '../../../lib/memoriaBudget';
+import { supplierPriceChanges, categoryYearOnYear } from '../../../lib/memoriaTrends';
 
 const CONTRACT_WINDOW_DAYS = 90;
 const NOTICE_WINDOW_DAYS = 60;
@@ -22,7 +23,7 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
     (async () => {
       const today = todayIso();
       const year = Number(today.slice(0, 4));
-      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes, mandRes, profRes, bRes, blRes, rmRes, yiRes, riRes] = await Promise.all([
+      const [cRes, iRes, tRes, qRes, sRes, taskRes, oRes, mRes, mandRes, profRes, bRes, blRes, rmRes, yiRes, riRes, caseRes, trRes, supRes] = await Promise.all([
         supabase.from('memoria_contracts').select('id, subject, ends_on, auto_renew, notice_period_days, status, tender_id').eq('status', 'active'),
         supabase.from('memoria_invoices').select('id, invoice_number, description, total_amount, currency, due_date, payment_status, is_urgent_unbudgeted, ratified_by_decision_id'),
         supabase.from('memoria_tenders').select('id, title, status, selection_reason').eq('status', 'decided'),
@@ -38,6 +39,9 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
         supabase.from('memoria_reserve_movements').select('moved_on, kind, amount'),
         supabase.from('memoria_invoices').select('invoice_date, total_amount, category, funding_source').gte('invoice_date', `${year}-01-01`).range(0, 9999),
         supabase.from('memoria_invoices').select('total_amount').eq('funding_source', 'reserve_fund'),
+        supabase.from('memoria_cases').select('id, title, status, next_step, next_step_due').in('status', ['open', 'in_progress', 'waiting']),
+        supabase.from('memoria_invoices').select('supplier_id, invoice_date, total_amount, category, funding_source').gte('invoice_date', `${year - 2}-01-01`).range(0, 9999),
+        supabase.from('memoria_suppliers').select('id, name'),
       ]);
       if (!active) return;
       const list = [];
@@ -127,6 +131,23 @@ export default function AlertsBar({ lang, refreshKey, onOpenTab }) {
       const rs = reserveStatus({ movements: rmRes.data || [], reserveInvoices: riRes.data || [], budget: budget || budgets[0] });
       if (rs.belowMinimum) {
         list.push({ key: 'reserve', tone: 'red', tab: 'budget', sort: '2', text: mt(lang, 'alertReserveBelow', { balance: formatMoney(rs.balance, 'EUR', lang), minimum: formatMoney(rs.minimum, 'EUR', lang) }) });
+      }
+
+      for (const c of caseRes.data || []) {
+        if (!c.next_step_due) continue;
+        if (c.next_step_due < today) {
+          list.push({ key: `cs-${c.id}`, tone: 'red', tab: 'cases', sort: c.next_step_due, text: mt(lang, 'alertCaseOverdue', { name: c.title, date: formatDate(c.next_step_due, lang) }) });
+        } else if (c.next_step_due <= addDaysIso(today, 14)) {
+          list.push({ key: `cs-${c.id}`, tone: 'ochre', tab: 'cases', sort: c.next_step_due, text: mt(lang, 'alertCaseSoon', { name: c.title, date: formatDate(c.next_step_due, lang) }) });
+        }
+      }
+
+      const supNames = Object.fromEntries((supRes.data || []).map((x) => [x.id, x.name]));
+      for (const p of supplierPriceChanges(trRes.data || [], supNames).filter((x) => x.flagged)) {
+        list.push({ key: `tp-${p.supplierId}`, tone: 'neutral', tab: 'budget', sort: '96', text: mt(lang, 'alertPriceRise', { name: p.name, pct: `+${Math.round(p.change * 100)} %`, from: p.fromYear, to: p.toYear }) });
+      }
+      for (const c of categoryYearOnYear(trRes.data || []).rows.filter((x) => x.flagged)) {
+        list.push({ key: `tc-${c.category}`, tone: 'neutral', tab: 'budget', sort: '96', text: mt(lang, 'alertCategoryRise', { name: mt(lang, `invcat_${c.category}`), pct: `+${Math.round(c.change * 100)} %` }) });
       }
 
       const quoteCount = {};

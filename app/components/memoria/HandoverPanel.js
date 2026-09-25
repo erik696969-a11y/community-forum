@@ -57,7 +57,7 @@ export default function HandoverPanel({ lang, profile }) {
     (async () => {
       const since = addMonthsIso(todayIso(), -12);
       const yr = Number(todayIso().slice(0, 4));
-      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes, mdRes, bRes, blRes, rmRes, yiRes, riRes] = await Promise.all([
+      const [tRes, oRes, mRes, cRes, sRes, rRes, tdRes, qRes, iRes, dRes, mdRes, bRes, blRes, rmRes, yiRes, riRes, csRes] = await Promise.all([
         supabase.from('memoria_tasks').select('*').in('status', OPEN_TASK_STATUSES).order('due_date', { ascending: true, nullsFirst: false }),
         supabase.from('memoria_obligations').select('*').eq('active', true),
         supabase.from('memoria_meetings').select('*').order('meeting_on', { ascending: false }),
@@ -74,6 +74,7 @@ export default function HandoverPanel({ lang, profile }) {
         supabase.from('memoria_reserve_movements').select('moved_on, kind, amount'),
         supabase.from('memoria_invoices').select('invoice_date, total_amount, category, funding_source').gte('invoice_date', `${yr}-01-01`).range(0, 9999),
         supabase.from('memoria_invoices').select('total_amount').eq('funding_source', 'reserve_fund'),
+        supabase.from('memoria_cases').select('*').in('status', ['open', 'in_progress', 'waiting']).order('opened_on', { ascending: true }),
       ]);
       const { count: decisionCount } = await supabase.from('memoria_decisions').select('id', { count: 'exact', head: true });
       if (!active) return;
@@ -94,6 +95,7 @@ export default function HandoverPanel({ lang, profile }) {
           const b = (bRes.data || []).find((x) => Number(x.year) === yr);
           return b ? { b, st: budgetStatus({ budget: b, lines: (blRes.data || []).filter((l) => l.budget_id === b.id), invoices: yiRes.data || [] }) } : null;
         })(),
+        cases: csRes.data || [],
         reserve: reserveStatus({ movements: rmRes.data || [], reserveInvoices: riRes.data || [], budget: (bRes.data || [])[0] }),
       });
     })();
@@ -286,6 +288,20 @@ export default function HandoverPanel({ lang, profile }) {
               {d.reserve.minimum !== null ? ` · ${mt(lang, 'reserveMinimum')}: ${formatMoney(d.reserve.minimum, 'EUR', lang)} (${d.reserve.belowMinimum ? mt(lang, 'reserveBelow') : mt(lang, 'reserveOk')})` : ''}
             </p>
           )}
+        </Section>
+
+        <Section title={mt(lang, 'tabCases')}>
+          <Table
+            head={[mt(lang, 'title'), mt(lang, 'caseCounterparty'), mt(lang, 'caseClaimed'), mt(lang, 'caseNextStep'), mt(lang, 'status')]}
+            empty={mt(lang, 'h_none')}
+            rows={d.cases.map((c) => [
+              <>{c.title} <DemoPill show={c.is_demo} /></>,
+              c.counterparty || dash,
+              c.amount_claimed !== null && c.amount_claimed !== undefined ? formatMoney(c.amount_claimed, 'EUR', lang) : dash,
+              c.next_step ? `${c.next_step}${c.next_step_due ? ` (${date(c.next_step_due)})` : ''}` : dash,
+              mt(lang, `cs_${c.status}`),
+            ])}
+          />
         </Section>
 
         <Section title={mt(lang, 'h_spend')}>

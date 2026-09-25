@@ -10,6 +10,7 @@ import {
 import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 import InvoiceImport from './InvoiceImport';
+import DocumentReader, { ReadNotice, createSupplierFromRead, attachReadFile } from './DocumentReader';
 import ImportHistory from './ImportHistory';
 
 const EMPTY_FORM = {
@@ -68,6 +69,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
   const [fundingFilter, setFundingFilter] = useState('');
   const [onlyUnratified, setOnlyUnratified] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [read, setRead] = useState(null);
   const [importKey, setImportKey] = useState(0);
   const [expanded, setExpanded] = useState({});
 
@@ -151,6 +153,45 @@ export default function InvoicesPanel({ lang, onChanged }) {
   function closeForm() {
     setEditingId(null);
     setFormError('');
+    setRead(null);
+  }
+
+  function applyRead(r) {
+    const d = r.data || {};
+    const date = d.invoice_date || todayIso();
+    const num = (x) => (x === null || x === undefined ? '' : String(x));
+    setForm({
+      ...EMPTY_FORM,
+      supplier_id: r.supplierId || '',
+      invoice_number: d.invoice_number || '',
+      invoice_date: d.invoice_date || '',
+      due_date: d.due_date || '',
+      paid_on: d.paid_on || '',
+      payment_status: d.paid_on ? 'paid' : 'pending',
+      net_amount: num(d.net_amount),
+      vat_amount: num(d.vat_amount),
+      total_amount: num(d.total_amount),
+      total_amount_touched: true,
+      currency: d.currency || 'EUR',
+      description: d.description || '',
+      category: d.category || 'other',
+      period_year: date.slice(0, 4),
+      period_month: String(Number(date.slice(5, 7))),
+    });
+    setFormError('');
+    setRead(r);
+    setEditingId('new');
+  }
+
+  async function createSupplier() {
+    try {
+      const id = await createSupplierFromRead(read, null, read.demoMode);
+      await load();
+      setField('supplier_id', id);
+      setRead((r) => ({ ...r, supplierId: id }));
+    } catch (e) {
+      setFormError(mt(lang, 'saveError', { error: e.message }));
+    }
   }
 
   function setField(key, value) {
@@ -191,15 +232,20 @@ export default function InvoicesPanel({ lang, onChanged }) {
 
     setSaving(true);
     setFormError('');
-    const { error } =
+    const { data: saved, error } =
       editingId === 'new'
-        ? await supabase.from('memoria_invoices').insert({ ...values, import_source: 'manual' })
-        : await supabase.from('memoria_invoices').update(values).eq('id', editingId);
+        ? await supabase
+            .from('memoria_invoices')
+            .insert({ ...values, import_source: read ? 'document_ai' : 'manual', ...(read?.demoMode ? { is_demo: true } : {}) })
+            .select('id')
+            .single()
+        : await supabase.from('memoria_invoices').update(values).eq('id', editingId).select('id').single();
     setSaving(false);
     if (error) {
       setFormError(friendlyError(lang, error));
       return;
     }
+    if (editingId === 'new' && read && saved?.id) await attachReadFile(read, 'invoice', saved.id, 'invoice', values.invoice_date, read.demoMode);
     closeForm();
     await load();
     onChanged?.();
@@ -220,6 +266,9 @@ export default function InvoicesPanel({ lang, onChanged }) {
   const formBlock = (
     <form onSubmit={handleSave} className="card p-4 space-y-4 mb-6 border-2 border-ochre/40">
       <h3 className="font-display text-lg text-harbor">{editingId === 'new' ? mt(lang, 'newInvoice') : mt(lang, 'edit')}</h3>
+      {editingId === 'new' && (
+        <ReadNotice lang={lang} read={read} onCreateSupplier={createSupplier} onToggleDemo={(v) => setRead((r) => ({ ...r, demoMode: v }))} />
+      )}
       <div className="grid sm:grid-cols-3 gap-3">
         <Field label={mt(lang, 'supplier')}>
           <select className="input-field" value={form.supplier_id} onChange={(e) => setField('supplier_id', e.target.value)}>
@@ -386,6 +435,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
             {!importOpen && (
               <button className="btn-secondary text-sm" onClick={() => setImportOpen(true)}>📥 {mt(lang, 'importOpen')}</button>
             )}
+            <DocumentReader lang={lang} kind="invoice" label={mt(lang, 'docReadInvoice')} onRead={applyRead} />
             <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newInvoice')}</button>
           </div>
         )}

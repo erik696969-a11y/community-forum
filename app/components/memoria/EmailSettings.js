@@ -45,12 +45,12 @@ export default function EmailSettings({ lang, profile }) {
     }
   }
 
-  async function sendTest() {
+  async function sendTest(kind) {
     setBusy(true);
     setError('');
     setMessage('');
     try {
-      const res = await fetch('/api/memoria/digest-test', { method: 'POST', headers: await authHeaders(), body: JSON.stringify({ lang }) });
+      const res = await fetch('/api/memoria/digest-test', { method: 'POST', headers: await authHeaders(), body: JSON.stringify({ lang, kind }) });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || res.statusText);
       setMessage(mt(lang, 'emailTestSent', { email: json.email }));
@@ -75,8 +75,11 @@ export default function EmailSettings({ lang, profile }) {
         {mt(lang, 'emailMine')}
       </label>
       <div className="flex items-center gap-3 flex-wrap">
-        <button className="btn-secondary text-sm py-1" disabled={busy} onClick={sendTest}>
+        <button className="btn-secondary text-sm py-1" disabled={busy} onClick={() => sendTest('weekly')}>
           {busy ? mt(lang, 'saving') : mt(lang, 'emailTest')}
+        </button>
+        <button className="btn-secondary text-sm py-1" disabled={busy} onClick={() => sendTest('monthly')}>
+          {busy ? mt(lang, 'saving') : mt(lang, 'emailTestMonthly')}
         </button>
         <span className="text-xs text-ink/50">{mt(lang, 'emailTestNote')}</span>
       </div>

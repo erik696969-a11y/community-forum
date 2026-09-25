@@ -70,7 +70,7 @@ export async function POST(request) {
     if (rlError) return Response.json({ error: 'Temporarily unavailable' }, { status: 503 });
     if (!allowed) return Response.json({ error: 'Daily limit reached' }, { status: 429 });
 
-    const [s, r, c, t, q, i, d, tk, o, m, mi, docs, md, bg, bl, rm] = await Promise.all([
+    const [s, r, c, t, q, i, d, tk, o, m, mi, docs, md, bg, bl, rm, cs] = await Promise.all([
       db.from('memoria_suppliers').select('*'),
       db.from('memoria_supplier_ratings').select('*'),
       db.from('memoria_contracts').select('*'),
@@ -87,12 +87,13 @@ export async function POST(request) {
       db.from('memoria_budgets').select('*'),
       db.from('memoria_budget_lines').select('*'),
       db.from('memoria_reserve_movements').select('*'),
+      db.from('memoria_cases').select('*'),
     ]);
     const today = new Date().toISOString().slice(0, 10);
     const context = buildMemoriaContext(
       {
         suppliers: s.data, ratings: r.data, contracts: c.data, tenders: t.data, quotes: q.data, invoices: i.data,
-        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data, mandates: md.data, budgets: bg.data, budgetLines: bl.data, reserveMovements: rm.data,
+        decisions: d.data, tasks: tk.data, obligations: o.data, meetings: m.data, meetingItems: mi.data, mandates: md.data, budgets: bg.data, budgetLines: bl.data, reserveMovements: rm.data, cases: cs.data,
       },
       today
     );

@@ -9,6 +9,7 @@ import {
 } from '../../../lib/memoriaI18n';
 import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
+import DocumentReader, { ReadNotice, createSupplierFromRead, attachReadFile } from './DocumentReader';
 
 const EMPTY_FORM = {
   supplier_id: '',
@@ -69,6 +70,7 @@ export default function ContractsPanel({ lang, onChanged }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+  const [read, setRead] = useState(null);
 
   async function load() {
     const [cRes, sRes, dRes, tRes] = await Promise.all([
@@ -119,6 +121,47 @@ export default function ContractsPanel({ lang, onChanged }) {
   function closeForm() {
     setEditingId(null);
     setFormError('');
+    setRead(null);
+  }
+
+  function applyRead(r) {
+    const d = r.data || {};
+    const freq = { one_off: 'one_off', monthly: 'monthly', quarterly: 'quarterly', yearly: 'yearly' }[d.amount_period] || '';
+    const notes = [
+      d.renewal_text,
+      d.notice_text ? `${mt(lang, 'noticePeriodDays')}: ${d.notice_text}` : null,
+      d.vat_included === true ? mt(lang, 'vatIncluded') : d.vat_included === false ? mt(lang, 'vatExcluded') : null,
+      ...(d.key_clauses || []).map((c) => `• ${c}`),
+    ].filter(Boolean).join('\n');
+    setForm({
+      ...EMPTY_FORM,
+      supplier_id: r.supplierId || '',
+      subject: d.subject || '',
+      signed_on: d.signed_on || '',
+      starts_on: d.starts_on || '',
+      ends_on: d.ends_on || '',
+      auto_renew: Boolean(d.auto_renew),
+      notice_period_days: d.notice_period_days !== null && d.notice_period_days !== undefined ? String(d.notice_period_days) : '',
+      amount: d.amount !== null && d.amount !== undefined ? String(d.amount) : '',
+      currency: d.currency || 'EUR',
+      payment_frequency: freq,
+      signed_by: d.signed_by || '',
+      notes,
+    });
+    setFormError('');
+    setRead(r);
+    setEditingId('new');
+  }
+
+  async function createSupplier() {
+    try {
+      const id = await createSupplierFromRead(read, read.data?.category, read.demoMode);
+      await load();
+      setField('supplier_id', id);
+      setRead((r) => ({ ...r, supplierId: id }));
+    } catch (e) {
+      setFormError(mt(lang, 'saveError', { error: e.message }));
+    }
   }
 
   function setField(key, value) {
@@ -139,15 +182,16 @@ export default function ContractsPanel({ lang, onChanged }) {
     if (!values.currency) values.currency = 'EUR';
     setSaving(true);
     setFormError('');
-    const { error } =
+    const { data: saved, error } =
       editingId === 'new'
-        ? await supabase.from('memoria_contracts').insert(values)
-        : await supabase.from('memoria_contracts').update(values).eq('id', editingId);
+        ? await supabase.from('memoria_contracts').insert(read?.demoMode ? { ...values, is_demo: true } : values).select('id').single()
+        : await supabase.from('memoria_contracts').update(values).eq('id', editingId).select('id').single();
     setSaving(false);
     if (error) {
       setFormError(mt(lang, 'saveError', { error: error.message }));
       return;
     }
+    if (editingId === 'new' && read && saved?.id) await attachReadFile(read, 'contract', saved.id, 'contract', values.signed_on, read.demoMode);
     closeForm();
     await load();
     onChanged?.();
@@ -170,6 +214,9 @@ export default function ContractsPanel({ lang, onChanged }) {
       <h3 className="font-display text-lg text-harbor">
         {editingId === 'new' ? mt(lang, 'newContract') : mt(lang, 'edit')}
       </h3>
+      {editingId === 'new' && (
+        <ReadNotice lang={lang} read={read} onCreateSupplier={createSupplier} onToggleDemo={(v) => setRead((r) => ({ ...r, demoMode: v }))} />
+      )}
       <div className="grid sm:grid-cols-2 gap-3">
         <Field label={mt(lang, 'supplier')} required>
           <select className="input-field" value={form.supplier_id} onChange={(e) => setField('supplier_id', e.target.value)}>
@@ -269,7 +316,10 @@ export default function ContractsPanel({ lang, onChanged }) {
           ))}
         </select>
         {editingId === null && (
-          <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newContract')}</button>
+          <span className="flex gap-2 flex-wrap items-start">
+            <DocumentReader lang={lang} kind="contract" label={mt(lang, 'docReadContract')} onRead={applyRead} />
+            <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newContract')}</button>
+          </span>
         )}
       </div>
       {suppliers.length === 0 && !loadingData && <p className="text-sm text-ink/50 mb-3">{mt(lang, 'noSuppliersYet')}</p>}

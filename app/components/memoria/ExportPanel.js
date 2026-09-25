@@ -32,6 +32,8 @@ export const EXPORT_TABLES = [
   'memoria_budgets',
   'memoria_budget_lines',
   'memoria_reserve_movements',
+  'memoria_cases',
+  'memoria_case_updates',
   'memoria_documents',
   'memoria_activity',
 ];

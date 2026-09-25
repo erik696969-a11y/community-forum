@@ -3,7 +3,8 @@
 
 import { getAuthedProfile } from '../../../../lib/serverAuth';
 import { collectDigestItems, renderDigest } from '../../../../lib/memoriaDigest';
-import { todayMadrid, appBaseUrl, loadDigestData, sendEmails } from '../../../../lib/memoriaDigestServer';
+import { todayMadrid, appBaseUrl, loadDigestData, loadMonthlyData, sendEmails } from '../../../../lib/memoriaDigestServer';
+import { buildMonthly, renderMonthly, previousMonth } from '../../../../lib/memoriaMonthly';
 
 export const maxDuration = 30;
 const DAILY_LIMIT = 10;
@@ -45,13 +46,19 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const lang = ['en', 'es', 'fr', 'de'].includes(body.lang) ? body.lang : auth.profile.language || 'en';
     const today = todayMadrid();
-    const data = await loadDigestData(db);
-    const items = collectDigestItems(data, today, { includeDemo: true });
-    const sample = items.some((i) => i.isDemo);
-    const email = renderDigest({ items, lang, weekly: true, appUrl: appBaseUrl(request), today, sample });
+    let email;
+    if (body.kind === 'monthly') {
+      const report = buildMonthly(await loadMonthlyData(db), previousMonth(today), today, { includeDemo: true });
+      email = renderMonthly(report, { lang, appUrl: appBaseUrl(request), sample: true });
+    } else {
+      const data = await loadDigestData(db);
+      const items = collectDigestItems(data, today, { includeDemo: true });
+      const sample = items.some((i) => i.isDemo);
+      email = renderDigest({ items, lang, weekly: true, appUrl: appBaseUrl(request), today, sample });
+    }
     const sent = await sendEmails([{ to: auth.user.email, ...email }]);
     if (!sent) return Response.json({ error: 'Email could not be sent' }, { status: 502 });
-    return Response.json({ sent: true, email: auth.user.email, items: items.length });
+    return Response.json({ sent: true, email: auth.user.email });
   } catch (e) {
     console.error('memoria digest-test error', e);
     return Response.json({ error: 'Server error' }, { status: 500 });

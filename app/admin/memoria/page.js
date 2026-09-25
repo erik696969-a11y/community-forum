@@ -28,6 +28,7 @@ import AskPanel from '../../components/memoria/AskPanel';
 import MandatesPanel from '../../components/memoria/MandatesPanel';
 import ExportPanel from '../../components/memoria/ExportPanel';
 import BudgetPanel from '../../components/memoria/BudgetPanel';
+import CasesPanel from '../../components/memoria/CasesPanel';
 import { supabase } from '../../../lib/supabaseClient';
 
 // Karty v troch skupinách, aby sa v module dalo ľahko zorientovať.
@@ -41,6 +42,7 @@ const TAB_GROUPS = [
       { key: 'meetings', label: 'tabMeetings', icon: '🗓️' },
       { key: 'decisions', label: 'tabDecisions', icon: '⚖️' },
       { key: 'mandates', label: 'tabMandates', icon: '👥' },
+      { key: 'cases', label: 'tabCases', icon: '🛡️' },
     ],
   },
   {
@@ -166,6 +168,7 @@ export default function MemoriaPage() {
         {tab === 'mandates' && <MandatesPanel lang={lang} profile={profile} onChanged={bump} />}
         {tab === 'export' && <ExportPanel lang={lang} profile={profile} />}
         {tab === 'budget' && <BudgetPanel lang={lang} onChanged={bump} />}
+        {tab === 'cases' && <CasesPanel lang={lang} onChanged={bump} />}
       </div>
     </main>
   );

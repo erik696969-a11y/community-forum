@@ -8,6 +8,7 @@ import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, formatMoney, formatMoneyRound, cleanFormValues, INVOICE_CATEGORIES } from '../../../lib/memoriaI18n';
 import { budgetStatus, reserveStatus } from '../../../lib/memoriaBudget';
+import { supplierPriceChanges, categoryYearOnYear } from '../../../lib/memoriaTrends';
 import { Field, Pill, ErrorBox, DemoPill } from './MemoriaUi';
 
 const STATUS_TONE = { ok: 'green', at_risk: 'ochre', over: 'red', unplanned: 'neutral' };
@@ -28,6 +29,8 @@ export default function BudgetPanel({ lang, onChanged }) {
   const [reserveInvoices, setReserveInvoices] = useState([]);
   const [movements, setMovements] = useState([]);
   const [decisions, setDecisions] = useState([]);
+  const [trendInvoices, setTrendInvoices] = useState([]);
+  const [supplierNames, setSupplierNames] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -37,13 +40,15 @@ export default function BudgetPanel({ lang, onChanged }) {
   const [mvForm, setMvForm] = useState(null);
 
   async function load() {
-    const [bRes, lRes, iRes, rRes, mRes, dRes] = await Promise.all([
+    const [bRes, lRes, iRes, rRes, mRes, dRes, tRes, sRes] = await Promise.all([
       supabase.from('memoria_budgets').select('*').order('year', { ascending: false }),
       supabase.from('memoria_budget_lines').select('*'),
       supabase.from('memoria_invoices').select('invoice_date, total_amount, category, funding_source').gte('invoice_date', `${year}-01-01`).lte('invoice_date', `${year}-12-31`).range(0, 9999),
       supabase.from('memoria_invoices').select('id, invoice_number, description, invoice_date, total_amount, is_demo').eq('funding_source', 'reserve_fund'),
       supabase.from('memoria_reserve_movements').select('*').order('moved_on', { ascending: false }),
       supabase.from('memoria_decisions').select('id, title, decided_on').order('decided_on', { ascending: false }),
+      supabase.from('memoria_invoices').select('supplier_id, invoice_date, total_amount, category, funding_source').gte('invoice_date', `${year - 2}-01-01`).lte('invoice_date', `${year}-12-31`).range(0, 9999),
+      supabase.from('memoria_suppliers').select('id, name'),
     ]);
     const firstError = [bRes, lRes, iRes, rRes, mRes, dRes].find((r) => r.error)?.error;
     setError(firstError ? firstError.message : '');
@@ -53,6 +58,8 @@ export default function BudgetPanel({ lang, onChanged }) {
     setReserveInvoices(rRes.data || []);
     setMovements(mRes.data || []);
     setDecisions(dRes.data || []);
+    setTrendInvoices(tRes.data || []);
+    setSupplierNames(Object.fromEntries((sRes.data || []).map((x) => [x.id, x.name])));
     setLoading(false);
   }
 
@@ -67,6 +74,8 @@ export default function BudgetPanel({ lang, onChanged }) {
   const latestBudget = budgets[0] || null;
   const reserve = useMemo(() => reserveStatus({ movements, reserveInvoices, budget: budget || latestBudget }), [movements, reserveInvoices, budget, latestBudget]);
   const decisionById = useMemo(() => Object.fromEntries(decisions.map((d) => [d.id, d])), [decisions]);
+  const prices = useMemo(() => supplierPriceChanges(trendInvoices, supplierNames), [trendInvoices, supplierNames]);
+  const catTrend = useMemo(() => categoryYearOnYear(trendInvoices), [trendInvoices]);
   const years = [...new Set([thisYear + 1, thisYear, thisYear - 1, ...budgets.map((b) => Number(b.year))])].sort((a, b) => b - a);
   const money = (x) => formatMoneyRound(x, 'EUR', lang);
 
@@ -320,6 +329,54 @@ export default function BudgetPanel({ lang, onChanged }) {
                 </div>
                 <p className="text-xs text-ink/40 italic mt-3">{mt(lang, 'projectionNote')}</p>
               </div>
+            </div>
+          )}
+
+          {/* ---------- Trendy ---------- */}
+          {(prices.length > 0 || catTrend.rows.length > 0) && (
+            <div className="card p-4 space-y-4">
+              <p className="font-semibold text-harbor">📈 {mt(lang, 'trendsTitle')}</p>
+              {prices.length > 0 && (
+                <div>
+                  <p className="text-sm font-semibold text-ink/70 mb-1">{mt(lang, 'trendsPrices')}</p>
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {prices.map((p) => (
+                        <tr key={p.supplierId} className="border-t border-ink/10">
+                          <td className="py-1.5 pr-3">{p.name}</td>
+                          <td className="py-1.5 pr-3 text-right whitespace-nowrap text-ink/60">{p.fromYear}: {money(p.from)}</td>
+                          <td className="py-1.5 pr-3 text-right whitespace-nowrap">{p.toYear}: {money(p.to)}</td>
+                          <td className="py-1.5 text-right whitespace-nowrap">
+                            <Pill tone={p.flagged ? 'ochre' : 'neutral'}>{`${p.change >= 0 ? '+' : ''}${Math.round(p.change * 1000) / 10} %`}</Pill>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {catTrend.rows.length > 0 && catTrend.windowEnd && (
+                <div>
+                  <p className="text-sm font-semibold text-ink/70 mb-1">
+                    {mt(lang, 'trendsCategories', { from: `01/01`, to: catTrend.windowEnd ? formatDate(catTrend.windowEnd, lang).slice(0, 5) : '', y1: catTrend.year, y0: catTrend.year - 1 })}
+                  </p>
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {catTrend.rows.map((c) => (
+                        <tr key={c.category} className="border-t border-ink/10">
+                          <td className="py-1.5 pr-3">{mt(lang, `invcat_${c.category}`)}</td>
+                          <td className="py-1.5 pr-3 text-right whitespace-nowrap text-ink/60">{catTrend.year - 1}: {money(c.before)}</td>
+                          <td className="py-1.5 pr-3 text-right whitespace-nowrap">{catTrend.year}: {money(c.now)}</td>
+                          <td className="py-1.5 text-right whitespace-nowrap">
+                            {c.change !== null ? <Pill tone={c.flagged ? 'ochre' : 'neutral'}>{`${c.change >= 0 ? '+' : ''}${Math.round(c.change * 100)} %`}</Pill> : <Pill>{mt(lang, 'trendsNew')}</Pill>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <p className="text-xs text-ink/40 italic">{mt(lang, 'trendsNote')}</p>
             </div>
           )}
 
