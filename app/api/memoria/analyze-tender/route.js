@@ -14,6 +14,47 @@ const MODELS = ['claude-sonnet-5', 'claude-haiku-4-5-20251001'];
 const DAILY_LIMIT = 60;
 const LANG_NAMES = { en: 'English', es: 'Spanish', fr: 'French', de: 'German' };
 
+// Záložný text postupu, ak ho model nevyplní — len fakty zo záznamov.
+const PROC_TEXT = {
+  en: {
+    who: 'The board decides by majority and records the decision with its reason in the decision log.',
+    budget: (b, c) => `Approved budget limit: ${b} ${c} per year; quotes above it need a new approval before signing.`,
+    noBudget: 'No budget limit is recorded for this tender; the board should set one before deciding.',
+    coi: (n) => `Conflict-of-interest check still missing for: ${n}.`,
+    coiOk: 'Conflict-of-interest check is recorded for all suppliers.',
+  },
+  es: {
+    who: 'La Junta decide por mayoría y registra la decisión con su motivo en el registro de decisiones.',
+    budget: (b, c) => `Presupuesto aprobado: ${b} ${c} al año; una oferta por encima requiere nueva aprobación antes de firmar.`,
+    noBudget: 'No consta presupuesto aprobado para esta contratación; la Junta debería fijarlo antes de decidir.',
+    coi: (n) => `Falta la comprobación de conflicto de intereses para: ${n}.`,
+    coiOk: 'La comprobación de conflicto de intereses consta para todos los proveedores.',
+  },
+  fr: {
+    who: 'Le conseil décide à la majorité et consigne la décision et sa justification dans le registre des décisions.',
+    budget: (b, c) => `Budget approuvé : ${b} ${c} par an ; une offre supérieure exige une nouvelle approbation avant signature.`,
+    noBudget: 'Aucun budget n’est enregistré pour cet appel d’offres ; le conseil devrait le fixer avant de décider.',
+    coi: (n) => `Vérification des conflits d’intérêts manquante pour : ${n}.`,
+    coiOk: 'La vérification des conflits d’intérêts est enregistrée pour tous les fournisseurs.',
+  },
+  de: {
+    who: 'Der Vorstand entscheidet mit Mehrheit und hält die Entscheidung samt Begründung im Entscheidungsprotokoll fest.',
+    budget: (b, c) => `Genehmigtes Budget: ${b} ${c} pro Jahr; Angebote darüber brauchen vor der Unterschrift eine neue Genehmigung.`,
+    noBudget: 'Für diese Ausschreibung ist kein Budget erfasst; der Vorstand sollte es vor der Entscheidung festlegen.',
+    coi: (n) => `Interessenkonflikt-Prüfung fehlt noch für: ${n}.`,
+    coiOk: 'Die Interessenkonflikt-Prüfung ist für alle Anbieter erfasst.',
+  },
+};
+
+function fallbackProcedure(lang, tender, suppliers) {
+  const t = PROC_TEXT[lang] || PROC_TEXT.en;
+  const parts = [t.who];
+  parts.push(tender.approved_budget != null ? t.budget(tender.approved_budget, tender.currency || 'EUR') : t.noBudget);
+  const unchecked = suppliers.filter((s) => !s.conflict_of_interest_checked).map((s) => s.name);
+  parts.push(unchecked.length ? t.coi(unchecked.join(', ')) : t.coiOk);
+  return parts.join(' ');
+}
+
 const TOOL = {
   name: 'record_analysis',
   description: 'Record a neutral analysis of the quotes for the board. Never name an overall winner and never recommend a supplier.',
@@ -30,7 +71,7 @@ const TOOL = {
             supplier: { type: 'string' },
             annual_net: { type: ['number', 'null'], description: 'Price per year without VAT (convert monthly x12, quarterly x4; one-off stays as is and say so in note).' },
             annual_gross: { type: ['number', 'null'], description: 'Price per year with 21% VAT unless another rate is stated.' },
-            contract_term: { type: ['string', 'null'], description: 'e.g. "2 years, no automatic renewal".' },
+            contract_term: { type: ['string', 'null'], description: 'Short and clean, e.g. "3 years (2027–2029), no automatic renewal". If the quote contradicts itself, write the term once and explain the contradiction in note.' },
             not_included: { type: ['string', 'null'], description: 'Costs that are excluded and would come on top.' },
             note: { type: ['string', 'null'] },
           },
@@ -65,7 +106,11 @@ const TOOL = {
         description: 'Facts from Memoria about each supplier: past contracts, ratings, invoices, notes. Empty if none.',
         items: { type: 'object', properties: { supplier: { type: 'string' }, fact: { type: 'string' } }, required: ['supplier', 'fact'] },
       },
-      procedure: { type: 'string', description: 'What the Statutes and resolutions require for this decision (who decides, budget limit, conflict-of-interest check, recording the reason). Facts only.' },
+      procedure: {
+        type: 'string',
+        minLength: 40,
+        description: 'REQUIRED, never empty: 2-4 short sentences on what the Statutes and resolutions require for this decision — who decides (board or general meeting), whether the quotes fit the approved budget limit, which suppliers still need the conflict-of-interest check, and that the decision and its reason must be recorded in the decision log. Facts only, no recommendation.',
+      },
     },
     required: ['summary', 'normalized', 'best_by_criterion', 'risks', 'missing_info', 'questions', 'history', 'procedure'],
   },
@@ -146,6 +191,7 @@ Rules:
 - NEVER name an overall best offer, never rank the suppliers overall, never write "we recommend", "the board should choose" or similar. The decision belongs to the board.
 - A supplier that is new to the community is not worse; say only that there is no history in Memoria.
 - Keep each item short (one sentence).
+- Fill every field. The procedure field must never be empty.
 - Always answer by calling the record_analysis tool once.
 
 COMMUNITY RULES (summary):
@@ -179,6 +225,10 @@ ${GOVERNANCE_RULES}`;
     const tool = (json.content || []).find((c) => c.type === 'tool_use');
     if (!tool) return Response.json({ error: 'AI request failed' }, { status: 502 });
     const analysis = { ...tool.input, lang };
+    if (!analysis.procedure || String(analysis.procedure).trim().length < 10) {
+      console.error('analyze-tender empty procedure', json.model);
+      analysis.procedure = fallbackProcedure(lang, tender, Object.values(suppliers));
+    }
 
     const at = new Date().toISOString();
     const fp = quotesFingerprint(quotes);

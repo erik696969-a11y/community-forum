@@ -156,9 +156,11 @@ export default function TenderAnalysis({ lang, tender, quotes, onSaved }) {
             </Section>
           </div>
 
-          <Section title={mt(lang, 'an_procedure')}>
-            <p className="text-sm text-ink">{analysis.procedure}</p>
-          </Section>
+          {analysis.procedure && (
+            <Section title={mt(lang, 'an_procedure')}>
+              <p className="text-sm text-ink whitespace-pre-line">{analysis.procedure}</p>
+            </Section>
+          )}
         </div>
       )}
       <p className="text-xs text-ink/50 italic">{mt(lang, 'aiAnalysisDisclaimer')}</p>
