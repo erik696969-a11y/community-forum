@@ -1,12 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 import { t } from '../../lib/i18n';
 import { useUnreadMessages } from '../../lib/useUnreadMessages';
 import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Header({ profile, lang, onLanguageChange }) {
   const { count, soundEnabled, toggleSound } = useUnreadMessages(profile);
+  const [siteRole, setSiteRole] = useState(false);
+
+  // Odkaz na Site reporting vidí iba Site Manager a kontaktná osoba (rozhoduje databáza).
+  useEffect(() => {
+    if (!profile?.id) return;
+    let active = true;
+    supabase.rpc('sm_me').then(({ data }) => {
+      if (active) setSiteRole(!!(data?.site_manager || data?.point_of_contact));
+    });
+    return () => {
+      active = false;
+    };
+  }, [profile?.id]);
 
   return (
     <header className="bg-harbor text-sand">
@@ -38,6 +53,11 @@ export default function Header({ profile, lang, onLanguageChange }) {
           <Link href="/dashboard/settings" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'settingsTitle')}
           </Link>
+          {siteRole && (
+            <Link href="/site" className="hover:text-ochre whitespace-nowrap">
+              🛠 Site
+            </Link>
+          )}
           {profile?.role === 'board' && (
             <Link href="/admin/memoria" className="hover:text-ochre whitespace-nowrap" title="Memoria">
               🧠 Memoria

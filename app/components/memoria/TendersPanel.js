@@ -57,6 +57,7 @@ export default function TendersPanel({ lang, onChanged }) {
   const [aiFor, setAiFor] = useState(null);
   const [compareFor, setCompareFor] = useState(null);
   const [quoteDocs, setQuoteDocs] = useState({});
+  const [conflicts, setConflicts] = useState([]);
 
   async function load() {
     const [tRes, qRes, sRes, dRes, docRes] = await Promise.all([
@@ -78,6 +79,8 @@ export default function TendersPanel({ lang, onChanged }) {
 
   useEffect(() => {
     load();
+    // Deklarované konflikty záujmov voči Site Managerovi (pre zákazky, ktoré obstarala ona).
+    supabase.rpc('sm_active_conflicts').then(({ data }) => setConflicts(Array.isArray(data) ? data : []));
   }, []);
 
   const supplierName = useMemo(() => Object.fromEntries(suppliers.map((s) => [s.id, s.name])), [suppliers]);
@@ -304,6 +307,16 @@ export default function TendersPanel({ lang, onChanged }) {
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0">
                     <p className="font-semibold text-ink">{t.title} <DemoPill show={t.is_demo} /></p>
+                    {t.sm_reference && (
+                      <p className="text-xs text-harbor mt-1">{mt(lang, 'smFromSiteManager', { ref: t.sm_reference })}</p>
+                    )}
+                    {t.sm_reference && conflicts.length > 0 && (
+                      <div className="mt-2 rounded-md border-l-4 border-ochre bg-ochre/10 px-3 py-2 text-sm text-ink">
+                        <b>{mt(lang, 'smRecusedTitle', { names: conflicts.map((c) => c.name).join(', ') })}</b>{' '}
+                        {mt(lang, 'smRecusedWhy')}
+                        {conflicts[0].minute_ref ? ` (${mt(lang, 'smMinute')} ${conflicts[0].minute_ref})` : ''}
+                      </div>
+                    )}
                     <div className="flex flex-wrap items-center gap-2 mt-1">
                       <Pill tone={STATUS_TONE[t.status]}>{mt(lang, `tenderStatus_${t.status}`)}</Pill>
                       <Pill tone={tq.length < 2 ? 'ochre' : 'neutral'}>{mt(lang, 'quotes')}: {tq.length}</Pill>
