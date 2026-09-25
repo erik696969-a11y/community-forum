@@ -40,11 +40,11 @@ const EXTRACT_TOOL = {
       amount_total: { type: ['number', 'null'], description: 'Total price WITH VAT.' },
       price_period: { type: 'string', enum: ['one_off', 'monthly', 'quarterly', 'yearly', 'unknown'], description: 'Whether the price is a one-off amount or a recurring fee.' },
       category: { type: 'string', enum: CATEGORIES, description: 'Type of work or service.' },
-      scope_summary: { type: ['string', 'null'], description: 'One or two sentences in English: what is offered.' },
+      scope_summary: { type: ['string', 'null'], description: 'One or two sentences: what is offered, in the requested output language.' },
       key_conditions: {
         type: 'array',
         items: { type: 'string' },
-        description: 'Short English bullet facts that matter for comparing offers: duration, start date, payment terms, warranty, what is excluded, response times, penalties.',
+        description: 'Short bullet facts (in the requested output language) that matter for comparing offers: duration, start date, payment terms, warranty, what is excluded, response times, penalties.',
       },
       uncertain_fields: {
         type: 'array',
@@ -86,6 +86,7 @@ export async function POST(request) {
     if (!process.env.ANTHROPIC_API_KEY) return Response.json({ error: 'AI is not configured' }, { status: 500 });
 
     const body = await request.json().catch(() => ({}));
+    const outLang = { en: 'English', es: 'Spanish', fr: 'French', de: 'German' }[body.lang] || 'English';
     const paths = Array.isArray(body.paths) ? body.paths.filter((p) => typeof p === 'string') : [];
     if (paths.length === 0) return Response.json({ error: 'No files' }, { status: 400 });
     if (paths.length > MAX_FILES) return Response.json({ error: `Max ${MAX_FILES} files at once` }, { status: 400 });
@@ -116,7 +117,7 @@ export async function POST(request) {
           const source = { type: 'base64', media_type: mediaType, data: b64 };
           const content = [
             mediaType === 'application/pdf' ? { type: 'document', source } : { type: 'image', source },
-            { type: 'text', text: 'Extract the quote facts from this document.' },
+            { type: 'text', text: `Extract the quote facts from this document. Write scope_summary and key_conditions in ${outLang}.` },
           ];
           const res = await fetch('https://api.anthropic.com/v1/messages', {
             method: 'POST',

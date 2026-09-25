@@ -100,7 +100,7 @@ export default function QuoteUploader({ lang, tender, onDone, onCancel, onClose 
       const res = await fetch('/api/memoria/extract-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token || ''}` },
-        body: JSON.stringify({ paths: uploaded.map((u) => u.path) }),
+        body: JSON.stringify({ paths: uploaded.map((u) => u.path), lang }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || res.statusText);
