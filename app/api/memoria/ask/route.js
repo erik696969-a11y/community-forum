@@ -75,7 +75,7 @@ export async function POST(request) {
       db.from('memoria_contracts').select('*'),
       db.from('memoria_tenders').select('*'),
       db.from('memoria_quotes').select('*'),
-      db.from('memoria_invoices').select('supplier_id, invoice_number, invoice_date, due_date, total_amount, category, payment_status, description, is_urgent_unbudgeted, urgency_reason, ratified_by_decision_id, is_demo'),
+      db.from('memoria_invoices').select('supplier_id, invoice_number, invoice_date, due_date, paid_on, total_amount, category, payment_status, description, is_urgent_unbudgeted, urgency_reason, ratified_by_decision_id, is_demo'),
       db.from('memoria_decisions').select('*'),
       db.from('memoria_tasks').select('*'),
       db.from('memoria_obligations').select('*'),
@@ -94,9 +94,10 @@ export async function POST(request) {
     const matched = retrieveRelevantDocumentChunks(docs.data || [], question, 3);
     const excerpts = matched.length ? formatDocumentExcerptsForPrompt(matched) : '';
 
-    let res = null;
+    let answer = '';
+    let lastStatus = 0;
     for (const model of MODELS) {
-      res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,22 +106,28 @@ export async function POST(request) {
         },
         body: JSON.stringify({
           model,
-          max_tokens: 1600,
+          max_tokens: 4000,
           system: systemPrompt(context, GOVERNANCE_RULES, excerpts, lang),
           messages: [...history, { role: 'user', content: question }],
         }),
       });
-      if (res.ok) break;
-      const errText = await res.text().catch(() => '');
-      console.error('memoria ask API error', model, res.status, errText);
-      // Neznámy / nedostupný model → skúsime ďalší; iné chyby hneď vrátime.
-      if (![400, 403, 404].includes(res.status)) break;
+      lastStatus = res.status;
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '');
+        console.error('memoria ask API error', model, res.status, errText);
+        // Neznámy / nedostupný model → skúsime ďalší; iné chyby hneď vrátime.
+        if (![400, 403, 404].includes(res.status)) break;
+        continue;
+      }
+      const json = await res.json();
+      answer = (json.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
+      if (answer) break;
+      // Prázdna odpoveď (napr. model minul limit bez textu) → skúsime ďalší model.
+      console.error('memoria ask empty answer', model, json.stop_reason, (json.content || []).map((b) => b.type).join(','));
     }
-    if (!res || !res.ok) {
-      return Response.json({ error: 'AI request failed' }, { status: 502 });
+    if (!answer) {
+      return Response.json({ error: lastStatus && lastStatus !== 200 ? 'AI request failed' : 'Memoria did not return an answer. Please ask again.' }, { status: 502 });
     }
-    const json = await res.json();
-    const answer = (json.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
     return Response.json({ answer });
   } catch (e) {
     console.error('memoria ask error', e);
