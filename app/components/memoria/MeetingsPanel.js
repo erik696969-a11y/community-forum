@@ -15,6 +15,7 @@ import {
 import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
 import Attachments, { removeEntityExtras } from './Attachments';
 import { noticeDeadline } from './ContractsPanel';
+import MinutesImport from './MinutesImport';
 
 const EMPTY_FORM = {
   title: '',
@@ -98,6 +99,7 @@ export default function MeetingsPanel({ lang, onChanged }) {
   const [outcomeDraft, setOutcomeDraft] = useState({}); // itemId -> text
   const [suggestions, setSuggestions] = useState({}); // meetingId -> [{key,title,source_type,source_id,item_type,checked}]
   const [printing, setPrinting] = useState(null); // {meeting, mode}
+  const [importFor, setImportFor] = useState(null); // null | 'any' | meetingId
 
   async function load() {
     const { data, error } = await supabase.from('memoria_meetings').select('*').order('meeting_on', { ascending: false });
@@ -448,10 +450,30 @@ export default function MeetingsPanel({ lang, onChanged }) {
       <div className="print:hidden">
         <p className="text-sm text-ink/60 mb-4">{mt(lang, 'meetingsIntro')}</p>
         <div className="flex justify-end mb-4">
-          {editingId === null && (
-            <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newMeeting')}</button>
+          {editingId === null && importFor === null && (
+            <div className="flex flex-wrap gap-2">
+              <button className="btn-secondary text-sm" onClick={() => setImportFor('any')}>📄 {mt(lang, 'minImportButton')}</button>
+              <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newMeeting')}</button>
+            </div>
           )}
         </div>
+        {importFor !== null && (
+          <MinutesImport
+            key={importFor}
+            lang={lang}
+            meetings={meetings}
+            presetMeetingId={importFor === 'any' ? null : importFor}
+            onClose={() => setImportFor(null)}
+            onSaved={async (id) => {
+              await load();
+              if (id) {
+                setExpanded((p) => ({ ...p, [id]: true }));
+                await loadItems(id);
+              }
+              onChanged?.();
+            }}
+          />
+        )}
         {editingId === 'new' && formBlock}
         <ErrorBox message={loadError} />
 
@@ -510,6 +532,17 @@ export default function MeetingsPanel({ lang, onChanged }) {
                         <button className="btn-secondary text-sm" onClick={() => doPrint(m, 'invitation')}>🖨 {mt(lang, 'printInvitation')}</button>
                         {m.status === 'held' && (
                           <button className="btn-secondary text-sm" onClick={() => doPrint(m, 'minutes')}>🖨 {mt(lang, 'printMinutes')}</button>
+                        )}
+                        {importFor === null && m.status !== 'cancelled' && (
+                          <button
+                            className="btn-secondary text-sm"
+                            onClick={() => {
+                              setImportFor(m.id);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            📄 {mt(lang, 'minImportButton')}
+                          </button>
                         )}
                       </div>
 
