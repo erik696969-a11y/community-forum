@@ -244,12 +244,12 @@ export default function PostDetailPage() {
         )}
 
         <div className={`card ${cardPadding} mt-3`}>
-          <div className="flex items-center justify-between gap-3">
-            <h1 className={titleClass}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
+            <h1 className={`${titleClass} min-w-0`}>
               {post.pinned && <span className="mr-2">📌</span>}
               {localizedField(post, 'title', lang)}
             </h1>
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2 flex-wrap sm:flex-shrink-0">
               {post.issue_status && (
                 <span className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ${ISSUE_COLORS[post.issue_status]}`}>
                   {t(lang, ISSUE_KEYS[post.issue_status])}
