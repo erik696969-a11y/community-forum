@@ -120,7 +120,7 @@ export default function MemoriaPage() {
         <div className="print:hidden">
           <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
         </div>
-        <h1 className={`font-display text-2xl text-harbor mt-2 ${tab === 'meetings' || tab === 'handover' ? 'print:hidden' : ''}`}>🧠 {mt(lang, 'memoriaTitle')}</h1>
+        <h1 className={`font-display text-2xl text-harbor mt-2 flex items-center gap-2 ${tab === 'meetings' || tab === 'handover' ? 'print:hidden' : ''}`}><img src="/memoria-icon.png" alt="" className="h-9 w-9 rounded-[22%]" />{mt(lang, 'memoriaTitle')}</h1>
         <p className="text-sm text-ink/60 mt-1 mb-6 print:hidden">{mt(lang, 'memoriaSubtitle')}</p>
 
         {hasDemo && (

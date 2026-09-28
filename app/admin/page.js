@@ -120,8 +120,9 @@ export default function AdminPage() {
         <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
           <h1 className="font-display text-2xl text-harbor">{t(lang, 'managementTitle')}</h1>
           <div className="flex items-center gap-2 flex-wrap">
-            <Link href="/admin/memoria" className="btn-primary text-sm">
-              🧠 Memoria
+            <Link href="/admin/memoria" className="btn-primary text-sm inline-flex items-center gap-2">
+              <img src="/memoria-icon.png" alt="" className="h-5 w-5 inline-block rounded-[22%] align-[-0.2em]" />
+              Memoria
             </Link>
             <Link href="/admin/insights" className="btn-secondary text-sm">
               {t(lang, 'insightsTitle')}

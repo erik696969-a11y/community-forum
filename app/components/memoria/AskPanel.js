@@ -127,12 +127,12 @@ export default function AskPanel({ lang }) {
             </div>
           ) : (
             <div key={i} className="card p-4 max-w-[95%]">
-              <p className="text-xs font-semibold text-harbor mb-2">🧠 Memoria</p>
+              <p className="text-xs font-semibold text-harbor mb-2 flex items-center gap-1.5"><img src="/memoria-icon.png" alt="" className="h-4 w-4 inline-block rounded-[22%] align-[-0.2em]" /> Memoria</p>
               <AnswerText text={m.content} />
             </div>
           )
         )}
-        {busy && <p className="text-sm text-ink/60 animate-pulse">🧠 {mt(lang, 'askThinking')}</p>}
+        {busy && <p className="text-sm text-ink/60 animate-pulse flex items-center gap-1.5"><img src="/memoria-icon.png" alt="" className="h-4 w-4 inline-block rounded-[22%] align-[-0.2em]" /> {mt(lang, 'askThinking')}</p>}
         <div ref={bottomRef} />
       </div>
 

@@ -59,8 +59,9 @@ export default function Header({ profile, lang, onLanguageChange }) {
             </Link>
           )}
           {profile?.role === 'board' && (
-            <Link href="/admin/memoria" className="hover:text-ochre whitespace-nowrap" title="Memoria">
-              🧠 Memoria
+            <Link href="/admin/memoria" className="hover:text-ochre whitespace-nowrap inline-flex items-center gap-1.5" title="Memoria">
+              <img src="/memoria-icon.png" alt="" className="h-5 w-5 inline-block rounded-[22%] align-[-0.2em]" />
+              Memoria
             </Link>
           )}
           {profile?.role === 'board' && (
