@@ -29,6 +29,8 @@ import MandatesPanel from '../../components/memoria/MandatesPanel';
 import ExportPanel from '../../components/memoria/ExportPanel';
 import BudgetPanel from '../../components/memoria/BudgetPanel';
 import CasesPanel from '../../components/memoria/CasesPanel';
+import HelpPanel from '../../components/memoria/HelpPanel';
+import { HELP_IDS, MEMORIA_TABS } from '../../../lib/memoriaHelp';
 import { supabase } from '../../../lib/supabaseClient';
 
 // Karty v troch skupinách, aby sa v module dalo ľahko zorientovať.
@@ -59,6 +61,7 @@ const TAB_GROUPS = [
     label: 'navGroupReports',
     tabs: [
       { key: 'ask', label: 'tabAsk', icon: '💬' },
+      { key: 'help', label: 'tabHelp', icon: '❓' },
       { key: 'report', label: 'tabReport', icon: '📊' },
       { key: 'handover', label: 'tabHandover', icon: '📦' },
       { key: 'activity', label: 'tabActivity', icon: '🕒' },
@@ -74,6 +77,32 @@ export default function MemoriaPage() {
   const [tab, setTab] = useState('home');
   const [refreshKey, setRefreshKey] = useState(0);
   const [hasDemo, setHasDemo] = useState(false);
+  const [helpId, setHelpId] = useState(null);
+  const [askSeed, setAskSeed] = useState(null);
+
+  // Priamy odkaz: /admin/memoria#tenders alebo #help/quotes-find (napr. z PDF návodu).
+  useEffect(() => {
+    const [h, id] = window.location.hash.replace(/^#/, '').split('/');
+    if (h === 'help') {
+      setTab('help');
+      if (HELP_IDS.includes(id)) setHelpId(id);
+    } else if (MEMORIA_TABS.includes(h)) {
+      setTab(h);
+    }
+  }, []);
+
+  function openTab(key) {
+    setTab(key);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function openHelp(id) {
+    setHelpId(id);
+    setTab('help');
+  }
+  function askQuestion(q) {
+    setAskSeed({ q, at: Date.now() });
+    setTab('ask');
+  }
 
   const isBoard = profile?.role === 'board' && profile?.status === 'approved';
 
@@ -120,7 +149,12 @@ export default function MemoriaPage() {
         <div className="print:hidden">
           <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
         </div>
-        <h1 className={`font-display text-2xl text-harbor mt-2 flex items-center gap-2 ${tab === 'meetings' || tab === 'handover' ? 'print:hidden' : ''}`}><img src="/memoria-icon.png" alt="" className="h-9 w-9 rounded-[22%]" />{mt(lang, 'memoriaTitle')}</h1>
+        <div className="flex items-start justify-between gap-3 mt-2">
+          <h1 className={`font-display text-2xl text-harbor flex items-center gap-2 ${tab === 'meetings' || tab === 'handover' || tab === 'help' ? 'print:hidden' : ''}`}><img src="/memoria-icon.png" alt="" className="h-9 w-9 rounded-[22%]" />{mt(lang, 'memoriaTitle')}</h1>
+          {tab !== 'help' && (
+            <button type="button" onClick={() => openHelp(null)} className="btn-secondary text-sm whitespace-nowrap print:hidden">{mt(lang, 'helpButton')}</button>
+          )}
+        </div>
         <p className="text-sm text-ink/60 mt-1 mb-6 print:hidden">{mt(lang, 'memoriaSubtitle')}</p>
 
         {hasDemo && (
@@ -138,7 +172,10 @@ export default function MemoriaPage() {
                   {g.tabs.map((tb) => (
                     <button
                       key={tb.key}
-                      onClick={() => setTab(tb.key)}
+                      onClick={() => {
+                        setTab(tb.key);
+                        if (tb.key === 'help') setHelpId(null);
+                      }}
                       className={`px-3 py-2 text-sm font-semibold whitespace-nowrap border-b-2 -mb-px ${
                         tab === tb.key ? 'border-ochre text-harbor' : 'border-transparent text-ink/50 hover:text-harbor'
                       }`}
@@ -152,11 +189,12 @@ export default function MemoriaPage() {
           </div>
         </nav>
 
-        {tab === 'home' && <HomePanel lang={lang} profile={profile} refreshKey={refreshKey} onOpenTab={setTab} />}
-        {tab === 'ask' && <AskPanel lang={lang} />}
+        {tab === 'home' && <HomePanel lang={lang} profile={profile} refreshKey={refreshKey} onOpenTab={openTab} />}
+        {tab === 'ask' && <AskPanel lang={lang} onOpenTab={openTab} onOpenHelp={openHelp} seed={askSeed} />}
+        {tab === 'help' && <HelpPanel lang={lang} onOpenTab={openTab} onAsk={askQuestion} articleId={helpId} onArticleChange={setHelpId} />}
         {tab === 'handover' && <HandoverPanel lang={lang} profile={profile} />}
         {tab === 'tasks' && <TasksPanel lang={lang} onChanged={bump} />}
-        {tab === 'calendar' && <CalendarPanel lang={lang} onChanged={bump} onOpenTab={setTab} />}
+        {tab === 'calendar' && <CalendarPanel lang={lang} onChanged={bump} onOpenTab={openTab} />}
         {tab === 'meetings' && <MeetingsPanel lang={lang} onChanged={bump} />}
         {tab === 'decisions' && <DecisionsPanel lang={lang} onChanged={bump} />}
         {tab === 'suppliers' && <SuppliersPanel lang={lang} onChanged={bump} />}

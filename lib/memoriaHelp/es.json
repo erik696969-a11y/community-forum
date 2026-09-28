@@ -1,0 +1,629 @@
+{
+  "open": {
+    "title": "Abrir Memoria y orientarse",
+    "summary": "Dónde está Memoria, cómo se organizan las pestañas y cómo volver al inicio.",
+    "keywords": "abrir inicio empezar entrar acceder donde dónde encontrar menu menú pestañas navegar navegacion navegación moverse primera vez principiante como usar cómo usar login home",
+    "steps": [
+      "Inicie sesión en Mi Hacienda como de costumbre.",
+      "En la barra oscura de la parte superior de cualquier página, haga clic en \"Memoria\" (junto al pequeño icono del árbol). También puede ir a \"Administración\" y hacer clic en el primer botón, \"Memoria\".",
+      "Memoria siempre se abre en la pestaña \"🏠 Hoy\".",
+      "Debajo del título verá una fila de pestañas en tres grupos: \"Gobierno\" (reuniones, decisiones, tareas, plazos), \"Proveedores y gastos\" (proveedores, ofertas, contratos, facturas, presupuesto) e \"Informes\" (Pregunte a Memoria, Resumen, Dossier de traspaso, Actividad, Exportar, Ayuda).",
+      "Haga clic en una pestaña para abrirla. La pestaña en la que se encuentra tiene una línea naranja debajo.",
+      "Para volver al inicio, haga clic en \"🏠 Hoy\". Si recarga la página, Memoria también vuelve a \"Hoy\"."
+    ],
+    "tips": [
+      "Solo los miembros de la Junta pueden ver Memoria. Los propietarios nunca la ven.",
+      "Memoria usa el idioma que eligió en la barra superior (EN, ES, FR, DE).",
+      "¿Perdido? Haga clic en \"❓ Ayuda\" y escriba su pregunta con sus propias palabras."
+    ]
+  },
+  "today": {
+    "title": "Entender la pantalla Hoy",
+    "summary": "Qué muestra la primera pantalla: cifras clave, lo que requiere atención, la próxima reunión y los próximos 30 días.",
+    "keywords": "hoy inicio panel resumen pantalla principal requiere atencion atención avisos alertas punto rojo naranja proxima próxima reunion reunión plazos gastos actividad reciente dashboard",
+    "steps": [
+      "Haga clic en \"🏠 Hoy\".",
+      "Arriba verá cuatro recuadros con cifras: \"Tareas abiertas\", \"Plazos en 30 días\", \"Contratos vigentes\" y \"Gastado en\" este año. Haga clic en un recuadro para abrir la pestaña correspondiente.",
+      "Debajo está \"🔔 Requiere atención\": una lista de asuntos que requieren acción, por ejemplo una tarea vencida o un contrato cuyo plazo de preaviso está cerca. Un punto rojo significa urgente o vencido, naranja significa próximo, gris es información.",
+      "Haga clic en cualquier línea de \"Requiere atención\" para ir directamente al registro.",
+      "La tarjeta \"🗓️ Próxima reunión\" muestra la próxima reunión prevista y si se cumple el plazo de convocatoria. Haga clic en ella para abrir la reunión.",
+      "La tarjeta \"📅 Próximos 30 días\" enumera los próximos plazos. \"Ver todo →\" abre el Calendario.",
+      "\"💶 Gasto … por categoría\" muestra las facturas de este año por categoría, y \"🕒 Actividad reciente\" muestra los últimos cambios.",
+      "Abajo, los botones \"💬 Pregunte a Memoria\" y \"📦 Preparar dossier de traspaso\" abren esas herramientas."
+    ],
+    "tips": [
+      "Memoria solo informa de hechos que constan en los registros. Nunca le dice a la Junta qué debe decidir."
+    ]
+  },
+  "demo": {
+    "title": "Qué significa \"DEMO\"",
+    "summary": "Los registros marcados DEMO son datos de ejemplo inventados para la presentación y se eliminarán.",
+    "keywords": "demo ejemplo muestra ficticio ficticios prueba datos de ejemplo etiqueta naranja discontinua eliminar borrar presentacion presentación sample test",
+    "steps": [
+      "Los registros con una pequeña etiqueta naranja discontinua \"DEMO\" son ejemplos inventados, para que pueda ver cómo funciona Memoria.",
+      "Mientras existan datos de ejemplo, un recuadro naranja discontinuo bajo el título indica \"DEMO · Los registros marcados DEMO son datos ficticios de ejemplo…\".",
+      "Los registros DEMO nunca se envían en los emails automáticos.",
+      "Cuando Memoria empiece a usarse de verdad, todos los registros DEMO se eliminarán de una sola vez. Sus registros reales se mantienen."
+    ],
+    "tips": [
+      "Si importa algo solo para probar, marque \"Marcar como DEMO (datos de ejemplo)\" para que se elimine junto con los demás ejemplos."
+    ]
+  },
+  "ask": {
+    "title": "Hacer una pregunta a Memoria con sus propias palabras",
+    "summary": "Escriba una pregunta y Memoria responde a partir de sus registros y de los Estatutos, y puede indicarle dónde hacer clic.",
+    "keywords": "preguntar pregunta consulta chat asistente ia ai buscar encontrar respuesta como cómo donde dónde que qué quien quién cuando cuándo coste historial por que por qué explicar ayuda",
+    "steps": [
+      "Haga clic en la pestaña \"💬 Pregunte a Memoria\" (o en el botón \"💬 Pregunte a Memoria\" de Hoy).",
+      "Antes de su primera pregunta verá preguntas de ejemplo. Haga clic en una para probarla.",
+      "O escriba su propia pregunta en el cuadro de abajo, con sus propias palabras. Por ejemplo: \"¿Dónde puedo ver todas las ofertas de limpieza de la piscina y cómo las comparo?\"",
+      "Haga clic en \"Preguntar\" (o pulse Intro). Espere unos segundos mientras se muestra \"Memoria está revisando los registros…\".",
+      "Lea la respuesta. Si explica cómo hacer algo, muestra botones que abren la pantalla correcta o la guía paso a paso.",
+      "Haga una pregunta de seguimiento en el mismo cuadro; Memoria recuerda los últimos mensajes.",
+      "Haga clic en \"Nueva conversación\" para empezar de nuevo."
+    ],
+    "tips": [
+      "Memoria solo responde con lo que está registrado. Si faltan datos (por ejemplo, facturas aún no importadas), lo indica.",
+      "Nunca decide por la Junta y nunca cambia nada.",
+      "Cada miembro de la Junta puede hacer hasta 200 preguntas al día."
+    ]
+  },
+  "task-new": {
+    "title": "Añadir una tarea: quién hace qué y para cuándo",
+    "summary": "Cada acuerdo recibe un responsable de ejecutarlo, un miembro de la Junta que lo supervisa y un plazo.",
+    "keywords": "tarea tareas pendiente pendientes seguimiento accion acción acuerdo responsable plazo vencimiento fecha limite límite asignar quien quién hace que qué crear nueva añadir anadir todo",
+    "steps": [
+      "Haga clic en la pestaña \"✅ Seguimiento\".",
+      "Haga clic en \"+ Nueva tarea\" (a la derecha, encima de la lista).",
+      "Escriba el \"Título\", por ejemplo \"Pedir 3 ofertas para la puerta del garaje\".",
+      "En \"Acuerdo / decisión\", elija la decisión de la que procede esta tarea (si la hay).",
+      "Elija \"Ejecuta (función)\" (por ejemplo \"Administrador\") y escriba el \"Nombre / empresa\".",
+      "En \"Supervisa (miembro de la Junta)\" escriba el miembro de la Junta que hace el seguimiento.",
+      "Elija el \"Vencimiento\" y, si es importante, ponga \"Prioridad\" en \"Alta\".",
+      "Haga clic en \"Guardar\". La tarea aparece ahora en la lista, en el Calendario, en Hoy y en el email semanal."
+    ],
+    "tips": [
+      "Las tareas también se crean automáticamente al importar un acta o al registrar una decisión desde una reunión."
+    ]
+  },
+  "task-progress": {
+    "title": "Anotar el avance de una tarea, marcarla como bloqueada o cumplida",
+    "summary": "Cambie el estado de una tarea y mantenga un breve historial de lo ocurrido.",
+    "keywords": "tarea avance progreso actualizar estado cumplida cumplido terminada hecha completada bloqueada bloqueado atascada nota historial en curso cerrar tarea marcar",
+    "steps": [
+      "Haga clic en la pestaña \"✅ Seguimiento\" y busque la tarea (use \"Buscar…\" si la lista es larga).",
+      "Para añadir una nota: haga clic en \"▸ Ver detalles\" en la tarea, escriba en el cuadro bajo \"Avance\" (por ejemplo \"3 ofertas solicitadas, respuestas antes del 15/10\") y haga clic en \"Añadir nota\".",
+      "Para cambiar el estado: use el pequeño desplegable a la derecha de la tarjeta de la tarea.",
+      "Elija \"En curso\" cuando empiece el trabajo. Una pequeña ventana pide una nota opcional; haga clic en Aceptar.",
+      "Elija \"Bloqueado\" si está atascada. Debe escribir el motivo; la tarea aparece entonces en \"Requiere atención\".",
+      "Elija \"Cumplido\" cuando esté terminada. Memoria registra la fecha de hoy como \"Cumplido el\" y pasa la tarea a \"Cumplidas\"."
+    ],
+    "tips": [
+      "Los cuatro recuadros de arriba (\"Abiertas\", \"Vencidas\", \"Bloqueadas\", \"Cumplidas\") son filtros: haga clic en uno para ver solo esas tareas. Haga clic en \"Todos\" para verlo todo."
+    ]
+  },
+  "obligation-new": {
+    "title": "Añadir un plazo periódico (revisión, seguro, obligación legal)",
+    "summary": "Memoria recuerda a la Junta las revisiones, renovaciones de seguros y otras obligaciones periódicas.",
+    "keywords": "calendario plazo periodico periódico obligacion obligación revision revisión inspeccion inspección seguro renovacion renovación ascensor extintor extintores piscina certificado obligacion legal recordatorio anual mensual",
+    "steps": [
+      "Haga clic en la pestaña \"📅 Calendario\".",
+      "Haga clic en \"+ Nueva obligación\" (a la derecha).",
+      "Escriba el \"Título\", por ejemplo \"Inspección del ascensor\".",
+      "Elija la \"Categoría\" (por ejemplo \"Revisión técnica\" o \"Seguros\").",
+      "Elija la fecha de \"Próximo vencimiento\" y la \"Periodicidad\" (por ejemplo \"Anual\").",
+      "En \"Avisar (días antes)\" mantenga 30 o cámbielo.",
+      "Si lo desea, rellene \"Base (ley, estatutos, contrato)\", \"Responsable\", \"Proveedor\" y \"Contrato\".",
+      "Haga clic en \"Guardar\". El plazo aparece ahora en el Calendario, en Hoy y en los emails de recordatorio."
+    ],
+    "tips": [
+      "Los plazos de las reuniones según los Estatutos y los plazos de preaviso de los contratos se calculan automáticamente; no es necesario añadirlos."
+    ]
+  },
+  "obligation-done": {
+    "title": "Marcar una revisión u otra obligación como cumplida",
+    "summary": "Registre que se ha hecho, con el justificante; Memoria adelanta la próxima fecha.",
+    "keywords": "calendario obligacion obligación cumplida hecha realizada revision revisión inspeccion inspección superada certificado justificante deficiencias proxima próxima fecha marcar como cumplida",
+    "steps": [
+      "Haga clic en la pestaña \"📅 Calendario\" y luego en el selector \"Obligaciones periódicas\".",
+      "Busque la obligación y haga clic en \"✓ Marcar como cumplida\".",
+      "Compruebe la fecha en \"Cumplida el\".",
+      "En \"Justificante (certificado, n.º de acta)\" escriba el número del certificado o del acta.",
+      "Si se detectaron problemas, descríbalos en \"Deficiencias detectadas\".",
+      "Haga clic en \"Guardar\". El próximo vencimiento se adelanta automáticamente.",
+      "Si escribió deficiencias, Memoria pregunta si desea crear una tarea de seguimiento. Haga clic en Aceptar para crearla."
+    ],
+    "tips": [
+      "Adjunte el certificado: haga clic en \"▸ Ver detalles\" en la obligación y luego en \"+ Añadir adjunto\"."
+    ]
+  },
+  "meeting-plan": {
+    "title": "Planificar una reunión y preparar el orden del día",
+    "summary": "Cree la reunión, deje que Memoria proponga puntos del orden del día a partir de los asuntos abiertos y compruebe los plazos legales.",
+    "keywords": "reunion reunión planificar nueva junta directiva junta general ordinaria extraordinaria orden del dia día convocatoria proponer puntos agenda programar meeting",
+    "steps": [
+      "Haga clic en la pestaña \"🗓️ Reuniones\".",
+      "Haga clic en \"+ Nueva reunión\".",
+      "Escriba el \"Título\", elija el \"Tipo\" (Junta Directiva o Junta General), la \"Fecha\" y, si lo desea, la \"Hora\" y el \"Lugar / enlace\".",
+      "Haga clic en \"Guardar\". Se abre el orden del día de la nueva reunión.",
+      "Haga clic en \"💡 Proponer orden del día con asuntos abiertos\". Memoria enumera los asuntos abiertos: gastos urgentes por ratificar, contratos con plazos próximos, licitaciones por decidir, tareas bloqueadas o vencidas.",
+      "Desmarque lo que no deba figurar en el orden del día y haga clic en \"Añadir seleccionados\".",
+      "Para añadir un punto propio, escríbalo en \"Añadir punto\", elija el tipo y haga clic en \"+ Añadir punto\". Use ▲ y ▼ para cambiar el orden y ✕ para eliminarlo.",
+      "Bajo la reunión verá si se cumple el plazo de convocatoria (por ejemplo \"Enviar la convocatoria antes del …\")."
+    ],
+    "tips": [
+      "Cuando haya enviado la convocatoria, haga clic en \"Editar\" y rellene \"Convocatoria enviada el\"; la comprobación se pone en verde.",
+      "Las reuniones de la Junta Directiva requieren 8 días de antelación y las Juntas Generales 15 días (Estatutos)."
+    ]
+  },
+  "meeting-print": {
+    "title": "Imprimir la convocatoria o el acta de una reunión",
+    "summary": "Memoria prepara una convocatoria y un acta para imprimir; también puede guardarlas como PDF.",
+    "keywords": "imprimir convocatoria acta pdf guardar reunion reunión papel enviar propietarios print",
+    "steps": [
+      "Haga clic en la pestaña \"🗓️ Reuniones\".",
+      "En la reunión, haga clic en \"▸ Orden del día\".",
+      "Haga clic en \"🖨 Imprimir convocatoria\". Se abre la ventana de impresión del navegador.",
+      "Elija una impresora, o elija \"Guardar como PDF\" como destino para obtener un archivo.",
+      "Una vez celebrada la reunión, use \"🖨 Imprimir acta\" en el mismo lugar."
+    ],
+    "tips": [
+      "\"🖨 Imprimir acta\" solo aparece cuando el estado de la reunión es \"Celebrada\"."
+    ]
+  },
+  "meeting-outcome": {
+    "title": "Después de una reunión: registrar lo acordado",
+    "summary": "Escriba el resultado de cada punto del orden del día y convierta las decisiones en registros y tareas de seguimiento.",
+    "keywords": "reunion reunión resultado celebrada despues después registrar decision decisión acuerdo acta punto orden del dia día votacion votación tarea seguimiento",
+    "steps": [
+      "Haga clic en la pestaña \"🗓️ Reuniones\", busque la reunión y haga clic en \"Editar\".",
+      "Ponga el \"Estado\" en \"Celebrada\", rellene \"Asistentes\" y \"Quórum alcanzado\" y haga clic en \"Guardar\".",
+      "Haga clic en \"▸ Orden del día\". Cada punto tiene ahora un cuadro \"Resultado\".",
+      "Escriba lo que se decidió y haga clic en \"Guardar resultado\".",
+      "Para una decisión, haga clic en \"⚖️ Registrar como decisión\". Se guarda en \"⚖️ Decisiones\".",
+      "Memoria pregunta si desea crear una tarea de seguimiento. Haga clic en Aceptar; la tarea aparece en \"✅ Seguimiento\"."
+    ],
+    "tips": [
+      "Más rápido: si el acta ya está redactada, use \"📄 Importar acta (IA)\" (vea la guía \"Importar el acta de una reunión\")."
+    ]
+  },
+  "minutes-import": {
+    "title": "Importar el acta de una reunión (IA)",
+    "summary": "Suba el acta aprobada; la IA propone puntos del orden del día, acuerdos y tareas con plazos; usted los revisa y guarda.",
+    "keywords": "acta actas importar subir pdf word documento transcripcion transcripción teams ia ai leer reunion reunión acuerdos decisiones tareas plazos automaticamente automáticamente minutes",
+    "steps": [
+      "Haga clic en la pestaña \"🗓️ Reuniones\".",
+      "Haga clic en \"📄 Importar acta (IA)\" (arriba, o dentro del orden del día de una reunión).",
+      "Haga clic en \"📎 Elegir archivo (PDF, Word o foto)\" y elija el acta aprobada. También puede pegar el texto y hacer clic en \"🤖 Leer el texto pegado\".",
+      "Espere hasta un minuto mientras se muestra \"La IA está leyendo el acta…\".",
+      "Revise \"1 · Reunión\": ¿es la reunión y la fecha correctas?",
+      "Revise \"2 · Puntos del orden del día y acuerdos\": desmarque lo que no deba guardarse y corrija cualquier texto.",
+      "Revise \"3 · Nuevas tareas con plazos\": quién lo hace y para cuándo. Las fechas marcadas \"fecha calculada, revísela\" las ha calculado la IA.",
+      "Revise \"4 · Avance de tareas existentes\" si aparece.",
+      "Haga clic en \"✓ Guardar lo marcado\" y luego en \"Aceptar\". El archivo del acta se adjunta a la reunión."
+    ],
+    "tips": [
+      "No se guarda nada hasta que haga clic en guardar. La IA solo copia lo que dice el acta; no añade ni valora nada.",
+      "Marque \"Marcar como DEMO (datos de ejemplo)\" si solo quiere probarlo."
+    ]
+  },
+  "decision-new": {
+    "title": "Registrar una decisión de la Junta Directiva o de la Junta General",
+    "summary": "El registro de decisiones: qué se decidió, quién, por qué, las alternativas consideradas y los votos.",
+    "keywords": "decision decisión decisiones acuerdo acuerdos registrar votacion votación votos aprobado aprobada junta decidio decidió por que por qué motivo alternativas registro libro nueva",
+    "steps": [
+      "Haga clic en la pestaña \"⚖️ Decisiones\".",
+      "Haga clic en \"+ Nueva decisión\".",
+      "Escriba el \"Título\" y compruebe la \"Fecha de la decisión\".",
+      "Elija \"Decidido por\" (por ejemplo \"Junta Directiva\" o \"Junta General\").",
+      "Rellene \"Contexto / problema\", \"Alternativas consideradas\", la \"Decisión\" en sí y el \"Motivo\".",
+      "Escriba los votos en \"A favor\", \"En contra\" y \"Abstenciones\".",
+      "En \"Proveedores relacionados\", haga clic en los nombres de los proveedores afectados.",
+      "Haga clic en \"Guardar\"."
+    ],
+    "tips": [
+      "Las decisiones también se crean desde una reunión (\"⚖️ Registrar como decisión\") y desde actas importadas.",
+      "Use \"Buscar…\" arriba para encontrar decisiones antiguas por cualquier palabra."
+    ]
+  },
+  "decision-link": {
+    "title": "Vincular una decisión a una licitación, contrato o tarea, y revisarla más adelante",
+    "summary": "Indique qué decisión aprobó una licitación o un contrato, siga sus tareas y anote más tarde cómo resultó.",
+    "keywords": "decision decisión vincular enlazar relacionar licitacion licitación contrato tarea aprobado por la decision decisión seguimiento revisar retrospectiva sustituida suspendida estado",
+    "steps": [
+      "Licitación: abra \"🧾 Licitaciones y ofertas\", haga clic en \"Editar\" en la licitación, elija la decisión en \"Aprobado por la decisión\" y haga clic en \"Guardar\".",
+      "Contrato: abra \"📑 Contratos\", haga clic en \"Editar\", elija la decisión en \"Aprobado por la decisión\" y haga clic en \"Guardar\".",
+      "Tarea: en \"✅ Seguimiento\", al crear o editar una tarea, elija la decisión en \"Acuerdo / decisión\".",
+      "En la tarjeta de la decisión verá entonces \"✅ Tareas de seguimiento\" con cuántas están cumplidas.",
+      "Más adelante, haga clic en \"Editar\" en la decisión y rellene \"En retrospectiva: ¿qué resultado dio?\" y \"Revisado el\".",
+      "Si la decisión fue reemplazada, cambie el \"Estado\" (por ejemplo \"Sustituida\") y explíquelo en \"Nota de estado\"."
+    ],
+    "tips": []
+  },
+  "mandate-new": {
+    "title": "Registrar el mandato de un miembro de la Junta y darle acceso",
+    "summary": "Quién ocupa cada cargo y desde cuándo; dar acceso a Memoria a un nuevo miembro de la Junta.",
+    "keywords": "miembro junta directiva mandato cargo presidente vicepresidente secretario nuevo miembro acceso dar acceso añadir anadir usuario elegido nombrado periodo",
+    "steps": [
+      "Haga clic en la pestaña \"👥 Junta y mandatos\".",
+      "Haga clic en \"+ Nuevo mandato\".",
+      "Elija la \"Cuenta en Mi Hacienda\" de la persona (su nombre se rellena solo), o escriba el \"Nombre\".",
+      "Elija el \"Cargo\" (por ejemplo \"Presidente\").",
+      "Rellene \"Elegido / nombrado por\", \"Inicio del mandato\" y \"Fin previsto\".",
+      "Haga clic en \"Guardar\".",
+      "En la nueva tarjeta, haga clic en \"Dar acceso de Junta\" y confirme. La persona ya puede abrir Memoria."
+    ],
+    "tips": [
+      "La persona debe registrarse primero en Mi Hacienda y ser aprobada, para que se pueda vincular su cuenta."
+    ]
+  },
+  "mandate-end": {
+    "title": "Cuando termina un mandato: retirar el acceso (nueva Junta)",
+    "summary": "Cierre el mandato anterior y retire el acceso a Memoria a los miembros que han dejado la Junta.",
+    "keywords": "mandato fin terminar retirar quitar acceso dejar la junta dimision dimisión renuncia cese traspaso nueva junta saliente antiguo miembro revocar",
+    "steps": [
+      "Primero dé acceso a los nuevos miembros de la Junta (vea \"Registrar el mandato de un miembro de la Junta y darle acceso\").",
+      "Haga clic en la pestaña \"👥 Junta y mandatos\".",
+      "En la tarjeta del miembro saliente haga clic en \"Editar\", rellene \"Fin real (renuncia, cese)\" si el mandato terminó antes de tiempo y haga clic en \"Guardar\".",
+      "La tarjeta pasa a \"Mandatos anteriores\" y aparece un botón rojo \"Retirar acceso de Junta\".",
+      "Haga clic en \"Retirar acceso de Junta\" y confirme. La persona sigue siendo propietaria en Mi Hacienda, pero ya no ve Memoria."
+    ],
+    "tips": [
+      "No puede retirarse su propio acceso; debe hacerlo otro miembro de la Junta.",
+      "Memoria avisa en \"Requiere atención\" cuando alguien sigue teniendo acceso después de terminar su mandato."
+    ]
+  },
+  "email-settings": {
+    "title": "Recordatorios por email: activar o desactivar, ver un ejemplo",
+    "summary": "Resumen semanal, recordatorios de plazos e informe mensual por email.",
+    "keywords": "email correo correo electronico electrónico recordatorios avisos notificaciones resumen semanal informe mensual activar desactivar darse de baja ejemplo prueba dejar de recibir",
+    "steps": [
+      "Haga clic en la pestaña \"👥 Junta y mandatos\" y desplácese hasta abajo, a \"✉️ Recordatorios por email\".",
+      "Marque o desmarque \"Enviarme los recordatorios de Memoria por email\". El cambio se guarda al instante.",
+      "Para ver cómo son los emails, haga clic en \"Enviarme ahora un resumen de prueba\" o \"Enviarme ahora el informe mensual\".",
+      "Compruebe si ha recibido el mensaje en su bandeja de entrada."
+    ],
+    "tips": [
+      "Cada lunes: un resumen semanal. Primer día laborable del mes: el informe mensual. Otros días: un email solo cuando un plazo está cerca.",
+      "El envío automático empieza solo cuando la Junta comience a usar Memoria."
+    ]
+  },
+  "case-new": {
+    "title": "Registrar un siniestro de seguro o una disputa",
+    "summary": "Haga el seguimiento de siniestros y disputas: importes, estado y el siguiente paso con su plazo.",
+    "keywords": "siniestro seguro seguros disputa reclamacion reclamación queja garantia garantía legal abogado expediente caso daños danos fuga filtracion filtración conflicto proveedor recuperar dinero siguiente paso",
+    "steps": [
+      "Haga clic en la pestaña \"🛡️ Siniestros y disputas\".",
+      "Haga clic en \"+ Nuevo caso\".",
+      "Elija el \"Tipo\" (por ejemplo \"Siniestro de seguro\") y escriba el \"Título\".",
+      "En \"Otra parte\" escriba la aseguradora o la empresa. No escriba nunca el nombre de un propietario.",
+      "Rellene \"Referencia (siniestro, póliza, expediente)\", \"Abierto el\" e \"Importe reclamado (EUR)\".",
+      "Rellene \"Siguiente paso\", \"Siguiente paso antes del\" y \"Responsable\".",
+      "Haga clic en \"Guardar\".",
+      "Cada vez que ocurra algo: haga clic en \"▸ Ver detalles\", escriba en \"¿Qué pasó? (Intro para añadir)\" y pulse Intro.",
+      "Al final, haga clic en \"Editar\", ponga el \"Estado\" (por ejemplo \"Resuelto por acuerdo\") y rellene \"Importe recuperado (EUR)\"."
+    ],
+    "tips": []
+  },
+  "supplier-new": {
+    "title": "Añadir un proveedor y comprobar conflictos de intereses",
+    "summary": "Registre una empresa con la que trabaja la comunidad, incluida la verificación de conflicto de intereses.",
+    "keywords": "proveedor proveedores nuevo añadir anadir empresa contratista compañia compañía conflicto de intereses verificacion verificación nif cif contacto telefono teléfono supplier",
+    "steps": [
+      "Haga clic en la pestaña \"🏢 Proveedores\".",
+      "Haga clic en \"+ Nuevo proveedor\".",
+      "Escriba el \"Nombre de la empresa\" y elija la \"Categoría\" (por ejemplo \"Piscinas\").",
+      "Rellene \"NIF/CIF\", \"Persona de contacto\", \"Teléfono\" y \"Email\".",
+      "Después de comprobar que la empresa no es propietaria, el administrador ni una empresa vinculada, marque \"Conflicto de intereses verificado\" y escriba cómo lo comprobó en \"Nota de la verificación\".",
+      "Haga clic en \"Guardar\"."
+    ],
+    "tips": [
+      "Los proveedores también se crean automáticamente cuando la IA lee una oferta, un contrato o una factura.",
+      "Un proveedor activo sin la verificación aparece en \"Requiere atención\"."
+    ]
+  },
+  "supplier-find": {
+    "title": "Buscar un proveedor, por ejemplo todas las empresas de piscinas",
+    "summary": "Busque y filtre la lista de proveedores, y vea sus valoraciones y decisiones.",
+    "keywords": "buscar encontrar proveedor proveedores lista empresas piscina piscinas jardineria jardinería electricista fontanero filtrar categoria categoría contacto telefono teléfono quien quién es nuestro",
+    "steps": [
+      "Haga clic en la pestaña \"🏢 Proveedores\".",
+      "Escriba un nombre o una palabra en \"Buscar…\", o elija una categoría en \"Categoría: Todos\" (por ejemplo \"Piscinas\").",
+      "Use \"Estado: Todos\" para ver solo los proveedores \"Activo\".",
+      "Haga clic en \"▸ Ver detalles\" en un proveedor para ver su NIF/CIF, notas, valoraciones y \"Decisiones relacionadas\"."
+    ],
+    "tips": [
+      "Sus ofertas están en \"🧾 Licitaciones y ofertas\", sus contratos en \"📑 Contratos\" y sus facturas en \"💶 Facturas\"."
+    ]
+  },
+  "supplier-rate": {
+    "title": "Valorar un proveedor",
+    "summary": "Asigne estrellas y un comentario, para que las futuras Juntas sepan cómo trabajó un proveedor.",
+    "keywords": "valorar valoracion valoración estrellas opinion opinión evaluar proveedor rendimiento calidad comentario puntuacion puntuación rating",
+    "steps": [
+      "Haga clic en la pestaña \"🏢 Proveedores\" y busque el proveedor.",
+      "Haga clic en \"▸ Ver detalles\".",
+      "En \"Valoraciones\", haga clic en \"+ Añadir valoración\".",
+      "Elija las estrellas en \"Valoración\", escriba un \"Comentario\" y compruebe la \"Fecha\".",
+      "Haga clic en \"Guardar\". La media de estrellas del proveedor se actualiza."
+    ],
+    "tips": []
+  },
+  "tender-new": {
+    "title": "Iniciar una licitación para reunir ofertas para un trabajo",
+    "summary": "Un registro por trabajo: reúna varias ofertas, compárelas y registre la elección.",
+    "keywords": "licitacion licitación licitaciones concurso nuevo trabajo ofertas presupuesto presupuestos pedir ofertas solicitar comparar precios iniciar reunir piscina limpieza mantenimiento tender",
+    "steps": [
+      "Haga clic en la pestaña \"🧾 Licitaciones y ofertas\".",
+      "Haga clic en \"+ Nueva licitación\".",
+      "Escriba el \"Título\", por ejemplo \"Mantenimiento de piscinas 2027\", y una \"Descripción\" del trabajo.",
+      "Si lo desea, escriba la \"Categoría\" y el \"Presupuesto aprobado\".",
+      "Haga clic en \"Guardar\". La licitación tiene el estado \"Recogiendo ofertas\".",
+      "Siguiente paso: añada las ofertas (vea \"Añadir ofertas a una licitación (la IA lee los PDF)\")."
+    ],
+    "tips": [
+      "La norma de la comunidad es comparar al menos 2 ofertas; Memoria avisa cuando se adjudica una licitación con menos."
+    ]
+  },
+  "quotes-upload": {
+    "title": "Añadir ofertas a una licitación (la IA lee los PDF)",
+    "summary": "Suba hasta 5 ofertas en PDF o foto; la IA lee el proveedor, el precio, el IVA y las condiciones; usted revisa y guarda.",
+    "keywords": "añadir anadir oferta ofertas subir pdf foto presupuesto presupuestos ia ai leer escanear proveedor precio iva condiciones nueva quote",
+    "steps": [
+      "Haga clic en la pestaña \"🧾 Licitaciones y ofertas\" y busque la licitación.",
+      "Haga clic en \"▸ Ver detalles\".",
+      "Haga clic en \"🤖 Subir ofertas (la IA las lee)\" y elija hasta 5 archivos (PDF o foto).",
+      "Espere 10–20 segundos mientras la IA los lee.",
+      "En \"Revise lo que ha leído la IA\", revise cada oferta: proveedor, \"Importe\", \"IVA incluido\", fechas y \"Alcance y condiciones\". Los campos marcados con ⚠ no estaban claros.",
+      "Si el proveedor es nuevo, Memoria lo crea; compruebe su nombre y su NIF/CIF.",
+      "Desmarque cualquier archivo que no sea una oferta y haga clic en \"Guardar ofertas seleccionadas\" y luego en \"Aceptar\"."
+    ],
+    "tips": [
+      "Sin IA: haga clic en \"+ Añadir oferta\" y escriba usted mismo el proveedor y el importe (el proveedor debe existir en \"🏢 Proveedores\").",
+      "Se conserva el PDF original; haga clic en \"📄 PDF\" en la tabla de ofertas para abrirlo."
+    ]
+  },
+  "quotes-find": {
+    "title": "Encontrar todas las ofertas de un trabajo (por ejemplo, limpieza de la piscina)",
+    "summary": "Dónde están las ofertas, cómo verlas una al lado de otra y abrir los PDF originales.",
+    "keywords": "buscar encontrar ver todas ofertas presupuesto presupuestos precios piscina limpieza mantenimiento donde dónde estan están lista licitacion licitación comparar quotes offers",
+    "steps": [
+      "Haga clic en la pestaña \"🧾 Licitaciones y ofertas\".",
+      "En \"Buscar…\" escriba una palabra del trabajo, por ejemplo \"piscina\".",
+      "Haga clic en \"▸ Ver detalles\" en la licitación. La tabla \"Ofertas\" enumera todas las ofertas, de la más barata a la más cara, con las etiquetas \"la más baja\" y \"supera el presupuesto\".",
+      "Haga clic en \"📄 PDF\" junto a una oferta para abrir el documento original.",
+      "Haga clic en \"⇆ Comparar condiciones\" para ver las condiciones de las ofertas una al lado de otra.",
+      "Para obtener un análisis, vea \"Comparar ofertas y obtener un análisis de la IA\"."
+    ],
+    "tips": [
+      "También puede preguntar en \"💬 Pregunte a Memoria\": \"Muéstrame todas las ofertas de limpieza de la piscina\".",
+      "Las ofertas de trabajos anteriores permanecen en sus licitaciones; use \"Estado: Todos\" para incluir las licitaciones adjudicadas."
+    ]
+  },
+  "quotes-analyse": {
+    "title": "Comparar ofertas y obtener un análisis de la IA",
+    "summary": "Con dos o más ofertas, la IA compara los precios anuales, los riesgos, la información que falta y el procedimiento. Nunca elige.",
+    "keywords": "analisis análisis analizar comparar ofertas cual cuál es mas más barata barato mejor oferta comparacion comparación ia ai evaluar riesgos preguntas proveedores precio anual",
+    "steps": [
+      "Haga clic en la pestaña \"🧾 Licitaciones y ofertas\", busque la licitación y haga clic en \"▸ Ver detalles\".",
+      "Revise la tabla \"Ofertas\". Aparece un aviso si algunos precios incluyen IVA y otros no.",
+      "En el recuadro \"🔎 Análisis de ofertas (IA)\", haga clic en \"Analizar las ofertas (IA)\".",
+      "Espere 20–40 segundos.",
+      "Lea \"Resumen\", \"Precios comparables\" (precio anual con y sin IVA), \"Riesgos\", \"Información que falta\", \"Preguntas para los proveedores\" y \"Procedimiento\".",
+      "El análisis se guarda en la licitación, para que todos los miembros de la Junta puedan leerlo.",
+      "Si cambia una oferta, haga clic en \"Volver a analizar\"."
+    ],
+    "tips": [
+      "La IA señala hechos, riesgos y preguntas. La elección y su motivo corresponden a la Junta."
+    ]
+  },
+  "tender-choose": {
+    "title": "Elegir el proveedor y registrar el motivo",
+    "summary": "Una vez que la Junta decide, marque la oferta elegida y escriba el motivo.",
+    "keywords": "elegir ganador seleccionar proveedor adjudicar adjudicada adjudicacion adjudicación decidido motivo por que por qué elegido cerrar licitacion licitación seleccion selección",
+    "steps": [
+      "Primero registre la decisión de la Junta en \"⚖️ Decisiones\".",
+      "Haga clic en la pestaña \"🧾 Licitaciones y ofertas\", busque la licitación y haga clic en \"▸ Ver detalles\".",
+      "En la tabla \"Ofertas\", haga clic en \"Elegir esta\" en la oferta elegida.",
+      "Una ventana pregunta \"¿Por qué se elige este proveedor?\". Escriba el motivo y haga clic en Aceptar.",
+      "La licitación pasa a \"Adjudicada\".",
+      "Haga clic en \"Editar\" en la licitación, elija la decisión en \"Aprobado por la decisión\" y haga clic en \"Guardar\".",
+      "Después añada el contrato en \"📑 Contratos\" y elija esta licitación en \"Licitación\"."
+    ],
+    "tips": [
+      "Una licitación adjudicada sin motivo, o con menos de 2 ofertas, aparece en \"Requiere atención\"."
+    ]
+  },
+  "contract-new": {
+    "title": "Añadir un contrato (la IA puede leerlo)",
+    "summary": "Registre un contrato con fechas, renovación automática y plazo de preaviso; Memoria le avisa antes de que venza el preaviso.",
+    "keywords": "contrato contratos nuevo añadir anadir subir pdf acuerdo contrato de servicio renovacion renovación automatica automática preaviso plazo fecha fin vencimiento proveedor ia ai leer",
+    "steps": [
+      "Haga clic en la pestaña \"📑 Contratos\".",
+      "Con el PDF: haga clic en \"🤖 Subir contrato (lo lee la IA)\" y elija el archivo. Espere hasta un minuto; el formulario se abre ya rellenado.",
+      "Sin el PDF: haga clic en \"+ Nuevo contrato\".",
+      "Compruebe o rellene \"Proveedor\", \"Objeto\", \"Inicio\" y \"Fin\".",
+      "Si se renueva solo, marque \"Renovación automática\" y escriba el \"Preaviso (días)\".",
+      "Rellene \"Importe\", \"Pago\" y \"Firmado por\"; elija \"Aprobado por la decisión\" y \"Licitación\".",
+      "Haga clic en \"Guardar\". Si la IA leyó un archivo, el archivo se adjunta al contrato."
+    ],
+    "tips": [
+      "Si el proveedor aún no está en Memoria, haga clic en \"+ Crear proveedor\" en el recuadro verde."
+    ]
+  },
+  "contract-notice": {
+    "title": "¿Cuándo debemos preavisar un contrato?",
+    "summary": "Memoria calcula el último día para cancelar un contrato que se renueva automáticamente, y se lo recuerda.",
+    "keywords": "preaviso preavisar cancelar rescindir resolver dar de baja contrato renovacion renovación plazo ultimo último dia día fin contrato vence vencimiento renovacion automatica automática",
+    "steps": [
+      "Haga clic en la pestaña \"📑 Contratos\".",
+      "Los contratos que se renuevan solos muestran \"↻ Renovación automática\".",
+      "Cuando faltan menos de 60 días para el plazo, la tarjeta muestra en rojo \"Preavisar antes del\" con la fecha.",
+      "Las mismas fechas aparecen en \"📅 Calendario\" (\"Último día para preaviso\") y en \"Requiere atención\" en Hoy.",
+      "Los emails de recordatorio llegan 30, 14, 7 y 1 día antes."
+    ],
+    "tips": [
+      "La fecha solo se calcula cuando el contrato tiene fecha de fin, está marcado \"Renovación automática\" y está rellenado el \"Preaviso (días)\"."
+    ]
+  },
+  "invoices-import": {
+    "title": "Importar facturas de la exportación del administrador",
+    "summary": "Suba la lista en Excel, CSV o PDF del administrador; Memoria asigna proveedores y categorías; usted revisa e importa.",
+    "keywords": "importar facturas administrador exportacion exportación excel csv xlsx pdf lista mensual subir cargar gastos cuentas contabilidad invoices",
+    "steps": [
+      "Haga clic en la pestaña \"💶 Facturas\".",
+      "Haga clic en \"📥 Importar del administrador\".",
+      "Haga clic en \"Elegir archivo\" y elija el archivo del administrador (Excel, CSV, PDF o foto). También puede pegar la tabla y hacer clic en \"Leer el texto pegado\".",
+      "Para Excel o CSV: compruebe qué columna es la fecha, el proveedor, el número de factura y el total, mire la \"Vista previa\" y haga clic en \"Continuar\".",
+      "En la tabla de revisión, compruebe el proveedor y la \"Categoría\" de cada fila. Las filas que ya están en Memoria se omiten automáticamente.",
+      "Desmarque las filas que no deban importarse.",
+      "Haga clic en \"Importar … facturas\" y luego en \"Aceptar\"."
+    ],
+    "tips": [
+      "¿Un error? En \"🗂 Importaciones anteriores\" haga clic en \"Deshacer importación\" e importe de nuevo.",
+      "Los datos del administrador suelen llegar con aproximadamente un mes de retraso."
+    ]
+  },
+  "invoice-single": {
+    "title": "Añadir una factura desde una foto o un PDF",
+    "summary": "La IA lee una sola factura y rellena el formulario; usted revisa y guarda.",
+    "keywords": "factura facturas nueva añadir anadir una sola foto pdf escanear recibo ticket ia ai leer manual invoice",
+    "steps": [
+      "Haga clic en la pestaña \"💶 Facturas\".",
+      "Haga clic en \"🤖 Factura desde foto o PDF\" y elija el archivo.",
+      "Espere hasta un minuto; el formulario \"Nueva factura\" se abre ya rellenado.",
+      "Compruebe todos los campos: proveedor, \"Nº factura\", \"Fecha factura\", importes, \"Categoría\" y \"Pagado con\".",
+      "Haga clic en \"Guardar\". El archivo se adjunta a la factura.",
+      "Sin archivo: haga clic en \"+ Nueva factura\" y escriba los datos; solo el \"Total\" es obligatorio."
+    ],
+    "tips": []
+  },
+  "invoice-urgent": {
+    "title": "Gasto urgente no presupuestado y su ratificación",
+    "summary": "Marque un gasto urgente autorizado por el Presidente y el Administrador, y registre cuándo lo ratificó la Junta.",
+    "keywords": "urgente urgencia emergencia reparacion reparación gasto no presupuestado ratificar ratificacion ratificación articulo artículo 30 presidente administrador aprobar despues después",
+    "steps": [
+      "Haga clic en la pestaña \"💶 Facturas\" y busque la factura.",
+      "Haga clic en \"Editar\" y marque \"Gasto urgente no presupuestado\".",
+      "Explíquelo en \"Motivo de la urgencia\" y haga clic en \"Guardar\". La factura muestra \"Urgente · Pendiente de ratificar\" y se propone para el orden del día de la próxima reunión.",
+      "Después de que la Junta lo ratifique (registre la decisión), haga clic de nuevo en \"Editar\" en la factura.",
+      "En \"Ratificado por la decisión\" elija esa decisión y haga clic en \"Guardar\". La etiqueta pasa a \"Urgente · ✓\"."
+    ],
+    "tips": [
+      "Marque \"Solo gastos urgentes sin ratificar\" encima de la lista para ver lo que sigue pendiente."
+    ]
+  },
+  "invoice-find": {
+    "title": "Buscar facturas y ver totales",
+    "summary": "Filtre las facturas por año, categoría, proveedor o estado de pago; se muestra el total de la lista.",
+    "keywords": "buscar encontrar facturas filtrar año ano categoria categoría proveedor pagada pagadas pendiente pendientes total cuanto cuánto hemos gastado coste gasto gastos",
+    "steps": [
+      "Haga clic en la pestaña \"💶 Facturas\".",
+      "Escriba un proveedor, un número o una palabra en \"Buscar…\".",
+      "Use \"Año: Todos\", \"Categoría: Todos\", \"Estado de pago: Todos\" y \"Pagado con: Todos\" para acotar la lista.",
+      "Encima de la lista, \"Total de las facturas mostradas\" indica la suma.",
+      "Haga clic en \"▸ Ver detalles\" en una factura para ver su contrato, su licitación y sus adjuntos."
+    ],
+    "tips": [
+      "Para costes de varios años, pregunte en \"💬 Pregunte a Memoria\" o use \"📊 Resumen\"."
+    ]
+  },
+  "budget-setup": {
+    "title": "Registrar el presupuesto y seguir el gasto por categoría",
+    "summary": "Introduzca el presupuesto aprobado y sus partidas; Memoria las compara con las facturas.",
+    "keywords": "presupuesto presupuestos anual aprobado categoria categoría partidas previsto real superado gasto gastos prevision previsión ritmo budget",
+    "steps": [
+      "Haga clic en la pestaña \"💰 Presupuesto y reserva\" y elija el \"Año\".",
+      "Haga clic en \"+ Registrar el presupuesto\".",
+      "Rellene \"Nombre\", \"Total aprobado (EUR)\", \"Aprobado el\" y \"Aprobado por la decisión\" y haga clic en \"Guardar\".",
+      "Para cada categoría: elíjala en \"Añadir categoría…\", escriba el importe y haga clic en \"+ Añadir\".",
+      "La tabla \"Por categoría\" muestra ahora el presupuesto, lo facturado, la proyección anual y un estado: \"En línea\", \"Podría superarse\" o \"Superado\".",
+      "Para cambiar una partida, haga clic en su importe, escriba el nuevo y haga clic en ✓."
+    ],
+    "tips": [
+      "Aquí solo cuentan las facturas pagadas con el \"Presupuesto ordinario\"."
+    ]
+  },
+  "reserve": {
+    "title": "Seguir el fondo de reserva",
+    "summary": "Registre el saldo inicial y los movimientos; Memoria compara el saldo con el mínimo legal.",
+    "keywords": "fondo de reserva reserva saldo minimo mínimo legal 10 por ciento porcentaje aportacion aportación disposicion disposición retirada saldo inicial intereses",
+    "steps": [
+      "Haga clic en la pestaña \"💰 Presupuesto y reserva\" y desplácese hasta \"🏦 Fondo de reserva\".",
+      "Haga clic en \"+ Añadir movimiento\".",
+      "Para empezar, elija \"Tipo\" = \"Saldo inicial\", la \"Fecha\" y el \"Importe (EUR)\" facilitado por el administrador. Haga clic en \"Guardar\".",
+      "Más adelante, añada movimientos de \"Aportación\", \"Intereses\" o \"Disposición\" que no tengan factura.",
+      "Las facturas marcadas \"Pagado con\" = \"Fondo de reserva\" se restan automáticamente.",
+      "La etiqueta muestra \"Por debajo del mínimo\" o \"Por encima del mínimo\"."
+    ],
+    "tips": []
+  },
+  "overview": {
+    "title": "Informe resumen de una categoría (por ejemplo, jardinería)",
+    "summary": "Qué empresas trabajaron para nosotros, sus contratos, si se compararon ofertas, por qué se eligió cada una y qué falta.",
+    "keywords": "resumen informe categoria categoría periodo jardineria jardinería piscinas historial empresas contratos ofertas comparadas por que por qué elegido informacion información que falta imprimir csv overview",
+    "steps": [
+      "Haga clic en la pestaña \"📊 Resumen\".",
+      "Elija la \"Categoría\" (por ejemplo \"Piscinas\").",
+      "Indique \"Desde\" y \"Hasta\". El informe se actualiza al instante.",
+      "Lea las tarjetas: cada contrato con su duración, importe, número de ofertas y \"Motivo de la elección\".",
+      "La tarjeta naranja \"Información que falta\" enumera lo que aún no está registrado.",
+      "Haga clic en \"Imprimir / PDF\" para imprimirlo o en \"Exportar CSV\" para abrirlo en Excel."
+    ],
+    "tips": []
+  },
+  "handover": {
+    "title": "Preparar el dossier de traspaso para una nueva Junta",
+    "summary": "Un solo documento con todo lo que una nueva Junta necesita desde el primer día.",
+    "keywords": "traspaso dossier nueva junta nuevo presidente relevo transicion transición resumen documento imprimir pdf continuidad handover",
+    "steps": [
+      "Haga clic en \"📦 Preparar dossier de traspaso\" en Hoy, o en la pestaña \"📦 Dossier de traspaso\".",
+      "Espere un momento mientras se prepara.",
+      "Haga clic en \"🖨 Imprimir / PDF\" y elija una impresora o \"Guardar como PDF\".",
+      "La sección 10 enumera lo que debe entregarse fuera del sistema (llaves, firmas bancarias, documentos originales)."
+    ],
+    "tips": []
+  },
+  "activity": {
+    "title": "Ver quién cambió qué",
+    "summary": "Cada cambio en Memoria se registra automáticamente y no se puede editar ni eliminar.",
+    "keywords": "actividad registro historial quien quién cambio cambió que qué auditoria auditoría eliminado borrado editado modificado cuando cuándo cambios log",
+    "steps": [
+      "Haga clic en la pestaña \"🕒 Actividad\".",
+      "Los cambios se agrupan por día: hora, nombre y qué se añadió, actualizó o eliminó.",
+      "En las actualizaciones, \"Cambios:\" enumera los campos.",
+      "Haga clic en \"Cargar anteriores\" abajo para ver cambios más antiguos."
+    ],
+    "tips": []
+  },
+  "export": {
+    "title": "Descargar todo (copia de seguridad)",
+    "summary": "Un ZIP con todos los registros en Excel y todos los documentos adjuntos, independiente de la aplicación.",
+    "keywords": "exportar descargar copia de seguridad backup copia zip excel todos los datos documentos archivo guardar todo",
+    "steps": [
+      "Haga clic en la pestaña \"💾 Exportar\".",
+      "Haga clic en \"💾 Descargar todo (ZIP)\".",
+      "Espere mientras se prepara; con muchos documentos puede tardar unos minutos.",
+      "Guarde el ZIP en un lugar seguro, por ejemplo en la unidad propia de la comunidad."
+    ],
+    "tips": [
+      "El ZIP contiene memoria.xlsx (una hoja por tabla), memoria.json, todos los documentos y un README."
+    ]
+  },
+  "attachments": {
+    "title": "Adjuntar un documento a cualquier registro",
+    "summary": "Añada un PDF, una foto o un enlace a una tarea, reunión, decisión, proveedor, licitación, contrato o factura.",
+    "keywords": "adjuntar adjunto adjuntos documento archivo fichero subir pdf foto enlace link añadir anadir documento guardar archivo",
+    "steps": [
+      "Abra el registro (por ejemplo, un contrato) y haga clic en \"▸ Ver detalles\".",
+      "En \"📎 Adjuntos\", haga clic en \"+ Añadir adjunto\".",
+      "Haga clic en \"Archivo (máx. 25 MB)\" y elija el archivo, o pegue una dirección web en \"…o enlace\".",
+      "Si lo desea, escriba un \"Título\", elija el \"Tipo\" y la \"Fecha del documento\".",
+      "Haga clic en \"Guardar\".",
+      "Para abrirlo más tarde, haga clic en su nombre en \"📎 Adjuntos\"."
+    ],
+    "tips": [
+      "Los archivos se guardan de forma privada; solo la Junta puede abrirlos."
+    ]
+  }
+}

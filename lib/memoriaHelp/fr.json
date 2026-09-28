@@ -1,0 +1,629 @@
+{
+  "open": {
+    "title": "Ouvrir Memoria et s’y retrouver",
+    "summary": "Où se trouve Memoria, comment les onglets sont organisés et comment revenir au début.",
+    "keywords": "ouvrir commencer debut démarrer début connexion connecter entrer ou où trouver menu onglet onglets naviguer navigation se déplacer accueil premiere première fois débutant debutant comment utiliser mode d'emploi open start menu tabs",
+    "steps": [
+      "Connectez-vous à Mi Hacienda comme d’habitude.",
+      "Dans la barre sombre en haut de chaque page, cliquez sur \"Memoria\" (à côté de la petite icône d’arbre). Vous pouvez aussi aller dans \"Administration\" et cliquer sur le premier bouton, \"Memoria\".",
+      "Memoria s’ouvre toujours sur l’onglet \"🏠 Aujourd’hui\".",
+      "Sous le titre, vous voyez une rangée d’onglets en trois groupes : \"Gouvernance\" (réunions, décisions, tâches, échéances), \"Fournisseurs et dépenses\" (fournisseurs, devis, contrats, factures, budget) et \"Rapports\" (Demander à Memoria, Synthèse, Dossier de passation, Activité, Exporter, Aide).",
+      "Cliquez sur un onglet pour l’ouvrir. L’onglet actif est souligné d’un trait orange.",
+      "Pour revenir au début, cliquez sur \"🏠 Aujourd’hui\". Si vous rechargez la page, Memoria revient aussi sur \"Aujourd’hui\"."
+    ],
+    "tips": [
+      "Seuls les membres du conseil voient Memoria. Les propriétaires ne la voient jamais.",
+      "Memoria utilise la langue choisie dans la barre du haut (EN, ES, FR, DE).",
+      "Perdu ? Cliquez sur \"❓ Aide\" et tapez votre question avec vos propres mots."
+    ]
+  },
+  "today": {
+    "title": "Comprendre l’écran Aujourd’hui",
+    "summary": "Ce que montre le premier écran : chiffres clés, points à traiter, prochaine réunion et 30 prochains jours.",
+    "keywords": "aujourd'hui aujourdhui accueil tableau de bord vue d'ensemble résumé resume ecran écran de départ à traiter a traiter alertes avertissements point rouge orange prochaine réunion reunion échéances echeances dépenses depenses activité récente activite today home dashboard",
+    "steps": [
+      "Cliquez sur \"🏠 Aujourd’hui\".",
+      "En haut, vous voyez quatre cases avec des chiffres : \"Tâches ouvertes\", \"Échéances sous 30 jours\", \"Contrats actifs\" et \"Dépensé en\" cette année. Cliquez sur une case pour ouvrir l’onglet correspondant.",
+      "En dessous se trouve \"🔔 À traiter\" : une liste de points qui demandent une action, par exemple une tâche en retard ou un contrat dont le délai de préavis approche. Un point rouge signifie urgent ou en retard, orange signifie à venir, gris est une information.",
+      "Cliquez sur une ligne de \"À traiter\" pour aller directement à l’enregistrement.",
+      "La carte \"🗓️ Prochaine réunion\" montre la prochaine réunion prévue et si le délai de convocation est respecté. Cliquez dessus pour ouvrir la réunion.",
+      "La carte \"📅 30 prochains jours\" liste les échéances à venir. \"Tout voir →\" ouvre le Calendrier.",
+      "\"💶 Dépenses … par catégorie\" montre les factures de cette année par catégorie, et \"🕒 Activité récente\" montre les dernières modifications.",
+      "En bas, les boutons \"💬 Demander à Memoria\" et \"📦 Préparer le dossier de passation\" ouvrent ces outils."
+    ],
+    "tips": [
+      "Memoria ne rapporte que les faits des enregistrements. Elle ne dit jamais au conseil ce qu’il doit décider."
+    ]
+  },
+  "demo": {
+    "title": "Ce que signifie \"DÉMO\"",
+    "summary": "Les enregistrements marqués DÉMO sont des exemples inventés pour la présentation et seront supprimés.",
+    "keywords": "démo demo exemple exemples fictif fictive faux test données de test donnees badge orange pointillé pointille supprimer présentation presentation sample fake",
+    "steps": [
+      "Les enregistrements avec un petit badge orange en pointillé \"DÉMO\" sont des exemples inventés, pour que vous voyiez comment Memoria fonctionne.",
+      "Tant que des exemples existent, un cadre orange en pointillé sous le titre indique \"DEMO · Les enregistrements marqués DÉMO sont des données fictives…\".",
+      "Les enregistrements DÉMO ne sont jamais envoyés dans les e-mails automatiques.",
+      "Quand Memoria passe à l’utilisation réelle, tous les enregistrements DÉMO sont supprimés en une seule fois. Vos vrais enregistrements restent."
+    ],
+    "tips": [
+      "Si vous importez quelque chose seulement pour essayer, cochez \"Marquer comme DÉMO (exemple)\" pour qu’il soit supprimé avec les autres exemples."
+    ]
+  },
+  "ask": {
+    "title": "Poser une question à Memoria avec vos propres mots",
+    "summary": "Tapez une question : Memoria répond à partir de ses enregistrements et des statuts, et peut vous montrer où cliquer.",
+    "keywords": "demander question questions discuter assistant ia chercher rechercher trouver réponse reponse comment où ou quoi qui quand coût cout historique pourquoi expliquer aide-moi ask chat ai",
+    "steps": [
+      "Cliquez sur l’onglet \"💬 Demander à Memoria\" (ou sur le bouton \"💬 Demander à Memoria\" dans Aujourd’hui).",
+      "Avant votre première question, vous voyez des exemples de questions. Cliquez sur l’un d’eux pour l’essayer.",
+      "Ou tapez votre propre question dans la case en bas, avec vos propres mots. Par exemple : \"Où puis-je voir tous les devis de nettoyage de la piscine, et comment les comparer ?\"",
+      "Cliquez sur \"Demander\" (ou appuyez sur Entrée). Attendez quelques secondes pendant que \"Memoria consulte les registres…\" s’affiche.",
+      "Lisez la réponse. Si elle explique comment faire quelque chose, elle affiche des boutons qui ouvrent le bon écran ou le guide pas à pas.",
+      "Posez une question complémentaire dans la même case ; Memoria se souvient des derniers messages.",
+      "Cliquez sur \"Nouvelle conversation\" pour recommencer."
+    ],
+    "tips": [
+      "Memoria répond uniquement à partir de ce qui est enregistré. S’il manque des données (par exemple des factures pas encore importées), elle le dit.",
+      "Elle ne décide jamais à la place du conseil et ne modifie jamais rien.",
+      "Chaque membre du conseil peut poser jusqu’à 200 questions par jour."
+    ]
+  },
+  "task-new": {
+    "title": "Ajouter une tâche : qui fait quoi, et pour quand",
+    "summary": "Chaque décision reçoit une personne responsable, un membre du conseil qui la contrôle et une échéance.",
+    "keywords": "tâche tache tâches taches à faire a faire suivi action résolution resolution décision decision responsable échéance echeance date limite attribuer qui fait quoi créer creer nouvelle ajouter task todo follow-up",
+    "steps": [
+      "Cliquez sur l’onglet \"✅ Suivi\".",
+      "Cliquez sur \"+ Nouvelle tâche\" (à droite, au-dessus de la liste).",
+      "Tapez le \"Titre\", par exemple \"Demander 3 devis pour la porte du garage\".",
+      "Dans \"Décision\", choisissez la décision dont vient cette tâche (s’il y en a une).",
+      "Choisissez \"Exécuté par (rôle)\" (par exemple \"Syndic\") et tapez le \"Nom / société\".",
+      "Dans \"Contrôlé par (membre du conseil)\", tapez le membre du conseil qui en assure le suivi.",
+      "Choisissez l’\"Échéance\" et, si c’est important, réglez la \"Priorité\" sur \"Haute\".",
+      "Cliquez sur \"Enregistrer\". La tâche apparaît maintenant dans la liste, dans le Calendrier, dans Aujourd’hui et dans l’e-mail hebdomadaire."
+    ],
+    "tips": [
+      "Des tâches sont aussi créées automatiquement quand vous importez un procès-verbal ou enregistrez une décision issue d’une réunion."
+    ]
+  },
+  "task-progress": {
+    "title": "Noter l’avancement d’une tâche, la marquer bloquée ou terminée",
+    "summary": "Changez le statut d’une tâche et gardez un court historique de ce qui s’est passé.",
+    "keywords": "tâche tache avancement progression mise à jour mettre a jour statut terminé termine terminée fini finie bloqué bloque bloquée coincé note historique en cours clôturer cloturer marquer terminé task progress done blocked",
+    "steps": [
+      "Cliquez sur l’onglet \"✅ Suivi\" et trouvez la tâche (utilisez \"Rechercher…\" si la liste est longue).",
+      "Pour ajouter une note : cliquez sur \"▸ Voir les détails\" sur la tâche, tapez dans la case sous \"Avancement\" (par exemple \"3 devis demandés, réponses avant le 15/10\") et cliquez sur \"Ajouter une note\".",
+      "Pour changer le statut : utilisez la petite liste déroulante à droite de la fiche de la tâche.",
+      "Choisissez \"En cours\" quand le travail commence. Une petite fenêtre demande une note facultative ; cliquez sur OK.",
+      "Choisissez \"Bloqué\" si la tâche est bloquée. Vous devez indiquer pourquoi ; la tâche apparaît alors dans \"À traiter\".",
+      "Choisissez \"Terminé\" quand elle est finie. Memoria enregistre la date du jour comme \"Terminé le\" et déplace la tâche dans \"Terminées\"."
+    ],
+    "tips": [
+      "Les quatre cases en haut (\"Ouvertes\", \"En retard\", \"Bloquées\", \"Terminées\") sont des filtres : cliquez sur l’une d’elles pour ne voir que ces tâches. Cliquez sur \"Tous\" pour tout voir."
+    ]
+  },
+  "obligation-new": {
+    "title": "Ajouter une échéance récurrente (contrôle, assurance, obligation légale)",
+    "summary": "Memoria rappelle au conseil les contrôles, les renouvellements d’assurance et les autres obligations récurrentes.",
+    "keywords": "calendrier échéance echeance échéances récurrente recurrente obligation obligations contrôle controle inspection assurance renouvellement ascenseur extincteur piscine certificat obligation légale legale rappel annuel annuelle mensuel calendar deadline reminder",
+    "steps": [
+      "Cliquez sur l’onglet \"📅 Calendrier\".",
+      "Cliquez sur \"+ Nouvelle obligation\" (à droite).",
+      "Tapez le \"Titre\", par exemple \"Contrôle de l’ascenseur\".",
+      "Choisissez la \"Catégorie\" (par exemple \"Contrôle technique\" ou \"Assurance\").",
+      "Choisissez la date de \"Prochaine échéance\" et la \"Périodicité\" (par exemple \"Annuelle\").",
+      "Dans \"Rappel (jours avant)\", gardez 30 ou modifiez-le.",
+      "Remplissez si besoin \"Fondement (loi, statuts, contrat)\", \"Responsable\", \"Fournisseur\" et \"Contrat\".",
+      "Cliquez sur \"Enregistrer\". L’échéance apparaît maintenant dans le Calendrier, dans Aujourd’hui et dans les e-mails de rappel."
+    ],
+    "tips": [
+      "Les délais des réunions prévus par les statuts et les délais de préavis des contrats sont calculés automatiquement ; vous n’avez pas besoin de les ajouter."
+    ]
+  },
+  "obligation-done": {
+    "title": "Marquer un contrôle ou une autre obligation comme faite",
+    "summary": "Enregistrez qu’elle a été faite, avec un justificatif ; Memoria avance la date suivante.",
+    "keywords": "calendrier obligation faite fait terminé termine contrôle controle réussi certificat justificatif preuve anomalies problèmes problemes prochaine date marquer comme faite done inspection",
+    "steps": [
+      "Cliquez sur l’onglet \"📅 Calendrier\", puis sur le bouton \"Obligations récurrentes\".",
+      "Trouvez l’obligation et cliquez sur \"✓ Marquer comme faite\".",
+      "Vérifiez la date dans \"Faite le\".",
+      "Dans \"Justificatif (certificat, n° de rapport)\", tapez le numéro du certificat ou du rapport.",
+      "Si des problèmes ont été constatés, décrivez-les dans \"Anomalies constatées\".",
+      "Cliquez sur \"Enregistrer\". La prochaine échéance avance automatiquement.",
+      "Si vous avez noté des anomalies, Memoria demande s’il faut créer une tâche de suivi. Cliquez sur OK pour la créer."
+    ],
+    "tips": [
+      "Joignez le certificat : cliquez sur \"▸ Voir les détails\" sur l’obligation, puis sur \"+ Ajouter une pièce jointe\"."
+    ]
+  },
+  "meeting-plan": {
+    "title": "Planifier une réunion et préparer l’ordre du jour",
+    "summary": "Créez la réunion, laissez Memoria proposer des points à partir des sujets ouverts et vérifiez les délais légaux.",
+    "keywords": "réunion reunion réunions planifier nouvelle réunion du conseil assemblée assemblee générale generale ag ordre du jour convocation convoquer proposer programmer meeting agenda",
+    "steps": [
+      "Cliquez sur l’onglet \"🗓️ Réunions\".",
+      "Cliquez sur \"+ Nouvelle réunion\".",
+      "Tapez le \"Titre\", choisissez le \"Type\" (réunion du conseil ou assemblée générale), la \"Date\" et, si besoin, l’\"Heure\" et le \"Lieu / lien\".",
+      "Cliquez sur \"Enregistrer\". L’ordre du jour de la nouvelle réunion s’ouvre.",
+      "Cliquez sur \"💡 Proposer l’ordre du jour à partir des points ouverts\". Memoria liste les sujets ouverts : dépenses urgentes à ratifier, contrats aux délais proches, appels d’offres à décider, tâches bloquées ou en retard.",
+      "Décochez ce qui ne doit pas figurer à l’ordre du jour et cliquez sur \"Ajouter la sélection\".",
+      "Pour ajouter votre propre point, tapez-le dans \"Ajouter un point\", choisissez le type et cliquez sur \"+ Ajouter un point\". Utilisez ▲ et ▼ pour changer l’ordre, ✕ pour supprimer.",
+      "Sous la réunion, vous voyez si le délai de convocation est respecté (par exemple \"Envoyer la convocation avant le …\")."
+    ],
+    "tips": [
+      "Quand la convocation a été envoyée, cliquez sur \"Modifier\" et remplissez \"Convocation envoyée le\" ; la vérification passe au vert.",
+      "Les réunions du conseil demandent 8 jours de préavis, les assemblées générales 15 jours (statuts)."
+    ]
+  },
+  "meeting-print": {
+    "title": "Imprimer la convocation ou le procès-verbal d’une réunion",
+    "summary": "Memoria prépare une convocation et un procès-verbal imprimables ; vous pouvez aussi les enregistrer en PDF.",
+    "keywords": "imprimer impression convocation procès-verbal proces-verbal pv compte rendu pdf enregistrer réunion reunion papier envoyer propriétaires proprietaires print minutes invitation",
+    "steps": [
+      "Cliquez sur l’onglet \"🗓️ Réunions\".",
+      "Sur la réunion, cliquez sur \"▸ Ordre du jour\".",
+      "Cliquez sur \"🖨 Imprimer la convocation\". La fenêtre d’impression de votre navigateur s’ouvre.",
+      "Choisissez une imprimante, ou choisissez \"Enregistrer au format PDF\" comme destination pour obtenir un fichier.",
+      "Une fois la réunion tenue, utilisez \"🖨 Imprimer le procès-verbal\" au même endroit."
+    ],
+    "tips": [
+      "\"🖨 Imprimer le procès-verbal\" n’apparaît que lorsque le statut de la réunion est \"Tenue\"."
+    ]
+  },
+  "meeting-outcome": {
+    "title": "Après une réunion : enregistrer ce qui a été décidé",
+    "summary": "Notez le résultat de chaque point de l’ordre du jour et transformez les décisions en enregistrements et en tâches de suivi.",
+    "keywords": "réunion reunion résultat resultat tenue après la réunion apres enregistrer décision decision procès-verbal pv point de l'ordre du jour vote résolution tâche de suivi meeting outcome",
+    "steps": [
+      "Cliquez sur l’onglet \"🗓️ Réunions\", trouvez la réunion et cliquez sur \"Modifier\".",
+      "Réglez le \"Statut\" sur \"Tenue\", remplissez \"Présents\" et \"Quorum atteint\", puis cliquez sur \"Enregistrer\".",
+      "Cliquez sur \"▸ Ordre du jour\". Chaque point a maintenant une case \"Résultat\".",
+      "Tapez ce qui a été décidé et cliquez sur \"Enregistrer le résultat\".",
+      "Pour une décision, cliquez sur \"⚖️ Enregistrer comme décision\". Elle est enregistrée dans \"⚖️ Décisions\".",
+      "Memoria demande s’il faut créer une tâche de suivi. Cliquez sur OK ; la tâche apparaît dans \"✅ Suivi\"."
+    ],
+    "tips": [
+      "Plus rapide : si le procès-verbal est déjà rédigé, utilisez plutôt \"📄 Importer un procès-verbal (IA)\" (voir le guide \"Importer le procès-verbal d’une réunion\")."
+    ]
+  },
+  "minutes-import": {
+    "title": "Importer le procès-verbal d’une réunion (IA)",
+    "summary": "Téléversez le procès-verbal approuvé ; l’IA propose les points de l’ordre du jour, les décisions et les tâches avec échéances ; vous vérifiez et enregistrez.",
+    "keywords": "procès-verbal proces-verbal pv compte rendu importer import téléverser televerser pdf word document transcription teams ia lire réunion reunion décisions decisions tâches taches échéances automatiquement minutes upload ai",
+    "steps": [
+      "Cliquez sur l’onglet \"🗓️ Réunions\".",
+      "Cliquez sur \"📄 Importer un procès-verbal (IA)\" (en haut, ou dans l’ordre du jour d’une réunion).",
+      "Cliquez sur \"📎 Choisir un fichier (PDF, Word ou photo)\" et choisissez le procès-verbal approuvé. Vous pouvez aussi coller le texte et cliquer sur \"🤖 Lire le texte collé\".",
+      "Attendez jusqu’à une minute pendant que \"L’IA lit le procès-verbal…\" s’affiche.",
+      "Vérifiez \"1 · Réunion\" : est-ce la bonne réunion et la bonne date ?",
+      "Vérifiez \"2 · Points de l’ordre du jour et décisions\" : décochez ce qui ne doit pas être enregistré et corrigez le texte si besoin.",
+      "Vérifiez \"3 · Nouvelles tâches avec échéances\" : qui le fait et pour quand. Les dates marquées \"à vérifier\" ont été calculées par l’IA.",
+      "Vérifiez \"4 · Avancement des tâches existantes\" si cette partie apparaît.",
+      "Cliquez sur \"✓ Enregistrer les éléments cochés\", puis sur \"OK\". Le fichier du procès-verbal est joint à la réunion."
+    ],
+    "tips": [
+      "Rien n’est enregistré tant que vous ne cliquez pas sur enregistrer. L’IA ne fait que reprendre ce que dit le procès-verbal ; elle n’ajoute et ne juge rien.",
+      "Cochez \"Marquer comme DÉMO (exemple)\" si vous voulez seulement essayer."
+    ]
+  },
+  "decision-new": {
+    "title": "Enregistrer une décision du conseil ou de l’assemblée générale",
+    "summary": "Le registre des décisions : ce qui a été décidé, par qui, pourquoi, les options envisagées et les votes.",
+    "keywords": "décision decision décisions decisions résolution resolution enregistrer accord acuerdo vote votes approuvé approuve conseil a décidé pourquoi motif raison options registre nouvelle decision log",
+    "steps": [
+      "Cliquez sur l’onglet \"⚖️ Décisions\".",
+      "Cliquez sur \"+ Nouvelle décision\".",
+      "Tapez le \"Titre\" et vérifiez la \"Date de la décision\".",
+      "Choisissez \"Décidé par\" (par exemple \"Conseil\" ou \"Assemblée générale\").",
+      "Remplissez \"Contexte / problème\", \"Options envisagées\", la \"Décision\" elle-même et \"Pourquoi\".",
+      "Tapez les votes dans \"Pour\", \"Contre\" et \"Abstentions\".",
+      "Sous \"Fournisseurs liés\", cliquez sur le nom des fournisseurs concernés.",
+      "Cliquez sur \"Enregistrer\"."
+    ],
+    "tips": [
+      "Des décisions sont aussi créées depuis une réunion (\"⚖️ Enregistrer comme décision\") et depuis un procès-verbal importé.",
+      "Utilisez \"Rechercher…\" en haut pour retrouver d’anciennes décisions avec n’importe quel mot."
+    ]
+  },
+  "decision-link": {
+    "title": "Lier une décision à un appel d’offres, un contrat ou une tâche, et la réexaminer plus tard",
+    "summary": "Montrez quelle décision a approuvé un appel d’offres ou un contrat, suivez ses tâches, et notez plus tard le résultat.",
+    "keywords": "décision decision lier relier lien appel d'offres appel d’offres contrat tâche tache approuvé par la décision suivi réexaminer reexaminer avec le recul remplacée remplacee suspendue statut link review",
+    "steps": [
+      "Appel d’offres : ouvrez \"🧾 Appels d’offres\", cliquez sur \"Modifier\" sur l’appel d’offres, choisissez la décision dans \"Approuvé par la décision\", cliquez sur \"Enregistrer\".",
+      "Contrat : ouvrez \"📑 Contrats\", cliquez sur \"Modifier\", choisissez la décision dans \"Approuvé par la décision\", cliquez sur \"Enregistrer\".",
+      "Tâche : dans \"✅ Suivi\", quand vous créez ou modifiez une tâche, choisissez la décision dans \"Décision\".",
+      "Sur la fiche de la décision, vous voyez alors \"✅ Tâches de suivi\" avec le nombre de tâches terminées.",
+      "Plus tard, cliquez sur \"Modifier\" sur la décision et remplissez \"Avec le recul : quel résultat ?\" et \"Revu le\".",
+      "Si la décision a été remplacée, changez le \"Statut\" (par exemple \"Remplacée\") et expliquez dans \"Note de statut\"."
+    ],
+    "tips": []
+  },
+  "mandate-new": {
+    "title": "Enregistrer le mandat d’un membre du conseil et donner l’accès",
+    "summary": "Qui occupe quelle fonction et depuis quand ; donner à un nouveau membre du conseil l’accès à Memoria.",
+    "keywords": "membre du conseil mandat mandats fonction président president vice-président vice-president nouveau membre accès acces donner l'accès ajouter utilisateur élu elu durée duree board member access",
+    "steps": [
+      "Cliquez sur l’onglet \"👥 Conseil et mandats\".",
+      "Cliquez sur \"+ Nouveau mandat\".",
+      "Choisissez le \"Compte Mi Hacienda\" de la personne (son nom se remplit), ou tapez le \"Nom\".",
+      "Choisissez la \"Fonction\" (par exemple \"Président\").",
+      "Remplissez \"Élu / nommé par\", \"Début du mandat\" et \"Fin prévue\".",
+      "Cliquez sur \"Enregistrer\".",
+      "Sur la nouvelle fiche, cliquez sur \"Donner l’accès du conseil\" et confirmez. La personne peut maintenant ouvrir Memoria."
+    ],
+    "tips": [
+      "La personne doit d’abord s’inscrire sur Mi Hacienda et être approuvée, pour que son compte puisse être lié."
+    ]
+  },
+  "mandate-end": {
+    "title": "Fin d’un mandat : retirer l’accès (nouveau conseil)",
+    "summary": "Clôturez l’ancien mandat et retirez l’accès à Memoria aux membres qui ont quitté le conseil.",
+    "keywords": "fin de mandat retirer l'accès acces quitter le conseil démission demission passation nouveau conseil sortant ancien membre révoquer revoquer mandate end remove access",
+    "steps": [
+      "Donnez d’abord l’accès aux nouveaux membres du conseil (voir \"Enregistrer le mandat d’un membre du conseil et donner l’accès\").",
+      "Cliquez sur l’onglet \"👥 Conseil et mandats\".",
+      "Sur la fiche du membre sortant, cliquez sur \"Modifier\", remplissez \"Fin effective (démission, révocation)\" si le mandat s’est terminé plus tôt, et cliquez sur \"Enregistrer\".",
+      "La fiche passe dans \"Mandats précédents\" et un bouton rouge \"Retirer l’accès du conseil\" apparaît.",
+      "Cliquez sur \"Retirer l’accès du conseil\" et confirmez. La personne reste propriétaire dans Mi Hacienda mais ne voit plus Memoria."
+    ],
+    "tips": [
+      "Vous ne pouvez pas retirer votre propre accès ; un autre membre du conseil doit le faire.",
+      "Memoria vous avertit dans \"À traiter\" quand quelqu’un a encore accès après la fin de son mandat."
+    ]
+  },
+  "email-settings": {
+    "title": "Rappels par e-mail : activer ou désactiver, voir un exemple",
+    "summary": "Résumé hebdomadaire, rappels d’échéances et rapport mensuel par e-mail.",
+    "keywords": "email e-mail mail courriel rappels rappel notifications résumé resume hebdomadaire rapport mensuel désactiver desactiver activer se désabonner exemple arrêter arreter les e-mails reminders weekly monthly",
+    "steps": [
+      "Cliquez sur l’onglet \"👥 Conseil et mandats\" et descendez tout en bas, jusqu’à \"✉️ Rappels par e-mail\".",
+      "Cochez ou décochez \"M’envoyer les rappels de Memoria par e-mail\". Le changement est enregistré immédiatement.",
+      "Pour voir à quoi ressemblent les e-mails, cliquez sur \"M’envoyer un résumé d’essai maintenant\" ou \"M’envoyer le rapport mensuel maintenant\".",
+      "Vérifiez votre boîte de réception."
+    ],
+    "tips": [
+      "Chaque lundi : un résumé hebdomadaire. Premier jour ouvrable du mois : le rapport mensuel. Les autres jours : un e-mail seulement quand une échéance approche.",
+      "L’envoi automatique ne commence que lorsque le conseil commence à utiliser Memoria."
+    ]
+  },
+  "case-new": {
+    "title": "Enregistrer un sinistre ou un litige",
+    "summary": "Suivez les sinistres et les litiges : montants, statut et prochaine étape avec son délai.",
+    "keywords": "sinistre sinistres assurance litige litiges réclamation reclamation plainte garantie juridique avocat dossier dommage dégât degat fuite conflit fournisseur récupérer recuperer argent prochaine étape claim dispute insurance",
+    "steps": [
+      "Cliquez sur l’onglet \"🛡️ Sinistres et litiges\".",
+      "Cliquez sur \"+ Nouveau dossier\".",
+      "Choisissez le \"Type\" (par exemple \"Sinistre\") et tapez le \"Titre\".",
+      "Dans \"Autre partie\", tapez l’assureur ou l’entreprise. Ne tapez jamais le nom d’un propriétaire.",
+      "Remplissez \"Référence (sinistre, police, dossier)\", \"Ouvert le\" et \"Montant réclamé (EUR)\".",
+      "Remplissez \"Prochaine étape\", \"Prochaine étape avant le\" et \"Responsable\".",
+      "Cliquez sur \"Enregistrer\".",
+      "Chaque fois qu’il se passe quelque chose : cliquez sur \"▸ Voir les détails\", tapez dans \"Que s’est-il passé ? (Entrée pour ajouter)\" et appuyez sur Entrée.",
+      "À la fin, cliquez sur \"Modifier\", réglez le \"Statut\" (par exemple \"Réglé\") et remplissez \"Montant récupéré (EUR)\"."
+    ],
+    "tips": []
+  },
+  "supplier-new": {
+    "title": "Ajouter un fournisseur et vérifier les conflits d’intérêts",
+    "summary": "Enregistrez une entreprise avec laquelle la communauté travaille, avec la vérification des conflits d’intérêts.",
+    "keywords": "fournisseur fournisseurs nouveau ajouter entreprise société societe prestataire entrepreneur artisan conflit d'intérêts interets vérification verification nif cif numéro fiscal contact supplier new",
+    "steps": [
+      "Cliquez sur l’onglet \"🏢 Fournisseurs\".",
+      "Cliquez sur \"+ Nouveau fournisseur\".",
+      "Tapez le \"Nom de l’entreprise\" et choisissez la \"Catégorie\" (par exemple \"Piscines\").",
+      "Remplissez \"N° fiscal (NIF/CIF)\", \"Personne de contact\", \"Téléphone\" et \"E-mail\".",
+      "Après avoir vérifié que l’entreprise n’est pas un propriétaire, le syndic ou une société liée, cochez \"Conflit d’intérêts vérifié\" et indiquez comment vous avez vérifié dans \"Note de vérification\".",
+      "Cliquez sur \"Enregistrer\"."
+    ],
+    "tips": [
+      "Des fournisseurs sont aussi créés automatiquement quand l’IA lit un devis, un contrat ou une facture.",
+      "Un fournisseur actif sans cette vérification apparaît dans \"À traiter\"."
+    ]
+  },
+  "supplier-find": {
+    "title": "Trouver un fournisseur, par exemple toutes les entreprises de piscine",
+    "summary": "Cherchez et filtrez la liste des fournisseurs, et voyez leurs évaluations et décisions.",
+    "keywords": "trouver chercher rechercher fournisseur fournisseurs liste entreprises piscine piscines jardinage électricien electricien plombier filtrer catégorie categorie contact téléphone telephone qui est notre find supplier",
+    "steps": [
+      "Cliquez sur l’onglet \"🏢 Fournisseurs\".",
+      "Tapez un nom ou un mot dans \"Rechercher…\", ou choisissez une catégorie dans \"Catégorie: Tous\" (par exemple \"Piscines\").",
+      "Utilisez \"Statut: Tous\" pour ne voir que les fournisseurs \"Actif\".",
+      "Cliquez sur \"▸ Voir les détails\" sur un fournisseur pour voir son numéro fiscal, ses notes, ses évaluations et ses \"Décisions liées\"."
+    ],
+    "tips": [
+      "Leurs devis sont dans \"🧾 Appels d’offres\", leurs contrats dans \"📑 Contrats\" et leurs factures dans \"💶 Factures\"."
+    ]
+  },
+  "supplier-rate": {
+    "title": "Évaluer un fournisseur",
+    "summary": "Donnez des étoiles et un commentaire, pour que les futurs conseils sachent comment un fournisseur a travaillé.",
+    "keywords": "évaluer evaluer évaluation evaluation évaluations note noter étoiles etoiles avis fournisseur performance qualité qualite commentaire score rate rating",
+    "steps": [
+      "Cliquez sur l’onglet \"🏢 Fournisseurs\" et trouvez le fournisseur.",
+      "Cliquez sur \"▸ Voir les détails\".",
+      "Sous \"Évaluations\", cliquez sur \"+ Ajouter une évaluation\".",
+      "Choisissez les étoiles dans \"Note\", écrivez un \"Commentaire\" et vérifiez la \"Date\".",
+      "Cliquez sur \"Enregistrer\". La moyenne des étoiles du fournisseur est mise à jour."
+    ],
+    "tips": []
+  },
+  "tender-new": {
+    "title": "Lancer un appel d’offres pour obtenir des devis pour un travail",
+    "summary": "Un enregistrement par travail : réunissez plusieurs devis, comparez-les et enregistrez le choix.",
+    "keywords": "appel d'offres appels d’offres nouveau travail travaux devis demande de devis offres comparer prix licitacion concurso lancer réunir budget nettoyage piscine entretien maintenance tender quotes",
+    "steps": [
+      "Cliquez sur l’onglet \"🧾 Appels d’offres\".",
+      "Cliquez sur \"+ Nouvel appel d’offres\".",
+      "Tapez le \"Titre\", par exemple \"Entretien de la piscine 2027\", et une \"Description\" du travail.",
+      "Tapez si besoin la \"Catégorie\" et le \"Budget approuvé\".",
+      "Cliquez sur \"Enregistrer\". L’appel d’offres a le statut \"Collecte des devis\".",
+      "Ensuite : ajoutez les devis (voir \"Ajouter des devis à un appel d’offres (l’IA lit les PDF)\")."
+    ],
+    "tips": [
+      "La règle de la communauté est de comparer au moins 2 devis ; Memoria avertit quand un appel d’offres est attribué avec moins de devis."
+    ]
+  },
+  "quotes-upload": {
+    "title": "Ajouter des devis à un appel d’offres (l’IA lit les PDF)",
+    "summary": "Téléversez jusqu’à 5 devis en PDF ou en photo ; l’IA lit le fournisseur, le prix, la TVA et les conditions ; vous vérifiez et enregistrez.",
+    "keywords": "ajouter devis téléverser televerser importer pdf photo offre budget presupuesto ia lire scanner fournisseur prix tva conditions nouveau add quote upload ai",
+    "steps": [
+      "Cliquez sur l’onglet \"🧾 Appels d’offres\" et trouvez l’appel d’offres.",
+      "Cliquez sur \"▸ Voir les détails\".",
+      "Cliquez sur \"🤖 Importer des devis (lus par l’IA)\" et choisissez jusqu’à 5 fichiers (PDF ou photo).",
+      "Attendez 10 à 20 secondes pendant que l’IA les lit.",
+      "Sous \"Vérifiez ce que l’IA a lu\", contrôlez chaque devis : fournisseur, \"Montant\", \"TVA incluse\", dates et \"Contenu et conditions\". Les champs marqués ⚠ n’étaient pas clairs.",
+      "Si le fournisseur est nouveau, Memoria le crée ; vérifiez son nom et son numéro fiscal.",
+      "Décochez tout fichier qui n’est pas un devis et cliquez sur \"Enregistrer les devis sélectionnés\", puis sur \"OK\"."
+    ],
+    "tips": [
+      "Sans IA : cliquez sur \"+ Ajouter un devis\" et tapez vous-même le fournisseur et le montant (le fournisseur doit exister dans \"🏢 Fournisseurs\").",
+      "Le PDF d’origine est conservé ; cliquez sur \"📄 PDF\" dans le tableau des devis pour l’ouvrir."
+    ]
+  },
+  "quotes-find": {
+    "title": "Trouver tous les devis pour un travail (par exemple le nettoyage de la piscine)",
+    "summary": "Où se trouvent les devis, comment les voir côte à côte et ouvrir les PDF d’origine.",
+    "keywords": "trouver voir tous les devis offres prix nettoyage piscine entretien piscine où sont les devis ou liste appel d'offres comparer ofertas presupuestos limpieza find quotes pool cleaning",
+    "steps": [
+      "Cliquez sur l’onglet \"🧾 Appels d’offres\".",
+      "Dans \"Rechercher…\", tapez un mot du travail, par exemple \"piscine\".",
+      "Cliquez sur \"▸ Voir les détails\" sur l’appel d’offres. Le tableau \"Devis\" liste tous les devis, du moins cher au plus cher, avec les mentions \"le plus bas\" et \"au-dessus du budget\".",
+      "Cliquez sur \"📄 PDF\" à côté d’un devis pour ouvrir le document d’origine.",
+      "Cliquez sur \"⇆ Comparer les conditions\" pour voir les conditions des devis côte à côte.",
+      "Pour obtenir une analyse, voir \"Comparer des devis et obtenir une analyse par l’IA\"."
+    ],
+    "tips": [
+      "Vous pouvez aussi demander dans \"💬 Demander à Memoria\" : \"Montre-moi tous les devis de nettoyage de la piscine\".",
+      "Les devis des anciens travaux restent dans leurs appels d’offres ; utilisez \"Statut: Tous\" pour inclure les appels d’offres attribués."
+    ]
+  },
+  "quotes-analyse": {
+    "title": "Comparer des devis et obtenir une analyse par l’IA",
+    "summary": "Avec deux devis ou plus, l’IA compare les prix par an, les risques, les informations manquantes et la procédure. Elle ne choisit jamais.",
+    "keywords": "analyse analyser comparer devis lequel est le moins cher meilleure offre comparaison ia évaluer evaluer risques questions aux fournisseurs prix par an analysis compare quotes",
+    "steps": [
+      "Cliquez sur l’onglet \"🧾 Appels d’offres\", trouvez l’appel d’offres et cliquez sur \"▸ Voir les détails\".",
+      "Vérifiez le tableau \"Devis\". Un avertissement apparaît si certains prix incluent la TVA et d’autres non.",
+      "Dans le cadre \"🔎 Analyse des devis (IA)\", cliquez sur \"Analyser les devis (IA)\".",
+      "Attendez 20 à 40 secondes.",
+      "Lisez \"Synthèse\", \"Prix comparables\" (prix par an avec et sans TVA), \"Risques\", \"Informations manquantes\", \"Questions aux fournisseurs\" et \"Procédure\".",
+      "L’analyse est enregistrée sur l’appel d’offres, pour que tous les membres du conseil puissent la lire.",
+      "Si un devis change, cliquez sur \"Relancer\"."
+    ],
+    "tips": [
+      "L’IA signale des faits, des risques et des questions. Le choix et sa justification appartiennent au conseil."
+    ]
+  },
+  "tender-choose": {
+    "title": "Choisir le fournisseur et noter pourquoi",
+    "summary": "Après la décision du conseil, marquez le devis retenu et écrivez le motif.",
+    "keywords": "choisir retenir gagnant sélectionner selectionner fournisseur attribuer attribué attribue décidé motif pourquoi retenu clôturer cloturer appel d'offres sélection choose winner",
+    "steps": [
+      "Enregistrez d’abord la décision du conseil dans \"⚖️ Décisions\".",
+      "Cliquez sur l’onglet \"🧾 Appels d’offres\", trouvez l’appel d’offres et cliquez sur \"▸ Voir les détails\".",
+      "Dans le tableau \"Devis\", cliquez sur \"Retenir\" sur le devis choisi.",
+      "Une fenêtre demande \"Pourquoi ce fournisseur est-il retenu ?\". Tapez le motif et cliquez sur OK.",
+      "L’appel d’offres passe à \"Attribué\".",
+      "Cliquez sur \"Modifier\" sur l’appel d’offres, choisissez la décision dans \"Approuvé par la décision\" et cliquez sur \"Enregistrer\".",
+      "Ajoutez ensuite le contrat dans \"📑 Contrats\" et choisissez cet appel d’offres dans \"Appel d’offres\"."
+    ],
+    "tips": [
+      "Un appel d’offres attribué sans motif, ou avec moins de 2 devis, apparaît dans \"À traiter\"."
+    ]
+  },
+  "contract-new": {
+    "title": "Ajouter un contrat (l’IA peut le lire)",
+    "summary": "Enregistrez un contrat avec ses dates, son renouvellement automatique et son préavis ; Memoria vous prévient avant la date limite de préavis.",
+    "keywords": "contrat contrats nouveau ajouter téléverser televerser pdf accord contrat de service renouvellement automatique préavis preavis date de fin fournisseur ia lire contract new upload",
+    "steps": [
+      "Cliquez sur l’onglet \"📑 Contrats\".",
+      "Avec le PDF : cliquez sur \"🤖 Envoyer un contrat (lu par l’IA)\" et choisissez le fichier. Attendez jusqu’à une minute ; le formulaire s’ouvre déjà rempli.",
+      "Sans le PDF : cliquez sur \"+ Nouveau contrat\".",
+      "Vérifiez ou remplissez \"Fournisseur\", \"Objet\", \"Début\" et \"Fin\".",
+      "S’il se renouvelle tout seul, cochez \"Renouvellement automatique\" et tapez le \"Préavis (jours)\".",
+      "Remplissez \"Montant\", \"Paiement\" et \"Signé par\" ; choisissez \"Approuvé par la décision\" et \"Appel d’offres\".",
+      "Cliquez sur \"Enregistrer\". Si l’IA a lu un fichier, celui-ci est joint au contrat."
+    ],
+    "tips": [
+      "Si le fournisseur n’est pas encore dans Memoria, cliquez sur \"+ Créer le fournisseur\" dans le cadre vert."
+    ]
+  },
+  "contract-notice": {
+    "title": "Quand devons-nous résilier un contrat ?",
+    "summary": "Memoria calcule le dernier jour pour résilier un contrat à renouvellement automatique, et vous le rappelle.",
+    "keywords": "préavis preavis résilier resilier résiliation resiliation annuler contrat renouvellement tacite reconduction date limite dernier jour de préavis fin de contrat expiration expire notice cancel renewal",
+    "steps": [
+      "Cliquez sur l’onglet \"📑 Contrats\".",
+      "Les contrats qui se renouvellent tout seuls affichent \"↻ Renouvellement automatique\".",
+      "Quand la date limite est à moins de 60 jours, la fiche affiche en rouge \"Préavis avant le\" avec la date.",
+      "Les mêmes dates apparaissent dans \"📅 Calendrier\" (\"Dernier jour de préavis\") et dans \"À traiter\" sur Aujourd’hui.",
+      "Les e-mails de rappel arrivent 30, 14, 7 et 1 jour avant."
+    ],
+    "tips": [
+      "La date n’est calculée que si le contrat a une date de fin, que \"Renouvellement automatique\" est coché et que le \"Préavis (jours)\" est rempli."
+    ]
+  },
+  "invoices-import": {
+    "title": "Importer les factures depuis l’export du syndic",
+    "summary": "Téléversez la liste Excel, CSV ou PDF du syndic ; Memoria associe fournisseurs et catégories ; vous vérifiez et importez.",
+    "keywords": "importer import factures facture syndic administrateur export excel csv xlsx pdf liste mensuelle téléverser televerser facturas charger dépenses depenses comptes comptabilité invoices",
+    "steps": [
+      "Cliquez sur l’onglet \"💶 Factures\".",
+      "Cliquez sur \"📥 Importer depuis le syndic\".",
+      "Cliquez sur \"Choisir un fichier\" et choisissez le fichier du syndic (Excel, CSV, PDF ou photo). Vous pouvez aussi coller le tableau et cliquer sur \"Lire le texte collé\".",
+      "Pour Excel ou CSV : vérifiez quelle colonne correspond à la date, au fournisseur, au numéro de facture et au total, regardez l’\"Aperçu\" et cliquez sur \"Continuer\".",
+      "Dans le tableau de contrôle, vérifiez le fournisseur et la \"Catégorie\" de chaque ligne. Les lignes déjà présentes dans Memoria sont ignorées automatiquement.",
+      "Décochez les lignes qui ne doivent pas être importées.",
+      "Cliquez sur \"Importer … factures\", puis sur \"OK\"."
+    ],
+    "tips": [
+      "Une erreur ? Sous \"🗂 Imports précédents\", cliquez sur \"Annuler l’import\" et importez à nouveau.",
+      "Les données du syndic arrivent en général avec environ un mois de retard."
+    ]
+  },
+  "invoice-single": {
+    "title": "Ajouter une facture à partir d’une photo ou d’un PDF",
+    "summary": "L’IA lit une seule facture et remplit le formulaire ; vous vérifiez et enregistrez.",
+    "keywords": "facture factures nouvelle ajouter une seule photo pdf scanner reçu recu ticket note factura ia lire manuel manuelle invoice single",
+    "steps": [
+      "Cliquez sur l’onglet \"💶 Factures\".",
+      "Cliquez sur \"🤖 Facture depuis photo ou PDF\" et choisissez le fichier.",
+      "Attendez jusqu’à une minute ; le formulaire \"Nouvelle facture\" s’ouvre déjà rempli.",
+      "Vérifiez chaque champ : fournisseur, \"N° de facture\", \"Date de facture\", montants, \"Catégorie\" et \"Payé par\".",
+      "Cliquez sur \"Enregistrer\". Le fichier est joint à la facture.",
+      "Sans fichier : cliquez sur \"+ Nouvelle facture\" et tapez les valeurs ; seul le \"Total\" est obligatoire."
+    ],
+    "tips": []
+  },
+  "invoice-urgent": {
+    "title": "Dépense urgente hors budget et sa ratification",
+    "summary": "Marquez une dépense urgente approuvée par le Président et le syndic, et notez quand le conseil l’a ratifiée.",
+    "keywords": "urgent urgente urgence réparation reparation hors budget dépense depense ratifier ratification article 30 président president syndic administrateur approuver après apres urgent expense ratify",
+    "steps": [
+      "Cliquez sur l’onglet \"💶 Factures\" et trouvez la facture.",
+      "Cliquez sur \"Modifier\" et cochez \"Dépense urgente hors budget\".",
+      "Expliquez dans \"Motif de l’urgence\" et cliquez sur \"Enregistrer\". La facture affiche \"Urgent · Pas encore ratifié\" et est proposée pour l’ordre du jour de la prochaine réunion.",
+      "Après la ratification par le conseil (enregistrez la décision), cliquez à nouveau sur \"Modifier\" sur la facture.",
+      "Dans \"Ratifié par la décision\", choisissez cette décision et cliquez sur \"Enregistrer\". Le badge devient \"Urgent · ✓\"."
+    ],
+    "tips": [
+      "Cochez \"Seulement les dépenses urgentes non ratifiées\" au-dessus de la liste pour voir ce qui attend encore."
+    ]
+  },
+  "invoice-find": {
+    "title": "Trouver des factures et voir les totaux",
+    "summary": "Filtrez les factures par année, catégorie, fournisseur ou statut de paiement ; le total de la liste s’affiche.",
+    "keywords": "trouver chercher rechercher factures facture filtrer année annee catégorie categorie fournisseur payé paye payée impayé impaye en attente total combien avons-nous dépensé depense coût cout dépenses find invoices spending",
+    "steps": [
+      "Cliquez sur l’onglet \"💶 Factures\".",
+      "Tapez un fournisseur, un numéro ou un mot dans \"Rechercher…\".",
+      "Utilisez \"Année: Tous\", \"Catégorie: Tous\", \"Statut du paiement: Tous\" et \"Payé par: Tous\" pour affiner la liste.",
+      "Au-dessus de la liste, \"Total des factures affichées\" donne la somme.",
+      "Cliquez sur \"▸ Voir les détails\" sur une facture pour voir son contrat, son appel d’offres et ses pièces jointes."
+    ],
+    "tips": [
+      "Pour les coûts sur plusieurs années, demandez à \"💬 Demander à Memoria\" ou utilisez \"📊 Synthèse\"."
+    ]
+  },
+  "budget-setup": {
+    "title": "Enregistrer le budget et suivre les dépenses par catégorie",
+    "summary": "Saisissez le budget approuvé et ses lignes ; Memoria les compare aux factures.",
+    "keywords": "budget budgets annuel approuvé approuve presupuesto catégorie categorie lignes prévu prevu réel reel dépassement depassement dépassé dépenses depenses prévision prevision rythme budget annual",
+    "steps": [
+      "Cliquez sur l’onglet \"💰 Budget et réserve\" et choisissez l’\"Année\".",
+      "Cliquez sur \"+ Enregistrer le budget\".",
+      "Remplissez \"Nom\", \"Total approuvé (EUR)\", \"Approuvé le\" et \"Approuvé par la décision\", puis cliquez sur \"Enregistrer\".",
+      "Pour chaque catégorie : choisissez-la dans \"Ajouter une catégorie…\", tapez le montant et cliquez sur \"+ Ajouter\".",
+      "Le tableau \"Par catégorie\" montre maintenant le budget, le facturé, le rythme sur l’année complète et un statut : \"Dans les clous\", \"Risque de dépassement\" ou \"Dépassé\".",
+      "Pour modifier une ligne, cliquez sur son montant, tapez le nouveau montant et cliquez sur ✓."
+    ],
+    "tips": [
+      "Seules les factures payées par le \"Budget ordinaire\" comptent ici."
+    ]
+  },
+  "reserve": {
+    "title": "Suivre le fonds de réserve",
+    "summary": "Enregistrez le solde d’ouverture et les mouvements ; Memoria compare le solde au minimum légal.",
+    "keywords": "fonds de réserve reserve fondo de reserva solde minimum légal legal 10 pour cent pourcent apport cotisation prélèvement prelevement retrait solde d'ouverture intérêts interets reserve fund balance",
+    "steps": [
+      "Cliquez sur l’onglet \"💰 Budget et réserve\" et descendez jusqu’à \"🏦 Fonds de réserve\".",
+      "Cliquez sur \"+ Ajouter un mouvement\".",
+      "Pour commencer, choisissez \"Type\" = \"Solde d’ouverture\", la \"Date\" et le \"Montant (EUR)\" indiqué par le syndic. Cliquez sur \"Enregistrer\".",
+      "Ensuite, ajoutez les mouvements \"Apport\", \"Intérêts\" ou \"Prélèvement\" qui n’ont pas de facture.",
+      "Les factures marquées \"Payé par\" = \"Fonds de réserve\" sont déduites automatiquement.",
+      "Le badge indique \"En dessous du minimum\" ou \"Au-dessus du minimum\"."
+    ],
+    "tips": []
+  },
+  "overview": {
+    "title": "Rapport de synthèse pour une catégorie (par exemple le jardinage)",
+    "summary": "Quelles entreprises ont travaillé pour nous, leurs contrats, si les devis ont été comparés, pourquoi chacune a été retenue et ce qui manque.",
+    "keywords": "synthèse synthese rapport vue d'ensemble catégorie categorie période periode jardinage piscines historique entreprises contrats devis comparés pourquoi retenu informations manquantes imprimer csv overview report",
+    "steps": [
+      "Cliquez sur l’onglet \"📊 Synthèse\".",
+      "Choisissez la \"Catégorie\" (par exemple \"Piscines\").",
+      "Réglez \"Du\" et \"Au\". Le rapport se met à jour immédiatement.",
+      "Lisez les fiches : chaque contrat avec sa durée, son montant, le nombre de devis et \"Pourquoi retenu\".",
+      "La fiche orange \"Informations manquantes\" liste ce qui n’est pas encore enregistré.",
+      "Cliquez sur \"Imprimer / PDF\" pour l’imprimer ou sur \"Exporter CSV\" pour l’ouvrir dans Excel."
+    ],
+    "tips": []
+  },
+  "handover": {
+    "title": "Préparer le dossier de passation pour un nouveau conseil",
+    "summary": "Un seul document avec tout ce dont un nouveau conseil a besoin dès le premier jour.",
+    "keywords": "passation dossier de passation nouveau conseil nouveau président president transition résumé resume document imprimer pdf continuité continuite handover",
+    "steps": [
+      "Cliquez sur \"📦 Préparer le dossier de passation\" dans Aujourd’hui, ou sur l’onglet \"📦 Dossier de passation\".",
+      "Attendez un instant pendant sa préparation.",
+      "Cliquez sur \"🖨 Imprimer / PDF\" et choisissez une imprimante ou \"Enregistrer au format PDF\".",
+      "La section 10 liste ce qui doit être transmis en dehors du système (clés, signatures bancaires, documents originaux)."
+    ],
+    "tips": []
+  },
+  "activity": {
+    "title": "Voir qui a modifié quoi",
+    "summary": "Chaque modification dans Memoria est enregistrée automatiquement et ne peut être ni modifiée ni supprimée.",
+    "keywords": "activité activite journal historique qui a modifié modifie quoi traçabilité tracabilite supprimé supprime modifié quand modifications changements activity log audit",
+    "steps": [
+      "Cliquez sur l’onglet \"🕒 Activité\".",
+      "Les modifications sont regroupées par jour : heure, nom, ce qui a été ajouté, modifié ou supprimé.",
+      "Pour les modifications, \"Modifié:\" liste les champs.",
+      "Cliquez sur \"Charger plus ancien\" en bas pour voir les modifications antérieures."
+    ],
+    "tips": []
+  },
+  "export": {
+    "title": "Tout télécharger (sauvegarde)",
+    "summary": "Un seul ZIP avec tous les enregistrements en Excel et tous les documents joints, indépendant de l’application.",
+    "keywords": "exporter export télécharger telecharger sauvegarde copie zip excel toutes les données donnees documents archive archiver tout enregistrer download backup",
+    "steps": [
+      "Cliquez sur l’onglet \"💾 Exporter\".",
+      "Cliquez sur \"💾 Tout télécharger (ZIP)\".",
+      "Attendez pendant sa préparation ; avec beaucoup de documents, cela peut prendre quelques minutes.",
+      "Enregistrez le ZIP dans un endroit sûr, par exemple le propre espace de stockage de la communauté."
+    ],
+    "tips": [
+      "Le ZIP contient memoria.xlsx (une feuille par tableau), memoria.json, tous les documents et un README."
+    ]
+  },
+  "attachments": {
+    "title": "Joindre un document à n’importe quel enregistrement",
+    "summary": "Ajoutez un PDF, une photo ou un lien à une tâche, une réunion, une décision, un fournisseur, un appel d’offres, un contrat ou une facture.",
+    "keywords": "joindre pièce jointe piece jointe pièces jointes document documents fichier téléverser televerser pdf photo lien ajouter un document stocker enregistrer attach attachment file",
+    "steps": [
+      "Ouvrez l’enregistrement (par exemple un contrat) et cliquez sur \"▸ Voir les détails\".",
+      "Sous \"📎 Pièces jointes\", cliquez sur \"+ Ajouter une pièce jointe\".",
+      "Cliquez sur \"Fichier (25 Mo max.)\" et choisissez le fichier, ou collez une adresse web dans \"…ou lien\".",
+      "Tapez si besoin un \"Titre\", choisissez le \"Type\" et la \"Date du document\".",
+      "Cliquez sur \"Enregistrer\".",
+      "Pour l’ouvrir plus tard, cliquez sur son nom dans \"📎 Pièces jointes\"."
+    ],
+    "tips": [
+      "Les fichiers sont stockés de façon privée ; seul le conseil peut les ouvrir."
+    ]
+  }
+}

@@ -5,6 +5,7 @@
 import { getAuthedProfile } from '../../../../lib/serverAuth';
 import { buildMemoriaContext, GOVERNANCE_RULES } from '../../../../lib/memoriaContext';
 import { retrieveRelevantDocumentChunks, formatDocumentExcerptsForPrompt } from '../../../../lib/documentRetrieval';
+import { helpForPrompt, extractHelpLinks, MEMORIA_TABS } from '../../../../lib/memoriaHelp';
 
 export const maxDuration = 60;
 
@@ -15,7 +16,7 @@ const MAX_QUESTION = 1000;
 const MAX_HISTORY = 4;
 const LANG_NAMES = { en: 'English', es: 'Spanish', fr: 'French', de: 'German' };
 
-function systemPrompt(context, rules, excerpts, lang) {
+function systemPrompt(context, rules, excerpts, lang, guide) {
   return `You are Memoria, the records assistant of the board (Junta Directiva) of the Comunidad de Propietarios "La Hacienda del Señorío de Cifuentes" in Benahavís, Spain.
 You answer questions from board members using ONLY the Memoria records and the community rules below.
 
@@ -31,6 +32,15 @@ How to answer:
 - When you answer about invoices or spending, add one short line with the date the invoice data covers (section INVOICE DATA COVERAGE), because the administrator's data arrives about one month late.
 - NEVER calculate dates or day counts yourself. Use the values already given in the records: "(in N days)", "(N days ago)", "LAST DAY TO GIVE NOTICE …" and the section DATES ALREADY CALCULATED. A contract "renews within X months" when its end date falls within that window; its notice deadline is the listed LAST DAY TO GIVE NOTICE. Something is overdue only when the records say "days ago", "PAST" or "OVERDUE".
 - Before answering, check that your first sentence does not contradict the details you list afterwards.
+
+# QUESTIONS ABOUT USING MEMORIA ("where do I find…", "how do I…")
+- Many board members are not used to apps. When the question is about where to find something or how to do something in Memoria, answer in two parts: first the relevant records (e.g. the actual quotes with supplier, amount and tender), then the steps as a short numbered list (1., 2., 3.) that follow the GUIDE ARTICLES below. Keep the button and tab names exactly as written in the guide, in quotes.
+- Never invent buttons, tabs or features that are not in the guide articles or the records. If the guide does not cover it, say so and suggest the "❓ Help" tab.
+- At the very end of such an answer, on its own lines, add machine markers (they become buttons): [[open:TAB]] for the screen to open and [[help:ID]] for the guide article, using only these values — TAB one of: ${MEMORIA_TABS.filter((t) => t !== 'help').join(', ')}; ID only from the guide articles below. At most 2 of each. Do not mention the markers in the text. Do not add markers to answers that are not about using Memoria.
+${guide ? `
+# GUIDE ARTICLES (how to use Memoria)
+${guide}
+` : ''}
 
 # COMMUNITY RULES (Statutes and law, summary)
 ${rules}
@@ -99,6 +109,7 @@ export async function POST(request) {
     );
     const matched = retrieveRelevantDocumentChunks(docs.data || [], question, 3);
     const excerpts = matched.length ? formatDocumentExcerptsForPrompt(matched) : '';
+    const guide = helpForPrompt(lang, question, 3);
 
     let answer = '';
     let lastStatus = 0;
@@ -113,7 +124,7 @@ export async function POST(request) {
         body: JSON.stringify({
           model,
           max_tokens: 4000,
-          system: systemPrompt(context, GOVERNANCE_RULES, excerpts, lang),
+          system: systemPrompt(context, GOVERNANCE_RULES, excerpts, lang, guide),
           messages: [...history, { role: 'user', content: question }],
         }),
       });
@@ -134,7 +145,8 @@ export async function POST(request) {
     if (!answer) {
       return Response.json({ error: lastStatus && lastStatus !== 200 ? 'AI request failed' : 'Memoria did not return an answer. Please ask again.' }, { status: 502 });
     }
-    return Response.json({ answer });
+    const { text, links } = extractHelpLinks(answer);
+    return Response.json({ answer: text, links });
   } catch (e) {
     console.error('memoria ask error', e);
     return Response.json({ error: 'Server error' }, { status: 500 });

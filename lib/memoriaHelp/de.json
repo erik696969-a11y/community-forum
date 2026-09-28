@@ -1,0 +1,629 @@
+{
+  "open": {
+    "title": "Memoria öffnen und sich zurechtfinden",
+    "summary": "Wo Memoria ist, wie die Reiter aufgebaut sind und wie Sie zum Anfang zurückkommen.",
+    "keywords": "öffnen oeffnen offnen start anfang anmelden einloggen wo finden menü menue reiter tabs navigation zurechtfinden startseite erstes mal einsteiger anleitung bedienung open start menu tabs navigate",
+    "steps": [
+      "Melden Sie sich wie gewohnt bei Mi Hacienda an.",
+      "Klicken Sie in der dunklen Leiste oben auf jeder Seite auf \"Memoria\" (neben dem kleinen Baum-Symbol). Sie können auch auf \"Verwaltung\" gehen und dort auf die erste Schaltfläche \"Memoria\" klicken.",
+      "Memoria öffnet sich immer mit dem Reiter \"🏠 Heute\".",
+      "Unter dem Titel sehen Sie eine Reihe von Reitern in drei Gruppen: \"Führung\" (Sitzungen, Entscheidungen, Aufgaben, Fristen), \"Lieferanten & Ausgaben\" (Lieferanten, Angebote, Verträge, Rechnungen, Budget) und \"Berichte\" (Memoria fragen, Übersicht, Übergabepaket, Aktivität, Export, Hilfe).",
+      "Klicken Sie auf einen Reiter, um ihn zu öffnen. Der aktuelle Reiter ist orange unterstrichen.",
+      "Um zum Anfang zurückzukehren, klicken Sie auf \"🏠 Heute\". Wenn Sie die Seite neu laden, kehrt Memoria ebenfalls zu \"Heute\" zurück."
+    ],
+    "tips": [
+      "Nur Vorstandsmitglieder sehen Memoria. Eigentümer sehen es nie.",
+      "Memoria verwendet die Sprache, die Sie in der oberen Leiste gewählt haben (EN, ES, FR, DE).",
+      "Nicht weiter? Klicken Sie auf \"❓ Hilfe\" und geben Sie Ihre Frage in eigenen Worten ein."
+    ]
+  },
+  "today": {
+    "title": "Die Seite „Heute“ verstehen",
+    "summary": "Was die erste Seite zeigt: wichtige Zahlen, Handlungsbedarf, die nächste Sitzung und die nächsten 30 Tage.",
+    "keywords": "heute startseite übersicht uebersicht zusammenfassung dashboard handlungsbedarf warnung warnungen hinweise roter orange punkt nächste naechste sitzung fristen frist ausgaben letzte aktivität aktivitaet kennzahlen today home dashboard alerts",
+    "steps": [
+      "Klicken Sie auf \"🏠 Heute\".",
+      "Oben sehen Sie vier Kästen mit Zahlen: \"Offene Aufgaben\", \"Fristen in 30 Tagen\", \"Aktive Verträge\" und \"Ausgaben\" dieses Jahres. Klicken Sie auf einen Kasten, um den zugehörigen Reiter zu öffnen.",
+      "Darunter steht \"🔔 Handlungsbedarf\": eine Liste der Dinge, die zu erledigen sind, zum Beispiel eine überfällige Aufgabe oder ein Vertrag, dessen Kündigungsfrist bald abläuft. Ein roter Punkt bedeutet dringend oder überfällig, orange bedeutet bald fällig, grau ist ein Hinweis.",
+      "Klicken Sie auf eine Zeile in \"Handlungsbedarf\", um direkt zum Eintrag zu gelangen.",
+      "Die Karte \"🗓️ Nächste Sitzung\" zeigt die nächste geplante Sitzung und ob die Einladungsfrist eingehalten ist. Klicken Sie darauf, um die Sitzung zu öffnen.",
+      "Die Karte \"📅 Nächste 30 Tage\" listet die kommenden Fristen auf. \"Alle anzeigen →\" öffnet die Fristen.",
+      "\"💶 Ausgaben\" zeigt die Rechnungen dieses Jahres nach Kategorie, und \"🕒 Letzte Aktivität\" zeigt die neuesten Änderungen.",
+      "Ganz unten öffnen die Schaltflächen \"💬 Memoria fragen\" und \"📦 Übergabepaket erstellen\" diese Werkzeuge."
+    ],
+    "tips": [
+      "Memoria berichtet nur Fakten aus den Einträgen. Es sagt dem Vorstand nie, was er entscheiden soll."
+    ]
+  },
+  "demo": {
+    "title": "Was „DEMO“ bedeutet",
+    "summary": "Mit DEMO markierte Einträge sind erfundene Beispieldaten für die Präsentation und werden gelöscht.",
+    "keywords": "demo beispiel beispieldaten muster fiktiv erfunden test testdaten orange markierung gestrichelt löschen loeschen präsentation praesentation demo sample test data",
+    "steps": [
+      "Einträge mit einer kleinen, gestrichelten orangen Markierung \"DEMO\" sind erfundene Beispiele, damit Sie sehen, wie Memoria funktioniert.",
+      "Solange Beispieldaten vorhanden sind, steht unter dem Titel ein gestrichelter oranger Kasten: \"DEMO · Mit DEMO markierte Einträge sind fiktive Beispieldaten…\".",
+      "DEMO-Einträge werden nie in den automatischen E-Mails versendet.",
+      "Wenn Memoria richtig in Betrieb geht, werden alle DEMO-Einträge in einem Schritt gelöscht. Ihre echten Einträge bleiben erhalten."
+    ],
+    "tips": [
+      "Wenn Sie etwas nur zum Ausprobieren importieren, haken Sie \"Als DEMO markieren (Beispieldaten)\" an, damit es mit den anderen Beispielen gelöscht wird."
+    ]
+  },
+  "ask": {
+    "title": "Memoria in eigenen Worten fragen",
+    "summary": "Geben Sie eine Frage ein. Memoria antwortet aus seinen Einträgen und der Satzung und kann Ihnen zeigen, wo Sie klicken müssen.",
+    "keywords": "fragen frage stellen chat assistent ki suchen finden antwort wie wo was wer wann kosten verlauf warum erklären erklaeren hilfe hilf mir ask question chat assistant ai",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💬 Memoria fragen\" (oder auf die Schaltfläche \"💬 Memoria fragen\" auf der Seite Heute).",
+      "Vor Ihrer ersten Frage sehen Sie Beispielfragen. Klicken Sie auf eine, um sie auszuprobieren.",
+      "Oder geben Sie unten im Feld Ihre eigene Frage in eigenen Worten ein. Zum Beispiel: \"Wo sehe ich alle Angebote für die Poolreinigung, und wie vergleiche ich sie?\"",
+      "Klicken Sie auf \"Fragen\" (oder drücken Sie die Eingabetaste). Warten Sie einige Sekunden, während \"Memoria durchsucht die Einträge…\" angezeigt wird.",
+      "Lesen Sie die Antwort. Erklärt sie, wie etwas geht, zeigt sie Schaltflächen, die die richtige Seite oder die Schritt-für-Schritt-Anleitung öffnen.",
+      "Stellen Sie eine Folgefrage im selben Feld. Memoria merkt sich die letzten Nachrichten.",
+      "Klicken Sie auf \"Neues Gespräch\", um neu zu beginnen."
+    ],
+    "tips": [
+      "Memoria antwortet nur aus dem, was erfasst ist. Fehlen Daten (zum Beispiel noch nicht importierte Rechnungen), sagt es das.",
+      "Es entscheidet nie für den Vorstand und ändert nie etwas.",
+      "Jedes Vorstandsmitglied kann bis zu 200 Fragen pro Tag stellen."
+    ]
+  },
+  "task-new": {
+    "title": "Aufgabe anlegen: wer macht was bis wann",
+    "summary": "Jeder Beschluss bekommt eine verantwortliche Person, ein Vorstandsmitglied, das ihn kontrolliert, und eine Frist.",
+    "keywords": "aufgabe aufgaben neue anlegen erstellen hinzufügen hinzufuegen umsetzung nachverfolgung beschluss beschlüsse beschluesse verantwortlich frist fällig faellig fälligkeit zuweisen wer macht was todo task follow-up new",
+    "steps": [
+      "Klicken Sie auf den Reiter \"✅ Umsetzung\".",
+      "Klicken Sie auf \"+ Neue Aufgabe\" (rechts, über der Liste).",
+      "Geben Sie den \"Titel\" ein, zum Beispiel \"3 Angebote für das Garagentor einholen\".",
+      "Wählen Sie unter \"Beschluss / Entscheidung\" die Entscheidung, aus der diese Aufgabe stammt (falls vorhanden).",
+      "Wählen Sie \"Ausgeführt von (Funktion)\" (zum Beispiel \"Verwalter\") und geben Sie \"Name / Firma\" ein.",
+      "Geben Sie unter \"Kontrolliert von (Vorstandsmitglied)\" das Vorstandsmitglied ein, das die Aufgabe nachverfolgt.",
+      "Wählen Sie das Datum unter \"Fällig am\" und setzen Sie bei Wichtigem die \"Priorität\" auf \"Hoch\".",
+      "Klicken Sie auf \"Speichern\". Die Aufgabe erscheint nun in der Liste, in den Fristen, auf der Seite Heute und in der wöchentlichen E-Mail."
+    ],
+    "tips": [
+      "Aufgaben werden auch automatisch angelegt, wenn Sie ein Protokoll importieren oder in einer Sitzung eine Entscheidung erfassen."
+    ]
+  },
+  "task-progress": {
+    "title": "Fortschritt einer Aufgabe erfassen, als blockiert oder erledigt markieren",
+    "summary": "Ändern Sie den Status einer Aufgabe und halten Sie kurz fest, was passiert ist.",
+    "keywords": "aufgabe aufgaben fortschritt stand status ändern aendern erledigt fertig abgeschlossen blockiert hängt haengt notiz verlauf in arbeit schließen schliessen task progress status done blocked",
+    "steps": [
+      "Klicken Sie auf den Reiter \"✅ Umsetzung\" und suchen Sie die Aufgabe (nutzen Sie \"Suchen…\", wenn die Liste lang ist).",
+      "Notiz hinzufügen: Klicken Sie bei der Aufgabe auf \"▸ Details anzeigen\", schreiben Sie in das Feld unter \"Verlauf\" (zum Beispiel \"3 Angebote angefragt, Antworten bis 15.10.\") und klicken Sie auf \"Notiz hinzufügen\".",
+      "Status ändern: Nutzen Sie das kleine Auswahlfeld rechts auf der Aufgabenkarte.",
+      "Wählen Sie \"In Arbeit\", wenn die Arbeit beginnt. Ein kleines Fenster fragt nach einer optionalen Notiz; klicken Sie auf OK.",
+      "Wählen Sie \"Blockiert\", wenn es nicht weitergeht. Sie müssen den Grund angeben; die Aufgabe erscheint dann unter \"Handlungsbedarf\".",
+      "Wählen Sie \"Erledigt\", wenn sie abgeschlossen ist. Memoria trägt das heutige Datum als \"Erledigt am\" ein und verschiebt die Aufgabe zu \"Erledigt\"."
+    ],
+    "tips": [
+      "Die vier Kästen oben (\"Offen\", \"Überfällig\", \"Blockiert\", \"Erledigt\") sind Filter: Klicken Sie auf einen, um nur diese Aufgaben zu sehen. Klicken Sie auf \"Alle\", um alles zu sehen."
+    ]
+  },
+  "obligation-new": {
+    "title": "Wiederkehrende Frist anlegen (Prüfung, Versicherung, gesetzliche Pflicht)",
+    "summary": "Memoria erinnert den Vorstand an Prüfungen, Versicherungsverlängerungen und andere wiederkehrende Pflichten.",
+    "keywords": "fristen frist kalender wiederkehrend pflicht pflichten prüfung pruefung inspektion versicherung verlängerung verlaengerung aufzug lift feuerlöscher feuerloescher pool zertifikat gesetzliche erinnerung jährlich jaehrlich monatlich calendar deadline obligation inspection insurance",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📅 Fristen\".",
+      "Klicken Sie auf \"+ Neue Pflicht\" (rechts).",
+      "Geben Sie den \"Titel\" ein, zum Beispiel \"Aufzugsprüfung\".",
+      "Wählen Sie die \"Kategorie\" (zum Beispiel \"Technische Prüfung\" oder \"Versicherung\").",
+      "Wählen Sie das Datum unter \"Nächste Fälligkeit\" und wie oft es sich wiederholt unter \"Wiederholung\" (zum Beispiel \"Jährlich\").",
+      "Behalten Sie unter \"Erinnern (Tage vorher)\" den Wert 30 oder ändern Sie ihn.",
+      "Füllen Sie bei Bedarf \"Grundlage (Gesetz, Satzung, Vertrag)\", \"Verantwortlich\", \"Lieferant\" und \"Vertrag\" aus.",
+      "Klicken Sie auf \"Speichern\". Die Frist erscheint nun in den Fristen, auf der Seite Heute und in den Erinnerungs-E-Mails."
+    ],
+    "tips": [
+      "Sitzungsfristen aus der Satzung und Kündigungsfristen von Verträgen werden automatisch berechnet; Sie müssen sie nicht anlegen."
+    ]
+  },
+  "obligation-done": {
+    "title": "Prüfung oder andere Pflicht als erledigt markieren",
+    "summary": "Erfassen Sie, dass sie erledigt wurde, mit Nachweis; Memoria verschiebt das nächste Datum.",
+    "keywords": "fristen pflicht pflichten erledigt abgeschlossen prüfung pruefung bestanden zertifikat nachweis mängel maengel festgestellt nächstes naechstes datum als erledigt markieren obligation done inspection certificate",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📅 Fristen\" und dann auf den Umschalter \"Wiederkehrende Pflichten\".",
+      "Suchen Sie die Pflicht und klicken Sie auf \"✓ Als erledigt markieren\".",
+      "Prüfen Sie das Datum unter \"Erledigt am\".",
+      "Geben Sie unter \"Nachweis (Zertifikat, Protokoll-Nr.)\" die Zertifikats- oder Protokollnummer ein.",
+      "Wurden Probleme festgestellt, beschreiben Sie sie unter \"Festgestellte Mängel\".",
+      "Klicken Sie auf \"Speichern\". Das nächste Fälligkeitsdatum wird automatisch verschoben.",
+      "Wenn Sie Mängel eingetragen haben, fragt Memoria, ob eine Umsetzungsaufgabe angelegt werden soll. Klicken Sie auf OK, um sie anzulegen."
+    ],
+    "tips": [
+      "Hängen Sie das Zertifikat an: Klicken Sie bei der Pflicht auf \"▸ Details anzeigen\" und dann auf \"+ Anhang hinzufügen\"."
+    ]
+  },
+  "meeting-plan": {
+    "title": "Sitzung planen und Tagesordnung vorbereiten",
+    "summary": "Legen Sie die Sitzung an, lassen Sie Memoria Tagesordnungspunkte aus offenen Themen vorschlagen und prüfen Sie die gesetzlichen Fristen.",
+    "keywords": "sitzung sitzungen planen neue vorstandssitzung junta eigentümerversammlung eigentuemerversammlung versammlung tagesordnung einladung einberufung vorschlagen termin meeting agenda invitation",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🗓️ Sitzungen\".",
+      "Klicken Sie auf \"+ Neue Sitzung\".",
+      "Geben Sie den \"Titel\" ein, wählen Sie die \"Art\" (Vorstandssitzung oder Eigentümerversammlung), das \"Datum\" und bei Bedarf \"Uhrzeit\" und \"Ort / Link\".",
+      "Klicken Sie auf \"Speichern\". Die Tagesordnung der neuen Sitzung öffnet sich.",
+      "Klicken Sie auf \"💡 Tagesordnung aus offenen Punkten vorschlagen\". Memoria listet offene Themen auf: dringende Ausgaben zur Ratifizierung, Verträge mit nahen Fristen, zu entscheidende Ausschreibungen, blockierte oder überfällige Aufgaben.",
+      "Entfernen Sie den Haken bei allem, was nicht auf die Tagesordnung soll, und klicken Sie auf \"Auswahl hinzufügen\".",
+      "Um einen eigenen Punkt hinzuzufügen, geben Sie ihn unter \"Punkt hinzufügen\" ein, wählen Sie die Art und klicken Sie auf \"+ Punkt hinzufügen\". Mit ▲ und ▼ ändern Sie die Reihenfolge, mit ✕ entfernen Sie einen Punkt.",
+      "Unter der Sitzung sehen Sie, ob die Einladungsfrist eingehalten ist (zum Beispiel \"Einladung bis … versenden\")."
+    ],
+    "tips": [
+      "Wenn die Einladung versendet wurde, klicken Sie auf \"Bearbeiten\" und füllen Sie \"Einladung versendet am\" aus; die Prüfung wird grün.",
+      "Vorstandssitzungen erfordern 8 Tage Vorlauf, Eigentümerversammlungen 15 Tage (Satzung)."
+    ]
+  },
+  "meeting-print": {
+    "title": "Einladung oder Protokoll einer Sitzung drucken",
+    "summary": "Memoria erstellt eine druckbare Einladung und ein Protokoll; Sie können sie auch als PDF speichern.",
+    "keywords": "drucken ausdrucken einladung einberufung protokoll acta pdf speichern sitzung papier versenden eigentümer eigentuemer print invitation minutes",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🗓️ Sitzungen\".",
+      "Klicken Sie bei der Sitzung auf \"▸ Tagesordnung\".",
+      "Klicken Sie auf \"🖨 Einladung drucken\". Das Druckfenster Ihres Browsers öffnet sich.",
+      "Wählen Sie einen Drucker oder als Ziel \"Als PDF speichern\", um eine Datei zu erhalten.",
+      "Nachdem die Sitzung stattgefunden hat, nutzen Sie an derselben Stelle \"🖨 Protokoll drucken\"."
+    ],
+    "tips": [
+      "\"🖨 Protokoll drucken\" erscheint nur, wenn der Status der Sitzung \"Abgehalten\" ist."
+    ]
+  },
+  "meeting-outcome": {
+    "title": "Nach einer Sitzung: Beschlüsse erfassen",
+    "summary": "Schreiben Sie das Ergebnis jedes Tagesordnungspunkts auf und machen Sie aus Entscheidungen Einträge und Umsetzungsaufgaben.",
+    "keywords": "sitzung ergebnis ergebnisse abgehalten nach der sitzung entscheidung erfassen beschluss beschlüsse beschluesse protokoll tagesordnungspunkt abstimmung umsetzung aufgabe meeting outcome decision",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🗓️ Sitzungen\", suchen Sie die Sitzung und klicken Sie auf \"Bearbeiten\".",
+      "Setzen Sie den \"Status\" auf \"Abgehalten\", füllen Sie \"Anwesend\" und \"Beschlussfähig\" aus und klicken Sie dann auf \"Speichern\".",
+      "Klicken Sie auf \"▸ Tagesordnung\". Jeder Punkt hat jetzt ein Feld \"Ergebnis\".",
+      "Schreiben Sie, was beschlossen wurde, und klicken Sie auf \"Ergebnis speichern\".",
+      "Bei einer Entscheidung klicken Sie auf \"⚖️ Als Entscheidung erfassen\". Sie wird unter \"⚖️ Entscheidungen\" gespeichert.",
+      "Memoria fragt, ob eine Umsetzungsaufgabe angelegt werden soll. Klicken Sie auf OK; die Aufgabe erscheint unter \"✅ Umsetzung\"."
+    ],
+    "tips": [
+      "Schneller: Ist das Protokoll bereits geschrieben, nutzen Sie stattdessen \"📄 Protokoll importieren (KI)\" (siehe die Anleitung \"Sitzungsprotokoll importieren\")."
+    ]
+  },
+  "minutes-import": {
+    "title": "Sitzungsprotokoll importieren (KI)",
+    "summary": "Laden Sie das genehmigte Protokoll hoch; die KI schlägt Tagesordnungspunkte, Entscheidungen und Aufgaben mit Fristen vor; Sie prüfen und speichern.",
+    "keywords": "protokoll protokolle acta importieren hochladen pdf word dokument mitschrift teams ki lesen sitzung entscheidungen beschlüsse beschluesse aufgaben fristen automatisch minutes import upload ai",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🗓️ Sitzungen\".",
+      "Klicken Sie auf \"📄 Protokoll importieren (KI)\" (oben oder in der Tagesordnung einer Sitzung).",
+      "Klicken Sie auf \"📎 Datei wählen (PDF, Word oder Foto)\" und wählen Sie das genehmigte Protokoll. Sie können den Text auch einfügen und auf \"🤖 Eingefügten Text lesen\" klicken.",
+      "Warten Sie bis zu einer Minute, während \"Die KI liest das Protokoll…\" angezeigt wird.",
+      "Prüfen Sie \"1 · Sitzung\": Sind Sitzung und Datum richtig?",
+      "Prüfen Sie \"2 · Tagesordnungspunkte und Beschlüsse\": Entfernen Sie den Haken bei allem, was nicht gespeichert werden soll, und korrigieren Sie den Text bei Bedarf.",
+      "Prüfen Sie \"3 · Neue Aufgaben mit Fristen\": wer es macht und bis wann. Mit \"Bitte prüfen\" markierte Daten hat die KI berechnet.",
+      "Prüfen Sie \"4 · Stand bestehender Aufgaben\", falls dieser Abschnitt erscheint.",
+      "Klicken Sie auf \"✓ Angehakte Einträge speichern\" und dann auf \"OK\". Die Protokolldatei wird an die Sitzung angehängt."
+    ],
+    "tips": [
+      "Nichts wird gespeichert, bevor Sie auf Speichern klicken. Die KI übernimmt nur, was im Protokoll steht; sie ergänzt oder bewertet nichts.",
+      "Haken Sie \"Als DEMO markieren (Beispieldaten)\" an, wenn Sie es nur ausprobieren möchten."
+    ]
+  },
+  "decision-new": {
+    "title": "Entscheidung des Vorstands oder der Eigentümerversammlung erfassen",
+    "summary": "Das Entscheidungsprotokoll: was entschieden wurde, von wem, warum, welche Alternativen geprüft wurden und wie abgestimmt wurde.",
+    "keywords": "entscheidung entscheidungen beschluss beschlüsse beschluesse erfassen vereinbarung acuerdo abstimmung stimmen genehmigt vorstand beschlossen warum begründung begruendung alternativen register neue decision resolution vote",
+    "steps": [
+      "Klicken Sie auf den Reiter \"⚖️ Entscheidungen\".",
+      "Klicken Sie auf \"+ Neue Entscheidung\".",
+      "Geben Sie den \"Titel\" ein und prüfen Sie das \"Datum der Entscheidung\".",
+      "Wählen Sie \"Entschieden von\" (zum Beispiel \"Vorstand\" oder \"Eigentümerversammlung\").",
+      "Füllen Sie \"Kontext / Problem\", \"Geprüfte Alternativen\", die \"Entscheidung\" selbst und die \"Begründung\" aus.",
+      "Tragen Sie die Stimmen unter \"Dafür\", \"Dagegen\" und \"Enthaltungen\" ein.",
+      "Klicken Sie unter \"Betroffene Lieferanten\" auf die Namen der betroffenen Lieferanten.",
+      "Klicken Sie auf \"Speichern\"."
+    ],
+    "tips": [
+      "Entscheidungen entstehen auch aus einer Sitzung (\"⚖️ Als Entscheidung erfassen\") und aus importierten Protokollen.",
+      "Nutzen Sie oben \"Suchen…\", um alte Entscheidungen über ein beliebiges Wort zu finden."
+    ]
+  },
+  "decision-link": {
+    "title": "Entscheidung mit Ausschreibung, Vertrag oder Aufgabe verknüpfen und später überprüfen",
+    "summary": "Zeigen Sie, welche Entscheidung eine Ausschreibung oder einen Vertrag genehmigt hat, verfolgen Sie die Aufgaben und notieren Sie später, wie es sich bewährt hat.",
+    "keywords": "entscheidung verknüpfen verknuepfen verbinden ausschreibung vertrag aufgabe genehmigt durch entscheidung umsetzung überprüfen ueberpruefen rückblick rueckblick ersetzt ausgesetzt status decision link tender contract review",
+    "steps": [
+      "Ausschreibung: Öffnen Sie \"🧾 Ausschreibungen\", klicken Sie bei der Ausschreibung auf \"Bearbeiten\", wählen Sie die Entscheidung unter \"Genehmigt durch Entscheidung\" und klicken Sie auf \"Speichern\".",
+      "Vertrag: Öffnen Sie \"📑 Verträge\", klicken Sie auf \"Bearbeiten\", wählen Sie die Entscheidung unter \"Genehmigt durch Entscheidung\" und klicken Sie auf \"Speichern\".",
+      "Aufgabe: Wählen Sie unter \"✅ Umsetzung\" beim Anlegen oder Bearbeiten einer Aufgabe die Entscheidung unter \"Beschluss / Entscheidung\".",
+      "Auf der Karte der Entscheidung sehen Sie dann \"✅ Umsetzungsaufgaben\" und wie viele davon erledigt sind.",
+      "Klicken Sie später bei der Entscheidung auf \"Bearbeiten\" und füllen Sie \"Rückblick: Wie hat es sich bewährt?\" und \"Überprüft am\" aus.",
+      "Wurde die Entscheidung ersetzt, ändern Sie den \"Status\" (zum Beispiel \"Ersetzt\") und erklären Sie es unter \"Statusnotiz\"."
+    ],
+    "tips": []
+  },
+  "mandate-new": {
+    "title": "Mandat eines Vorstandsmitglieds erfassen und Zugang geben",
+    "summary": "Wer welche Funktion innehat und seit wann; geben Sie einem neuen Vorstandsmitglied Zugang zu Memoria.",
+    "keywords": "vorstandsmitglied vorstand mandat mandate funktion amt präsident praesident vizepräsident vizepraesident neues mitglied zugang geben benutzer hinzufügen hinzufuegen gewählt gewaehlt amtszeit board member mandate access",
+    "steps": [
+      "Klicken Sie auf den Reiter \"👥 Vorstand & Mandate\".",
+      "Klicken Sie auf \"+ Neues Mandat\".",
+      "Wählen Sie das \"Mi-Hacienda-Konto\" der Person (der Name wird übernommen) oder geben Sie den Namen unter \"Name\" ein.",
+      "Wählen Sie die \"Funktion\" (zum Beispiel \"Präsident\").",
+      "Füllen Sie \"Gewählt / ernannt durch\", \"Beginn des Mandats\" und \"Geplantes Ende\" aus.",
+      "Klicken Sie auf \"Speichern\".",
+      "Klicken Sie auf der neuen Karte auf \"Vorstandszugang geben\" und bestätigen Sie. Die Person kann Memoria jetzt öffnen."
+    ],
+    "tips": [
+      "Die Person muss sich zuerst bei Mi Hacienda registrieren und freigeschaltet sein, damit ihr Konto verknüpft werden kann."
+    ]
+  },
+  "mandate-end": {
+    "title": "Wenn ein Mandat endet: Zugang entziehen (neuer Vorstand)",
+    "summary": "Schließen Sie das alte Mandat ab und entziehen Sie ausgeschiedenen Mitgliedern den Zugang zu Memoria.",
+    "keywords": "mandat ende beenden zugang entziehen entfernen ausscheiden rücktritt ruecktritt übergabe uebergabe neuer vorstand ausscheidend ehemaliges mitglied sperren mandate end remove access revoke",
+    "steps": [
+      "Geben Sie zuerst den neuen Vorstandsmitgliedern Zugang (siehe \"Mandat eines Vorstandsmitglieds erfassen und Zugang geben\").",
+      "Klicken Sie auf den Reiter \"👥 Vorstand & Mandate\".",
+      "Klicken Sie auf der Karte des ausscheidenden Mitglieds auf \"Bearbeiten\", füllen Sie \"Tatsächliches Ende (Rücktritt, Abberufung)\" aus, falls das Mandat vorzeitig endete, und klicken Sie auf \"Speichern\".",
+      "Die Karte wechselt zu \"Frühere Mandate\" und eine rote Schaltfläche \"Vorstandszugang entziehen\" erscheint.",
+      "Klicken Sie auf \"Vorstandszugang entziehen\" und bestätigen Sie. Die Person bleibt Eigentümer in Mi Hacienda, sieht Memoria aber nicht mehr."
+    ],
+    "tips": [
+      "Sie können sich nicht selbst den Zugang entziehen; das muss ein anderes Vorstandsmitglied tun.",
+      "Memoria warnt unter \"Handlungsbedarf\", wenn jemand nach Ende des Mandats noch Zugang hat."
+    ]
+  },
+  "email-settings": {
+    "title": "E-Mail-Erinnerungen: ein- oder ausschalten, Beispiel ansehen",
+    "summary": "Wöchentliche Übersicht, Fristerinnerungen und der Monatsbericht per E-Mail.",
+    "keywords": "email e-mail mail erinnerung erinnerungen benachrichtigung benachrichtigungen wöchentlich woechentlich übersicht uebersicht monatsbericht bericht ausschalten abbestellen beispiel probe keine emails email reminders notifications weekly monthly",
+    "steps": [
+      "Klicken Sie auf den Reiter \"👥 Vorstand & Mandate\" und scrollen Sie ganz nach unten zu \"✉️ Erinnerungen per E-Mail\".",
+      "Setzen oder entfernen Sie den Haken bei \"Memoria-Erinnerungen per E-Mail an mich senden\". Die Änderung wird sofort gespeichert.",
+      "Um zu sehen, wie die E-Mails aussehen, klicken Sie auf \"Mir jetzt eine Probe-Übersicht senden\" oder \"Mir jetzt den Monatsbericht senden\".",
+      "Sehen Sie in Ihrem Posteingang nach der Nachricht."
+    ],
+    "tips": [
+      "Jeden Montag: eine wöchentliche Übersicht. Erster Werktag des Monats: der Monatsbericht. An anderen Tagen: nur dann eine E-Mail, wenn eine Frist naht.",
+      "Der automatische Versand beginnt erst, wenn der Vorstand Memoria in Betrieb nimmt."
+    ]
+  },
+  "case-new": {
+    "title": "Versicherungsschaden oder Streitfall erfassen",
+    "summary": "Verfolgen Sie Schäden und Streitfälle: Beträge, Status und den nächsten Schritt mit Frist.",
+    "keywords": "schaden schäden schaeden versicherung versicherungsschaden streitfall streit beschwerde reklamation gewährleistung gewaehrleistung garantie rechtlich anwalt fall wasserschaden leck lieferant konflikt geld zurück zurueck nächster naechster schritt claim insurance dispute case",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🛡️ Schäden & Streitfälle\".",
+      "Klicken Sie auf \"+ Neuer Fall\".",
+      "Wählen Sie die \"Art\" (zum Beispiel \"Versicherungsschaden\") und geben Sie den \"Titel\" ein.",
+      "Geben Sie unter \"Gegenseite\" den Versicherer oder die Firma ein. Geben Sie nie den Namen eines Eigentümers ein.",
+      "Füllen Sie \"Referenz (Schaden, Police, Aktenzeichen)\", \"Eröffnet am\" und \"Geforderter Betrag (EUR)\" aus.",
+      "Füllen Sie \"Nächster Schritt\", \"Nächster Schritt bis\" und \"Verantwortlich\" aus.",
+      "Klicken Sie auf \"Speichern\".",
+      "Jedes Mal, wenn etwas passiert: Klicken Sie auf \"▸ Details anzeigen\", schreiben Sie in \"Was ist passiert? (Enter zum Hinzufügen)\" und drücken Sie die Eingabetaste.",
+      "Klicken Sie am Ende auf \"Bearbeiten\", setzen Sie den \"Status\" (zum Beispiel \"Einvernehmlich gelöst\") und füllen Sie \"Erhaltener Betrag (EUR)\" aus."
+    ],
+    "tips": []
+  },
+  "supplier-new": {
+    "title": "Lieferant anlegen und Interessenkonflikte prüfen",
+    "summary": "Erfassen Sie eine Firma, mit der die Gemeinschaft arbeitet, einschließlich der Prüfung auf Interessenkonflikte.",
+    "keywords": "lieferant lieferanten neu anlegen hinzufügen hinzufuegen firma unternehmen dienstleister handwerker anbieter interessenkonflikt prüfung pruefung steuernummer nif cif kontakt supplier new company conflict of interest",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🏢 Lieferanten\".",
+      "Klicken Sie auf \"+ Neuer Lieferant\".",
+      "Geben Sie den \"Firmenname\" ein und wählen Sie die \"Kategorie\" (zum Beispiel \"Pools\").",
+      "Füllen Sie \"Steuernummer (NIF/CIF)\", \"Ansprechpartner\", \"Telefon\" und \"E-Mail\" aus.",
+      "Nachdem Sie geprüft haben, dass die Firma weder ein Eigentümer noch der Verwalter noch ein verbundenes Unternehmen ist, haken Sie \"Interessenkonflikt geprüft\" an und schreiben Sie unter \"Notiz zur Prüfung\", wie Sie geprüft haben.",
+      "Klicken Sie auf \"Speichern\"."
+    ],
+    "tips": [
+      "Lieferanten werden auch automatisch angelegt, wenn die KI ein Angebot, einen Vertrag oder eine Rechnung liest.",
+      "Ein aktiver Lieferant ohne diese Prüfung erscheint unter \"Handlungsbedarf\"."
+    ]
+  },
+  "supplier-find": {
+    "title": "Lieferanten finden, zum Beispiel alle Poolfirmen",
+    "summary": "Durchsuchen und filtern Sie die Lieferantenliste und sehen Sie Bewertungen und Entscheidungen.",
+    "keywords": "finden suchen lieferant lieferanten liste pool poolfirmen poolfirma gartenpflege garten gärtner gaertner elektriker klempner installateur filter kategorie kontakt telefon wer ist unser find search supplier list",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🏢 Lieferanten\".",
+      "Geben Sie einen Namen oder ein Wort in \"Suchen…\" ein oder wählen Sie eine Kategorie unter \"Kategorie: Alle\" (zum Beispiel \"Pools\").",
+      "Wählen Sie unter \"Status: Alle\" den Eintrag \"Aktiv\", um nur aktive Lieferanten zu sehen.",
+      "Klicken Sie bei einem Lieferanten auf \"▸ Details anzeigen\", um Steuernummer, Notizen, Bewertungen und \"Zugehörige Entscheidungen\" zu sehen."
+    ],
+    "tips": [
+      "Seine Angebote finden Sie unter \"🧾 Ausschreibungen\", seine Verträge unter \"📑 Verträge\" und seine Rechnungen unter \"💶 Rechnungen\"."
+    ]
+  },
+  "supplier-rate": {
+    "title": "Lieferanten bewerten",
+    "summary": "Vergeben Sie Sterne und einen Kommentar, damit künftige Vorstände wissen, wie ein Lieferant gearbeitet hat.",
+    "keywords": "bewerten bewertung bewertungen sterne beurteilen lieferant leistung qualität qualitaet kommentar note rate rating stars review",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🏢 Lieferanten\" und suchen Sie den Lieferanten.",
+      "Klicken Sie auf \"▸ Details anzeigen\".",
+      "Klicken Sie unter \"Bewertungen\" auf \"+ Bewertung hinzufügen\".",
+      "Wählen Sie die Sterne unter \"Bewertung\", schreiben Sie einen \"Kommentar\" und prüfen Sie das \"Datum\".",
+      "Klicken Sie auf \"Speichern\". Der Sterne-Durchschnitt des Lieferanten wird aktualisiert."
+    ],
+    "tips": []
+  },
+  "tender-new": {
+    "title": "Ausschreibung starten, um Angebote für einen Auftrag einzuholen",
+    "summary": "Ein Eintrag pro Auftrag: mehrere Angebote sammeln, vergleichen und die Wahl festhalten.",
+    "keywords": "ausschreibung ausschreibungen neu auftrag angebote angebot einholen anfragen preise vergleichen licitacion concurso starten budget pool poolreinigung reinigung wartung instandhaltung tender quotes bids new",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🧾 Ausschreibungen\".",
+      "Klicken Sie auf \"+ Neue Ausschreibung\".",
+      "Geben Sie den \"Titel\" ein, zum Beispiel \"Poolwartung 2027\", und eine \"Beschreibung\" des Auftrags.",
+      "Geben Sie bei Bedarf \"Kategorie\" und \"Genehmigtes Budget\" ein.",
+      "Klicken Sie auf \"Speichern\". Die Ausschreibung hat den Status \"Angebote werden eingeholt\".",
+      "Weiter: Fügen Sie die Angebote hinzu (siehe \"Angebote zu einer Ausschreibung hinzufügen (KI liest die PDFs)\")."
+    ],
+    "tips": [
+      "Die Regel der Gemeinschaft ist, mindestens 2 Angebote zu vergleichen; Memoria warnt, wenn eine Ausschreibung mit weniger entschieden wird."
+    ]
+  },
+  "quotes-upload": {
+    "title": "Angebote zu einer Ausschreibung hinzufügen (KI liest die PDFs)",
+    "summary": "Laden Sie bis zu 5 Angebots-PDFs oder Fotos hoch; die KI liest Lieferant, Preis, MwSt. und Bedingungen; Sie prüfen und speichern.",
+    "keywords": "angebot angebote hinzufügen hinzufuegen hochladen pdf foto kostenvoranschlag presupuesto ki lesen scannen lieferant preis mwst mehrwertsteuer bedingungen neu add quote upload ai",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🧾 Ausschreibungen\" und suchen Sie die Ausschreibung.",
+      "Klicken Sie auf \"▸ Details anzeigen\".",
+      "Klicken Sie auf \"🤖 Angebote hochladen (KI liest sie)\" und wählen Sie bis zu 5 Dateien (PDF oder Foto).",
+      "Warten Sie 10–20 Sekunden, während die KI sie liest.",
+      "Prüfen Sie unter \"Prüfen Sie, was die KI gelesen hat\" jedes Angebot: Lieferant, \"Betrag\", \"inkl. MwSt.\", Daten sowie \"Umfang und Bedingungen\". Mit ⚠ markierte Felder waren unklar.",
+      "Ist der Lieferant neu, legt Memoria ihn an; prüfen Sie Name und Steuernummer.",
+      "Entfernen Sie den Haken bei jeder Datei, die kein Angebot ist, und klicken Sie auf \"Ausgewählte Angebote speichern\" und dann auf \"OK\"."
+    ],
+    "tips": [
+      "Ohne KI: Klicken Sie auf \"+ Angebot hinzufügen\" und geben Sie Lieferant und Betrag selbst ein (der Lieferant muss unter \"🏢 Lieferanten\" existieren).",
+      "Das Original-PDF bleibt erhalten; klicken Sie in der Angebotstabelle auf \"📄 PDF\", um es zu öffnen."
+    ]
+  },
+  "quotes-find": {
+    "title": "Alle Angebote für einen Auftrag finden (zum Beispiel Poolreinigung)",
+    "summary": "Wo die Angebote sind, wie Sie sie nebeneinander sehen und die Original-PDFs öffnen.",
+    "keywords": "finden sehen alle angebote angebot preise pool poolreinigung reinigung poolwartung wartung wo sind die angebote liste ausschreibung vergleichen ofertas presupuestos piscina limpieza find quotes pool cleaning",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🧾 Ausschreibungen\".",
+      "Geben Sie in \"Suchen…\" ein Wort aus dem Auftrag ein, zum Beispiel \"Pool\".",
+      "Klicken Sie bei der Ausschreibung auf \"▸ Details anzeigen\". Die Tabelle \"Angebote\" listet jedes Angebot auf, das günstigste zuerst, mit den Markierungen \"günstigstes\" und \"über Budget\".",
+      "Klicken Sie neben einem Angebot auf \"📄 PDF\", um das Originaldokument zu öffnen.",
+      "Klicken Sie auf \"⇆ Bedingungen vergleichen\", um die Bedingungen der Angebote nebeneinander zu sehen.",
+      "Für eine Analyse siehe \"Angebote vergleichen und KI-Analyse erhalten\"."
+    ],
+    "tips": [
+      "Sie können auch unter \"💬 Memoria fragen\" fragen: \"Zeige mir alle Angebote für die Poolreinigung\".",
+      "Angebote älterer Aufträge bleiben in ihren Ausschreibungen; nutzen Sie \"Status: Alle\", um entschiedene Ausschreibungen einzubeziehen."
+    ]
+  },
+  "quotes-analyse": {
+    "title": "Angebote vergleichen und KI-Analyse erhalten",
+    "summary": "Bei zwei oder mehr Angeboten vergleicht die KI Preise pro Jahr, Risiken, fehlende Angaben und das Verfahren. Sie wählt nie aus.",
+    "keywords": "analyse analysieren vergleich vergleichen angebote angebot welches ist günstiger guenstiger bestes ki bewerten risiken fragen an lieferanten preis pro jahr analysis compare quotes ai",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🧾 Ausschreibungen\", suchen Sie die Ausschreibung und klicken Sie auf \"▸ Details anzeigen\".",
+      "Prüfen Sie die Tabelle \"Angebote\". Eine Warnung erscheint, wenn einige Preise die MwSt. enthalten und andere nicht.",
+      "Klicken Sie im Kasten \"🔎 Angebotsanalyse (KI)\" auf \"Angebote analysieren (KI)\".",
+      "Warten Sie 20–40 Sekunden.",
+      "Lesen Sie \"Zusammenfassung\", \"Vergleichbare Preise\" (Preis pro Jahr mit und ohne MwSt.), \"Risiken\", \"Fehlende Angaben\", \"Fragen an die Lieferanten\" und \"Verfahren\".",
+      "Die Analyse wird bei der Ausschreibung gespeichert, damit alle Vorstandsmitglieder sie lesen können.",
+      "Ändert sich ein Angebot, klicken Sie auf \"Neu analysieren\"."
+    ],
+    "tips": [
+      "Die KI weist auf Fakten, Risiken und Fragen hin. Die Wahl und ihre Begründung liegen beim Vorstand."
+    ]
+  },
+  "tender-choose": {
+    "title": "Lieferanten auswählen und die Begründung festhalten",
+    "summary": "Nachdem der Vorstand entschieden hat, markieren Sie das gewählte Angebot und schreiben die Begründung.",
+    "keywords": "auswählen auswaehlen wählen waehlen gewinner lieferant vergabe zuschlag entschieden begründung begruendung warum gewählt gewaehlt ausschreibung abschließen abschliessen auswahl choose winner select award reason",
+    "steps": [
+      "Erfassen Sie zuerst die Entscheidung des Vorstands unter \"⚖️ Entscheidungen\".",
+      "Klicken Sie auf den Reiter \"🧾 Ausschreibungen\", suchen Sie die Ausschreibung und klicken Sie auf \"▸ Details anzeigen\".",
+      "Klicken Sie in der Tabelle \"Angebote\" beim gewählten Angebot auf \"Auswählen\".",
+      "Ein Fenster fragt \"Warum wird dieser Lieferant gewählt?\". Geben Sie die Begründung ein und klicken Sie auf OK.",
+      "Die Ausschreibung erhält den Status \"Entschieden\".",
+      "Klicken Sie bei der Ausschreibung auf \"Bearbeiten\", wählen Sie die Entscheidung unter \"Genehmigt durch Entscheidung\" und klicken Sie auf \"Speichern\".",
+      "Legen Sie dann den Vertrag unter \"📑 Verträge\" an und wählen Sie diese Ausschreibung unter \"Ausschreibung\"."
+    ],
+    "tips": [
+      "Eine entschiedene Ausschreibung ohne Begründung oder mit weniger als 2 Angeboten erscheint unter \"Handlungsbedarf\"."
+    ]
+  },
+  "contract-new": {
+    "title": "Vertrag anlegen (die KI kann ihn lesen)",
+    "summary": "Erfassen Sie einen Vertrag mit Daten, automatischer Verlängerung und Kündigungsfrist; Memoria erinnert Sie vor Ablauf der Kündigungsfrist.",
+    "keywords": "vertrag verträge vertraege neu anlegen hinzufügen hinzufuegen hochladen pdf vereinbarung dienstleistungsvertrag verlängerung verlaengerung automatisch kündigungsfrist kuendigungsfrist enddatum lieferant ki lesen contract new upload renewal notice period",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📑 Verträge\".",
+      "Mit PDF: Klicken Sie auf \"🤖 Vertrag hochladen (KI liest ihn)\" und wählen Sie die Datei. Warten Sie bis zu einer Minute; das Formular öffnet sich bereits ausgefüllt.",
+      "Ohne PDF: Klicken Sie auf \"+ Neuer Vertrag\".",
+      "Prüfen oder füllen Sie \"Lieferant\", \"Gegenstand\", \"Beginn\" und \"Ende\" aus.",
+      "Verlängert er sich von selbst, haken Sie \"Verlängert sich automatisch\" an und geben Sie die \"Kündigungsfrist (Tage)\" ein.",
+      "Füllen Sie \"Betrag\", \"Zahlung\" und \"Unterzeichnet von\" aus; wählen Sie \"Genehmigt durch Entscheidung\" und \"Ausschreibung\".",
+      "Klicken Sie auf \"Speichern\". Hat die KI eine Datei gelesen, wird die Datei an den Vertrag angehängt."
+    ],
+    "tips": [
+      "Ist der Lieferant noch nicht in Memoria, klicken Sie im grünen Kasten auf \"+ Lieferant anlegen\"."
+    ]
+  },
+  "contract-notice": {
+    "title": "Wann müssen wir einen Vertrag kündigen?",
+    "summary": "Memoria berechnet den letzten Tag, an dem ein sich automatisch verlängernder Vertrag gekündigt werden kann, und erinnert Sie daran.",
+    "keywords": "kündigen kuendigen kündigung kuendigung vertrag beenden verlängerung verlaengerung frist kündigungsfrist kuendigungsfrist letzter tag ablauf läuft aus laeuft aus automatisch verlängern notice cancel terminate contract renewal",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📑 Verträge\".",
+      "Verträge, die sich von selbst verlängern, zeigen \"↻ Verlängert sich automatisch\".",
+      "Sind es bis zur Frist weniger als 60 Tage, zeigt die Karte in Rot \"Kündigen bis\" mit dem Datum.",
+      "Dieselben Daten erscheinen unter \"📅 Fristen\" (\"Letzter Kündigungstag\") und unter \"Handlungsbedarf\" auf der Seite Heute.",
+      "Die Erinnerungs-E-Mails kommen 30, 14, 7 und 1 Tag vorher."
+    ],
+    "tips": [
+      "Das Datum wird nur berechnet, wenn der Vertrag ein Enddatum hat, \"Verlängert sich automatisch\" angehakt ist und die \"Kündigungsfrist (Tage)\" ausgefüllt ist."
+    ]
+  },
+  "invoices-import": {
+    "title": "Rechnungen aus dem Export des Verwalters importieren",
+    "summary": "Laden Sie die Excel-, CSV- oder PDF-Liste des Verwalters hoch; Memoria ordnet Lieferanten und Kategorien zu; Sie prüfen und importieren.",
+    "keywords": "import importieren rechnungen rechnung verwalter export excel csv xlsx pdf liste monatlich hochladen facturas laden ausgaben buchhaltung import invoices administrator",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💶 Rechnungen\".",
+      "Klicken Sie auf \"📥 Vom Verwalter importieren\".",
+      "Klicken Sie auf \"Datei wählen\" und wählen Sie die Datei des Verwalters (Excel, CSV, PDF oder Foto). Sie können die Tabelle auch einfügen und auf \"Eingefügten Text lesen\" klicken.",
+      "Bei Excel oder CSV: Prüfen Sie, welche Spalte Datum, Lieferant, Rechnungsnummer und Gesamtbetrag ist, sehen Sie sich die \"Vorschau\" an und klicken Sie auf \"Weiter\".",
+      "Prüfen Sie in der Prüftabelle bei jeder Zeile den Lieferanten und die \"Kategorie\". Zeilen, die schon in Memoria sind, werden automatisch übersprungen.",
+      "Entfernen Sie den Haken bei Zeilen, die nicht importiert werden sollen.",
+      "Klicken Sie auf \"… Rechnungen importieren\" und dann auf \"OK\"."
+    ],
+    "tips": [
+      "Ein Fehler? Klicken Sie unter \"🗂 Frühere Importe\" auf \"Import rückgängig machen\" und importieren Sie erneut.",
+      "Die Daten des Verwalters kommen meist etwa einen Monat verspätet."
+    ]
+  },
+  "invoice-single": {
+    "title": "Eine Rechnung aus Foto oder PDF hinzufügen",
+    "summary": "Die KI liest eine einzelne Rechnung und füllt das Formular aus; Sie prüfen und speichern.",
+    "keywords": "rechnung rechnungen neu hinzufügen hinzufuegen einzelne foto pdf scan beleg quittung factura ki lesen manuell invoice new photo pdf",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💶 Rechnungen\".",
+      "Klicken Sie auf \"🤖 Rechnung aus Foto oder PDF\" und wählen Sie die Datei.",
+      "Warten Sie bis zu einer Minute; das Formular \"Neue Rechnung\" öffnet sich bereits ausgefüllt.",
+      "Prüfen Sie jedes Feld: Lieferant, \"Rechnungsnr.\", \"Rechnungsdatum\", Beträge, \"Kategorie\" und \"Bezahlt aus\".",
+      "Klicken Sie auf \"Speichern\". Die Datei wird an die Rechnung angehängt.",
+      "Ohne Datei: Klicken Sie auf \"+ Neue Rechnung\" und geben Sie die Werte ein; nur \"Gesamt\" ist Pflicht."
+    ],
+    "tips": []
+  },
+  "invoice-urgent": {
+    "title": "Dringende außerplanmäßige Ausgabe und ihre Ratifizierung",
+    "summary": "Markieren Sie eine dringende Ausgabe, die Präsident und Verwalter genehmigt haben, und erfassen Sie, wann der Vorstand sie ratifiziert hat.",
+    "keywords": "dringend dringende notfall reparatur außerplanmäßig ausserplanmaessig nicht budgetiert ausgabe ratifizieren ratifizierung genehmigen nachträglich nachtraeglich artikel 30 präsident praesident verwalter urgent emergency unbudgeted ratify",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💶 Rechnungen\" und suchen Sie die Rechnung.",
+      "Klicken Sie auf \"Bearbeiten\" und haken Sie \"Dringende außerplanmäßige Ausgabe\" an.",
+      "Erklären Sie es unter \"Grund der Dringlichkeit\" und klicken Sie auf \"Speichern\". Die Rechnung zeigt \"Dringend · Noch nicht ratifiziert\" und wird für die Tagesordnung der nächsten Sitzung vorgeschlagen.",
+      "Nachdem der Vorstand sie ratifiziert hat (erfassen Sie die Entscheidung), klicken Sie bei der Rechnung erneut auf \"Bearbeiten\".",
+      "Wählen Sie unter \"Ratifiziert durch Entscheidung\" diese Entscheidung und klicken Sie auf \"Speichern\". Die Markierung wird zu \"Dringend · ✓\"."
+    ],
+    "tips": [
+      "Haken Sie über der Liste \"Nur nicht ratifizierte dringende Ausgaben\" an, um zu sehen, was noch aussteht."
+    ]
+  },
+  "invoice-find": {
+    "title": "Rechnungen finden und Summen sehen",
+    "summary": "Filtern Sie Rechnungen nach Jahr, Kategorie, Lieferant oder Zahlungsstatus; die Summe der Liste wird angezeigt.",
+    "keywords": "rechnungen rechnung finden suchen filtern jahr kategorie lieferant bezahlt unbezahlt offen summe gesamt wie viel haben wir ausgegeben kosten ausgaben find invoices total spending",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💶 Rechnungen\".",
+      "Geben Sie einen Lieferanten, eine Nummer oder ein Wort in \"Suchen…\" ein.",
+      "Nutzen Sie \"Jahr: Alle\", \"Kategorie: Alle\", \"Zahlungsstatus: Alle\" und \"Bezahlt aus: Alle\", um die Liste einzugrenzen.",
+      "Über der Liste zeigt \"Summe der angezeigten Rechnungen\" die Summe.",
+      "Klicken Sie bei einer Rechnung auf \"▸ Details anzeigen\", um Vertrag, Ausschreibung und Anhänge zu sehen."
+    ],
+    "tips": [
+      "Für Kosten über mehrere Jahre fragen Sie \"💬 Memoria fragen\" oder nutzen Sie \"📊 Übersicht\"."
+    ]
+  },
+  "budget-setup": {
+    "title": "Budget erfassen und Ausgaben nach Kategorie verfolgen",
+    "summary": "Geben Sie das genehmigte Budget und seine Positionen ein; Memoria vergleicht sie mit den Rechnungen.",
+    "keywords": "budget haushalt haushaltsplan jährlich jaehrlich genehmigt presupuesto kategorie positionen geplant ist überschritten ueberschritten ausgaben prognose hochrechnung budget annual category over budget",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💰 Budget & Rücklage\" und wählen Sie das \"Jahr\".",
+      "Klicken Sie auf \"+ Budget erfassen\".",
+      "Füllen Sie \"Bezeichnung\", \"Genehmigter Gesamtbetrag (EUR)\", \"Genehmigt am\" und \"Genehmigt durch Entscheidung\" aus und klicken Sie dann auf \"Speichern\".",
+      "Für jede Kategorie: Wählen Sie sie unter \"Kategorie hinzufügen…\", geben Sie den Betrag ein und klicken Sie auf \"+ Hinzufügen\".",
+      "Die Tabelle \"Nach Kategorie\" zeigt nun Budget, abgerechnet, Hochrechnung aufs Jahr und einen Status: \"Im Rahmen\", \"Könnte überschritten werden\" oder \"Überschritten\".",
+      "Um eine Position zu ändern, klicken Sie auf ihren Betrag, geben Sie den neuen ein und klicken Sie auf ✓."
+    ],
+    "tips": [
+      "Hier zählen nur Rechnungen, die aus \"Ordentliches Budget\" bezahlt wurden."
+    ]
+  },
+  "reserve": {
+    "title": "Die Rücklage verfolgen",
+    "summary": "Erfassen Sie den Anfangsbestand und die Bewegungen; Memoria vergleicht den Stand mit dem gesetzlichen Minimum.",
+    "keywords": "rücklage ruecklage reservefonds rücklagenfonds fondo de reserva stand saldo minimum gesetzlich 10 prozent zuführung zufuehrung entnahme anfangsbestand zinsen reserve fund balance",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💰 Budget & Rücklage\" und scrollen Sie zu \"🏦 Rücklage\".",
+      "Klicken Sie auf \"+ Bewegung hinzufügen\".",
+      "Für den Anfang wählen Sie \"Art\" = \"Anfangsbestand\", das \"Datum\" und den \"Betrag (EUR)\", den der Verwalter angegeben hat. Klicken Sie auf \"Speichern\".",
+      "Fügen Sie später Bewegungen vom Typ \"Zuführung\", \"Zinsen\" oder \"Entnahme\" hinzu, zu denen es keine Rechnung gibt.",
+      "Rechnungen mit \"Bezahlt aus\" = \"Rücklage\" werden automatisch abgezogen.",
+      "Die Markierung zeigt \"Unter dem Minimum\" oder \"Über dem Minimum\"."
+    ],
+    "tips": []
+  },
+  "overview": {
+    "title": "Übersichtsbericht für eine Kategorie (zum Beispiel Gartenpflege)",
+    "summary": "Welche Firmen für uns gearbeitet haben, ihre Verträge, ob Angebote verglichen wurden, warum jede gewählt wurde und was fehlt.",
+    "keywords": "übersicht uebersicht bericht kategorie zeitraum gartenpflege garten pools pool verlauf geschichte firmen verträge vertraege angebote verglichen warum gewählt gewaehlt fehlende angaben drucken csv overview report category",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📊 Übersicht\".",
+      "Wählen Sie die \"Kategorie\" (zum Beispiel \"Pools\").",
+      "Stellen Sie \"Von\" und \"Bis\" ein. Der Bericht wird sofort aktualisiert.",
+      "Lesen Sie die Karten: jeder Vertrag mit Laufzeit, Betrag, Anzahl der Angebote und \"Warum gewählt\".",
+      "Die orange Karte \"Fehlende Angaben\" listet auf, was noch nicht erfasst ist.",
+      "Klicken Sie auf \"Drucken / PDF\", um ihn zu drucken, oder auf \"CSV exportieren\", um ihn in Excel zu öffnen."
+    ],
+    "tips": []
+  },
+  "handover": {
+    "title": "Übergabepaket für einen neuen Vorstand erstellen",
+    "summary": "Ein Dokument mit allem, was ein neuer Vorstand am ersten Tag braucht.",
+    "keywords": "übergabe uebergabe übergabepaket uebergabepaket neuer vorstand neuer präsident praesident wechsel zusammenfassung paket dokument drucken pdf kontinuität kontinuitaet handover new board",
+    "steps": [
+      "Klicken Sie auf der Seite Heute auf \"📦 Übergabepaket erstellen\" oder auf den Reiter \"📦 Übergabepaket\".",
+      "Warten Sie einen Moment, während es erstellt wird.",
+      "Klicken Sie auf \"🖨 Drucken / PDF\" und wählen Sie einen Drucker oder \"Als PDF speichern\".",
+      "Abschnitt 10 listet auf, was außerhalb des Systems übergeben werden muss (Schlüssel, Bankvollmachten, Originaldokumente)."
+    ],
+    "tips": []
+  },
+  "activity": {
+    "title": "Sehen, wer was geändert hat",
+    "summary": "Jede Änderung in Memoria wird automatisch protokolliert und kann weder bearbeitet noch gelöscht werden.",
+    "keywords": "aktivität aktivitaet protokoll verlauf änderungen aenderungen wer hat was geändert geaendert nachverfolgung gelöscht geloescht bearbeitet wann activity log history audit",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🕒 Aktivität\".",
+      "Die Änderungen sind nach Tag gruppiert: Uhrzeit, Name, was hinzugefügt, geändert oder gelöscht wurde.",
+      "Bei Änderungen listet \"Geändert:\" die Felder auf.",
+      "Klicken Sie unten auf \"Ältere laden\", um frühere Änderungen zu sehen."
+    ],
+    "tips": []
+  },
+  "export": {
+    "title": "Alles herunterladen (Sicherung)",
+    "summary": "Eine ZIP-Datei mit allen Einträgen in Excel und allen angehängten Dokumenten, unabhängig von der App.",
+    "keywords": "export exportieren herunterladen download sicherung backup kopie zip excel alle daten dokumente archiv speichern alles export download backup",
+    "steps": [
+      "Klicken Sie auf den Reiter \"💾 Export\".",
+      "Klicken Sie auf \"💾 Alles herunterladen (ZIP)\".",
+      "Warten Sie, während sie erstellt wird; bei vielen Dokumenten kann das einige Minuten dauern.",
+      "Speichern Sie die ZIP-Datei an einem sicheren Ort, zum Beispiel im eigenen Laufwerk der Gemeinschaft."
+    ],
+    "tips": [
+      "Die ZIP-Datei enthält memoria.xlsx (ein Blatt pro Tabelle), memoria.json, alle Dokumente und eine README."
+    ]
+  },
+  "attachments": {
+    "title": "Dokument an einen beliebigen Eintrag anhängen",
+    "summary": "Fügen Sie einer Aufgabe, Sitzung, Entscheidung, einem Lieferanten, einer Ausschreibung, einem Vertrag oder einer Rechnung ein PDF, Foto oder einen Link hinzu.",
+    "keywords": "anhängen anhaengen anhang anhänge anhaenge dokument dokumente datei hochladen pdf foto link hinzufügen hinzufuegen ablegen speichern attach attachment document file upload",
+    "steps": [
+      "Öffnen Sie den Eintrag (zum Beispiel einen Vertrag) und klicken Sie auf \"▸ Details anzeigen\".",
+      "Klicken Sie unter \"📎 Anhänge\" auf \"+ Anhang hinzufügen\".",
+      "Klicken Sie auf \"Datei (max. 25 MB)\" und wählen Sie die Datei, oder fügen Sie eine Webadresse unter \"…oder Link\" ein.",
+      "Geben Sie bei Bedarf einen \"Titel\" ein und wählen Sie die \"Art\" und das \"Dokumentdatum\".",
+      "Klicken Sie auf \"Speichern\".",
+      "Um ihn später zu öffnen, klicken Sie unter \"📎 Anhänge\" auf seinen Namen."
+    ],
+    "tips": [
+      "Dateien werden privat gespeichert; nur der Vorstand kann sie öffnen."
+    ]
+  }
+}

@@ -3,11 +3,12 @@
 // „Opýtaj sa Memorie“ — otázky boardu vlastnými slovami; odpoveď zo záznamov
 // Memorie a zo stanov. Fakty a postup áno, rozhodnutie ostáva na boarde.
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { mt } from '../../../lib/memoriaI18n';
 import { ErrorBox } from './MemoriaUi';
 import { parseAnswer } from '../../../lib/answerFormat';
+import { TAB_LABELS, helpArticle } from '../../../lib/memoriaHelp';
 
 // Jednoduché zobrazenie odpovede: odseky, odrážky a **tučné**.
 function Inline({ text }) {
@@ -20,13 +21,14 @@ export function AnswerText({ text }) {
   return (
     <div className="space-y-2 text-sm text-ink">
       {blocks.map((b, i) => {
-        if (b.type === 'ul') {
+        if (b.type === 'ul' || b.type === 'ol') {
+          const List = b.type === 'ol' ? 'ol' : 'ul';
           return (
-            <ul key={i} className="list-disc pl-5 space-y-1">
+            <List key={i} className={`${b.type === 'ol' ? 'list-decimal' : 'list-disc'} pl-5 space-y-1`}>
               {b.items.map((it, j) => (
                 <li key={j}><Inline text={it} /></li>
               ))}
-            </ul>
+            </List>
           );
         }
         if (b.type === 'table') {
@@ -61,7 +63,34 @@ export function AnswerText({ text }) {
   );
 }
 
-export default function AskPanel({ lang }) {
+function AnswerLinks({ links, lang, onOpenTab, onOpenHelp }) {
+  if (!links?.length) return null;
+  return (
+    <div className="flex flex-wrap gap-2 mt-3">
+      {links.map((l) => {
+        if (l.kind === 'open' && TAB_LABELS[l.value] && onOpenTab) {
+          const [icon, key] = TAB_LABELS[l.value];
+          return (
+            <button key={`o-${l.value}`} type="button" className="btn-primary text-sm !px-3 !py-1.5" onClick={() => onOpenTab(l.value)}>
+              {mt(lang, 'askOpenScreen', { name: `${icon} ${mt(lang, key)}` })}
+            </button>
+          );
+        }
+        const a = l.kind === 'help' ? helpArticle(lang, l.value) : null;
+        if (a && onOpenHelp) {
+          return (
+            <button key={`h-${l.value}`} type="button" className="btn-secondary text-sm !px-3 !py-1.5" onClick={() => onOpenHelp(l.value)}>
+              {mt(lang, 'askShowGuide', { name: a.title })}
+            </button>
+          );
+        }
+        return null;
+      })}
+    </div>
+  );
+}
+
+export default function AskPanel({ lang, onOpenTab, onOpenHelp, seed }) {
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState('');
   const [busy, setBusy] = useState(false);
@@ -74,7 +103,7 @@ export default function AskPanel({ lang }) {
     setBusy(true);
     setError('');
     setQuestion('');
-    const history = messages.slice(-4);
+    const history = messages.slice(-4).map((m) => ({ role: m.role, content: m.content }));
     setMessages((prev) => [...prev, { role: 'user', content: q }]);
     try {
       const {
@@ -87,7 +116,7 @@ export default function AskPanel({ lang }) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || res.statusText);
-      setMessages((prev) => [...prev, { role: 'assistant', content: json.answer || '—' }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: json.answer || '—', links: json.links || [] }]);
     } catch (e) {
       setError(mt(lang, 'askError', { error: e.message }));
       setMessages((prev) => prev.slice(0, -1));
@@ -97,6 +126,11 @@ export default function AskPanel({ lang }) {
       setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 50);
     }
   }
+
+  // Otázka poslaná z návodu („Ask Memoria this question“).
+  useEffect(() => {
+    if (seed?.q) ask(seed.q);
+  }, [seed?.at]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const examples = ['askQ1', 'askQ2', 'askQ3', 'askQ4', 'askQ5'];
 
@@ -129,6 +163,7 @@ export default function AskPanel({ lang }) {
             <div key={i} className="card p-4 max-w-[95%]">
               <p className="text-xs font-semibold text-harbor mb-2 flex items-center gap-1.5"><img src="/memoria-icon.png" alt="" className="h-4 w-4 inline-block rounded-[22%] align-[-0.2em]" /> Memoria</p>
               <AnswerText text={m.content} />
+              <AnswerLinks links={m.links} lang={lang} onOpenTab={onOpenTab} onOpenHelp={onOpenHelp} />
             </div>
           )
         )}

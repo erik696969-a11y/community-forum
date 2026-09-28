@@ -1,0 +1,629 @@
+{
+  "open": {
+    "title": "Open Memoria and find your way around",
+    "summary": "Where Memoria is, how the tabs are organised and how to get back to the start.",
+    "keywords": "open start begin login enter where find menu tabs navigate navigation move around home first time beginner how to use",
+    "steps": [
+      "Sign in to Mi Hacienda as usual.",
+      "In the dark bar at the top of any page, click \"Memoria\" (next to the small tree icon). You can also go to \"Admin\" and click the first button, \"Memoria\".",
+      "Memoria always opens on the tab \"🏠 Today\".",
+      "Below the title you see a row of tabs in three groups: \"Governance\" (meetings, decisions, tasks, deadlines), \"Suppliers & spending\" (suppliers, quotes, contracts, invoices, budget) and \"Reports\" (Ask Memoria, Overview, Handover pack, Activity, Export, Help).",
+      "Click a tab to open it. The tab you are in has an orange line under it.",
+      "To come back to the start, click \"🏠 Today\". If you reload the page, Memoria also returns to \"Today\"."
+    ],
+    "tips": [
+      "Only board members can see Memoria. Owners never see it.",
+      "Memoria uses the language you chose in the top bar (EN, ES, FR, DE).",
+      "Lost? Click \"❓ Help\" and type your question in your own words."
+    ]
+  },
+  "today": {
+    "title": "Understand the Today screen",
+    "summary": "What the first screen shows: key numbers, what needs attention, the next meeting and the next 30 days.",
+    "keywords": "today home dashboard overview summary start screen what needs attention alerts warnings red orange dot next meeting deadlines spending recent activity",
+    "steps": [
+      "Click \"🏠 Today\".",
+      "At the top you see four boxes with numbers: \"Open tasks\", \"Deadlines in 30 days\", \"Active contracts\" and \"Spent in\" this year. Click a box to open the tab behind it.",
+      "Below is \"🔔 Needs attention\": a list of things that need action, for example an overdue task or a contract whose notice deadline is close. A red dot means urgent or overdue, orange means coming up, grey is information.",
+      "Click any line in \"Needs attention\" to go straight to the record.",
+      "The card \"🗓️ Next meeting\" shows the next planned meeting and whether the invitation deadline is met. Click it to open the meeting.",
+      "The card \"📅 Next 30 days\" lists upcoming deadlines. \"See all →\" opens the Calendar.",
+      "\"💶 Spending in\" shows this year's invoices by category, and \"🕒 Recent activity\" shows the latest changes.",
+      "At the bottom, the buttons \"💬 Ask Memoria\" and \"📦 Prepare handover pack\" open those tools."
+    ],
+    "tips": [
+      "Memoria only reports facts from the records. It never tells the board what to decide."
+    ]
+  },
+  "demo": {
+    "title": "What \"DEMO\" means",
+    "summary": "Records marked DEMO are invented sample data for the presentation and will be deleted.",
+    "keywords": "demo sample example fake fictional test data orange badge dashed delete sample data presentation",
+    "steps": [
+      "Records with a small dashed orange \"DEMO\" badge are invented examples, so you can see how Memoria works.",
+      "While sample data exists, a dashed orange box under the title says \"DEMO · Records marked DEMO are fictional sample data…\".",
+      "DEMO records are never sent in the automatic e-mails.",
+      "When Memoria goes into real use, all DEMO records are deleted in one step. Your real records stay."
+    ],
+    "tips": [
+      "When you import something only to try it out, tick \"Mark as DEMO (sample data)\" so it is deleted with the other samples."
+    ]
+  },
+  "ask": {
+    "title": "Ask Memoria a question in your own words",
+    "summary": "Type a question and Memoria answers from its records and the Statutes, and can show you where to click.",
+    "keywords": "ask question chat assistant ai search find answer how where what who when cost history why explain help me",
+    "steps": [
+      "Click the tab \"💬 Ask Memoria\" (or the button \"💬 Ask Memoria\" on Today).",
+      "Before your first question you see example questions. Click one to try it.",
+      "Or type your own question in the box at the bottom, in your own words. For example: \"Where can I see all quotes for pool cleaning, and how do I compare them?\"",
+      "Click \"Ask\" (or press Enter). Wait a few seconds while \"Memoria is looking through the records…\" is shown.",
+      "Read the answer. If it explains how to do something, it shows buttons that open the right screen or the step-by-step guide.",
+      "Ask a follow-up question in the same box; Memoria remembers the last few messages.",
+      "Click \"New conversation\" to start again."
+    ],
+    "tips": [
+      "Memoria answers only from what is recorded. If data is missing (for example invoices not yet imported), it says so.",
+      "It never decides for the board and never changes anything.",
+      "Each board member can ask up to 200 questions a day."
+    ]
+  },
+  "task-new": {
+    "title": "Add a task: who does what, by when",
+    "summary": "Every resolution gets a person responsible, a board member who checks it, and a deadline.",
+    "keywords": "task todo to do follow up follow-up action resolution responsible deadline due date assign who does what create new add",
+    "steps": [
+      "Click the tab \"✅ Follow-up\".",
+      "Click \"+ New task\" (right side, above the list).",
+      "Type the \"Title\", for example \"Ask 3 quotes for the garage door\".",
+      "In \"Resolution / decision\", choose the decision this task comes from (if there is one).",
+      "Choose \"Carried out by (role)\" (for example \"Administrator\") and type the \"Name / company\".",
+      "In \"Checked by (board member)\" type the board member who follows it up.",
+      "Choose the \"Due date\" and, if it is important, set \"Priority\" to \"High\".",
+      "Click \"Save\". The task now appears in the list, in the Calendar, on Today and in the weekly e-mail."
+    ],
+    "tips": [
+      "Tasks are also created automatically when you import minutes or record a decision from a meeting."
+    ]
+  },
+  "task-progress": {
+    "title": "Record progress on a task, mark it blocked or done",
+    "summary": "Change the status of a task and keep a short history of what happened.",
+    "keywords": "task progress update status done finished complete blocked stuck note history in progress close task mark done",
+    "steps": [
+      "Click the tab \"✅ Follow-up\" and find the task (use \"Search…\" if the list is long).",
+      "To add a note: click \"▸ Show details\" on the task, type in the box under \"Progress\" (for example \"3 quotes requested, answers by 15/10\") and click \"Add note\".",
+      "To change the status: use the small drop-down on the right of the task card.",
+      "Choose \"In progress\" when work starts. A small window asks for an optional note; click OK.",
+      "Choose \"Blocked\" if it is stuck. You must type why; the task then appears in \"Needs attention\".",
+      "Choose \"Done\" when it is finished. Memoria records today's date as \"Completed on\" and moves the task to \"Done\"."
+    ],
+    "tips": [
+      "The four boxes at the top (\"Open\", \"Overdue\", \"Blocked\", \"Done\") are filters: click one to see only those tasks. Click \"All\" to see everything."
+    ]
+  },
+  "obligation-new": {
+    "title": "Add a recurring deadline (inspection, insurance, legal duty)",
+    "summary": "Memoria reminds the board of inspections, insurance renewals and other recurring duties.",
+    "keywords": "calendar deadline recurring obligation inspection insurance renewal lift elevator fire extinguisher pool certificate legal duty reminder yearly monthly annual",
+    "steps": [
+      "Click the tab \"📅 Calendar\".",
+      "Click \"+ New obligation\" (right side).",
+      "Type the \"Title\", for example \"Lift inspection\".",
+      "Choose the \"Category\" (for example \"Technical inspection\" or \"Insurance\").",
+      "Choose the \"Next due\" date and how often it \"Repeats\" (for example \"Yearly\").",
+      "In \"Remind (days before)\" keep 30 or change it.",
+      "Optionally fill \"Basis (law, statutes, contract)\", \"Responsible\", \"Supplier\" and \"Contract\".",
+      "Click \"Save\". The deadline now appears in the Calendar, on Today and in the reminder e-mails."
+    ],
+    "tips": [
+      "Meeting deadlines from the Statutes and contract notice deadlines are calculated automatically; you do not need to add them."
+    ]
+  },
+  "obligation-done": {
+    "title": "Mark an inspection or other obligation as done",
+    "summary": "Record that it was done, with evidence; Memoria moves the next date forward.",
+    "keywords": "calendar obligation done completed inspection passed certificate evidence issues found next date mark as done",
+    "steps": [
+      "Click the tab \"📅 Calendar\", then the switch \"Recurring obligations\".",
+      "Find the obligation and click \"✓ Mark as done\".",
+      "Check the date in \"Done on\".",
+      "In \"Evidence (certificate, report no.)\" type the certificate or report number.",
+      "If problems were found, describe them in \"Issues found\".",
+      "Click \"Save\". The next due date moves forward automatically.",
+      "If you wrote issues, Memoria asks whether to create a follow-up task. Click OK to create it."
+    ],
+    "tips": [
+      "Attach the certificate: click \"▸ Show details\" on the obligation, then \"+ Add attachment\"."
+    ]
+  },
+  "meeting-plan": {
+    "title": "Plan a meeting and prepare the agenda",
+    "summary": "Create the meeting, let Memoria suggest agenda items from open matters and check the legal deadlines.",
+    "keywords": "meeting plan new board meeting junta general meeting agm agenda order of the day invitation convocation suggest agenda schedule",
+    "steps": [
+      "Click the tab \"🗓️ Meetings\".",
+      "Click \"+ New meeting\".",
+      "Type the \"Title\", choose the \"Type\" (board meeting or general meeting), the \"Date\" and optionally \"Time\" and \"Place / link\".",
+      "Click \"Save\". The agenda of the new meeting opens.",
+      "Click \"💡 Suggest agenda from open items\". Memoria lists open matters: urgent expenses to ratify, contracts with close deadlines, tenders to decide, blocked or overdue tasks.",
+      "Untick what should not be on the agenda and click \"Add selected\".",
+      "To add your own point, type it in \"Add item\", choose the type and click \"+ Add item\". Use ▲ and ▼ to change the order, ✕ to remove.",
+      "Under the meeting you see whether the invitation deadline is met (for example \"Send the invitation by …\")."
+    ],
+    "tips": [
+      "When the invitation has been sent, click \"Edit\" and fill \"Invitation sent on\"; the check turns green.",
+      "Board meetings need 8 days' notice, general meetings 15 days (Statutes)."
+    ]
+  },
+  "meeting-print": {
+    "title": "Print the invitation or the minutes of a meeting",
+    "summary": "Memoria prepares a printable invitation and minutes; you can also save them as PDF.",
+    "keywords": "print invitation convocation minutes acta pdf save meeting paper send owners",
+    "steps": [
+      "Click the tab \"🗓️ Meetings\".",
+      "On the meeting, click \"▸ Agenda\".",
+      "Click \"🖨 Print invitation\". Your browser's print window opens.",
+      "Choose a printer, or choose \"Save as PDF\" as the destination to get a file.",
+      "After the meeting has been held, use \"🖨 Print minutes\" in the same place."
+    ],
+    "tips": [
+      "\"🖨 Print minutes\" appears only when the meeting status is \"Held\"."
+    ]
+  },
+  "meeting-outcome": {
+    "title": "After a meeting: record what was decided",
+    "summary": "Write the outcome of each agenda item and turn decisions into records and follow-up tasks.",
+    "keywords": "meeting outcome result held after the meeting record decision minutes agenda item vote resolution follow-up task",
+    "steps": [
+      "Click the tab \"🗓️ Meetings\", find the meeting and click \"Edit\".",
+      "Set \"Status\" to \"Held\", fill \"Present\" and \"Quorum reached\", then click \"Save\".",
+      "Click \"▸ Agenda\". Each item now has an \"Outcome\" box.",
+      "Type what was decided and click \"Save outcome\".",
+      "For a decision, click \"⚖️ Record as decision\". It is saved in \"⚖️ Decisions\".",
+      "Memoria asks whether to create a follow-up task. Click OK; the task appears in \"✅ Follow-up\"."
+    ],
+    "tips": [
+      "Faster: if the minutes are already written, use \"📄 Import minutes (AI)\" instead (see the guide \"Import the minutes of a meeting\")."
+    ]
+  },
+  "minutes-import": {
+    "title": "Import the minutes of a meeting (AI)",
+    "summary": "Upload the approved minutes; the AI proposes agenda points, decisions and tasks with deadlines; you check and save.",
+    "keywords": "minutes acta import upload pdf word document transcript teams ai read meeting decisions tasks deadlines automatically",
+    "steps": [
+      "Click the tab \"🗓️ Meetings\".",
+      "Click \"📄 Import minutes (AI)\" (at the top, or inside a meeting's agenda).",
+      "Click \"📎 Choose file (PDF, Word or photo)\" and choose the approved minutes. You can also paste the text and click \"🤖 Read the pasted text\".",
+      "Wait up to a minute while \"AI is reading the minutes…\" is shown.",
+      "Check \"1 · Meeting\": is it the right meeting and date?",
+      "Check \"2 · Agenda points and decisions\": untick what should not be saved and correct any text.",
+      "Check \"3 · New tasks with deadlines\": who does it and by when. Dates marked \"please check\" were calculated by the AI.",
+      "Check \"4 · Progress on existing tasks\" if it appears.",
+      "Click \"✓ Save the ticked items\", then \"OK\". The minutes file is attached to the meeting."
+    ],
+    "tips": [
+      "Nothing is saved until you click save. The AI only copies what the minutes say; it does not add or judge anything.",
+      "Tick \"Mark as DEMO (sample data)\" when you only want to try it."
+    ]
+  },
+  "decision-new": {
+    "title": "Record a decision of the board or the general meeting",
+    "summary": "The decision log: what was decided, by whom, why, the options considered and the votes.",
+    "keywords": "decision resolution record agreement acuerdo vote approved board decided why reason options log register new",
+    "steps": [
+      "Click the tab \"⚖️ Decisions\".",
+      "Click \"+ New decision\".",
+      "Type the \"Title\" and check the \"Date of decision\".",
+      "Choose \"Decided by\" (for example \"Board\" or \"General Meeting\").",
+      "Fill \"Context / problem\", \"Options considered\", the \"Decision\" itself and \"Why\".",
+      "Type the votes in \"For\", \"Against\" and \"Abstained\".",
+      "Under \"Related suppliers\", click the names of the suppliers concerned.",
+      "Click \"Save\"."
+    ],
+    "tips": [
+      "Decisions are also created from a meeting (\"⚖️ Record as decision\") and from imported minutes.",
+      "Use \"Search…\" at the top to find old decisions by any word."
+    ]
+  },
+  "decision-link": {
+    "title": "Link a decision to a tender, contract or task, and review it later",
+    "summary": "Show which decision approved a tender or contract, follow its tasks, and note later how it worked out.",
+    "keywords": "decision link connect tender contract task approved by decision follow up review looking back superseded suspended status",
+    "steps": [
+      "Tender: open \"🧾 Tenders & quotes\", click \"Edit\" on the tender, choose the decision in \"Approved by decision\", click \"Save\".",
+      "Contract: open \"📑 Contracts\", click \"Edit\", choose the decision in \"Approved by decision\", click \"Save\".",
+      "Task: in \"✅ Follow-up\", when you create or edit a task, choose the decision in \"Resolution / decision\".",
+      "On the decision card you then see \"✅ Follow-up tasks\" with how many are done.",
+      "Later, click \"Edit\" on the decision and fill \"Looking back: how did it work out?\" and \"Reviewed on\".",
+      "If the decision was replaced, change \"Status\" (for example \"Superseded\") and explain in \"Status note\"."
+    ],
+    "tips": []
+  },
+  "mandate-new": {
+    "title": "Record a board member's mandate and give access",
+    "summary": "Who holds which position and since when; give a new board member access to Memoria.",
+    "keywords": "board member mandate position president vice-president new member access give access add user elected term",
+    "steps": [
+      "Click the tab \"👥 Board & mandates\".",
+      "Click \"+ New mandate\".",
+      "Choose the person's \"Mi Hacienda account\" (their name fills in), or type the \"Name\".",
+      "Choose the \"Position\" (for example \"President\").",
+      "Fill \"Elected / appointed by\", \"Start of mandate\" and \"Planned end\".",
+      "Click \"Save\".",
+      "On the new card, click \"Give board access\" and confirm. The person can now open Memoria."
+    ],
+    "tips": [
+      "The person must first register in Mi Hacienda and be approved, so that their account can be linked."
+    ]
+  },
+  "mandate-end": {
+    "title": "When a mandate ends: remove access (new board)",
+    "summary": "Close the old mandate and remove Memoria access from members who left the board.",
+    "keywords": "mandate end remove access leave board resign handover new board outgoing former member revoke",
+    "steps": [
+      "First give access to the new board members (see \"Record a board member's mandate and give access\").",
+      "Click the tab \"👥 Board & mandates\".",
+      "On the outgoing member's card click \"Edit\", fill \"Actual end (resignation, removal)\" if the mandate ended early, and click \"Save\".",
+      "The card moves to \"Previous mandates\" and a red button \"Remove board access\" appears.",
+      "Click \"Remove board access\" and confirm. The person stays an owner in Mi Hacienda but no longer sees Memoria."
+    ],
+    "tips": [
+      "You cannot remove your own access; another board member has to do it.",
+      "Memoria warns in \"Needs attention\" when someone still has access after the mandate ended."
+    ]
+  },
+  "email-settings": {
+    "title": "E-mail reminders: switch on or off, see a sample",
+    "summary": "Weekly summary, deadline reminders and the monthly report by e-mail.",
+    "keywords": "email e-mail reminders notifications weekly summary monthly report digest switch off unsubscribe sample stop emails",
+    "steps": [
+      "Click the tab \"👥 Board & mandates\" and scroll to the bottom, to \"✉️ Email reminders\".",
+      "Tick or untick \"Send me Memoria reminders by email\". The change is saved at once.",
+      "To see what the e-mails look like, click \"Send me a sample summary now\" or \"Send me the monthly report now\".",
+      "Check your inbox for the message."
+    ],
+    "tips": [
+      "Every Monday: a weekly summary. First working day of the month: the monthly report. Other days: an e-mail only when a deadline is close.",
+      "Automatic sending starts only when the board starts using Memoria."
+    ]
+  },
+  "case-new": {
+    "title": "Record an insurance claim or a dispute",
+    "summary": "Follow claims and disputes: amounts, status, and the next step with its deadline.",
+    "keywords": "claim insurance dispute complaint warranty legal lawyer case damage leak supplier conflict recover money next step",
+    "steps": [
+      "Click the tab \"🛡️ Claims & disputes\".",
+      "Click \"+ New case\".",
+      "Choose the \"Type\" (for example \"Insurance claim\") and type the \"Title\".",
+      "In \"Other party\" type the insurer or company. Never type an owner's name.",
+      "Fill \"Reference (claim, policy, case no.)\", \"Opened on\" and \"Amount claimed (EUR)\".",
+      "Fill \"Next step\", \"Next step by\" and \"Responsible\".",
+      "Click \"Save\".",
+      "Each time something happens: click \"▸ Show details\", type in \"What happened? (Enter to add)\" and press Enter.",
+      "At the end, click \"Edit\", set \"Status\" (for example \"Settled\") and fill \"Amount recovered (EUR)\"."
+    ],
+    "tips": []
+  },
+  "supplier-new": {
+    "title": "Add a supplier and check for conflicts of interest",
+    "summary": "Record a company the community works with, including the conflict-of-interest check.",
+    "keywords": "supplier new add company provider contractor vendor firm conflict of interest check tax id nif cif contact",
+    "steps": [
+      "Click the tab \"🏢 Suppliers\".",
+      "Click \"+ New supplier\".",
+      "Type the \"Company name\" and choose the \"Category\" (for example \"Pools\").",
+      "Fill \"Tax ID (NIF/CIF)\", \"Contact person\", \"Phone\" and \"Email\".",
+      "After checking that the company is not an owner, the administrator or a related company, tick \"Conflict of interest checked\" and write how you checked in \"Conflict check note\".",
+      "Click \"Save\"."
+    ],
+    "tips": [
+      "Suppliers are also created automatically when the AI reads a quote, contract or invoice.",
+      "An active supplier without the check appears in \"Needs attention\"."
+    ]
+  },
+  "supplier-find": {
+    "title": "Find a supplier, for example all pool companies",
+    "summary": "Search and filter the list of suppliers, and see their ratings and decisions.",
+    "keywords": "find search supplier list pool companies gardening electrician plumber filter category contact phone who is our",
+    "steps": [
+      "Click the tab \"🏢 Suppliers\".",
+      "Type a name or word in \"Search…\", or choose a category in \"Category: All\" (for example \"Pools\").",
+      "Use \"Status: All\" to see only \"Active\" suppliers.",
+      "Click \"▸ Show details\" on a supplier to see its tax ID, notes, ratings and \"Related decisions\"."
+    ],
+    "tips": [
+      "Their quotes are in \"🧾 Tenders & quotes\", their contracts in \"📑 Contracts\" and their invoices in \"💶 Invoices\"."
+    ]
+  },
+  "supplier-rate": {
+    "title": "Rate a supplier",
+    "summary": "Give stars and a comment, so future boards know how a supplier performed.",
+    "keywords": "rate rating stars review evaluate supplier performance quality comment score",
+    "steps": [
+      "Click the tab \"🏢 Suppliers\" and find the supplier.",
+      "Click \"▸ Show details\".",
+      "Under \"Ratings\", click \"+ Add rating\".",
+      "Choose the stars in \"Rating\", write a \"Comment\" and check the \"Date\".",
+      "Click \"Save\". The average stars on the supplier update."
+    ],
+    "tips": []
+  },
+  "tender-new": {
+    "title": "Start a tender to collect quotes for a job",
+    "summary": "One record per job: collect several quotes, compare them and record the choice.",
+    "keywords": "tender new job quotes request for quotes bids offers compare prices licitacion concurso start collect budget pool cleaning maintenance",
+    "steps": [
+      "Click the tab \"🧾 Tenders & quotes\".",
+      "Click \"+ New tender\".",
+      "Type the \"Title\", for example \"Pool maintenance 2027\", and a \"Description\" of the job.",
+      "Optionally type the \"Category\" and the \"Approved budget\".",
+      "Click \"Save\". The tender has the status \"Collecting quotes\".",
+      "Next: add the quotes (see \"Add quotes to a tender (AI reads the PDFs)\")."
+    ],
+    "tips": [
+      "The community rule is to compare at least 2 quotes; Memoria warns when a tender is decided with fewer."
+    ]
+  },
+  "quotes-upload": {
+    "title": "Add quotes to a tender (AI reads the PDFs)",
+    "summary": "Upload up to 5 quote PDFs or photos; the AI reads supplier, price, VAT and conditions; you check and save.",
+    "keywords": "add quote upload pdf photo offer budget presupuesto ai read scan supplier price vat conditions quotes new",
+    "steps": [
+      "Click the tab \"🧾 Tenders & quotes\" and find the tender.",
+      "Click \"▸ Show details\".",
+      "Click \"🤖 Upload quotes (AI reads them)\" and choose up to 5 files (PDF or photo).",
+      "Wait 10–20 seconds while the AI reads them.",
+      "Under \"Check what AI read\", check each quote: supplier, \"Amount\", \"VAT included\", dates and \"Scope and conditions\". Fields marked ⚠ were unclear.",
+      "If the supplier is new, Memoria creates it; check its name and tax ID.",
+      "Untick any file that is not a quote and click \"Save selected quotes\", then \"OK\"."
+    ],
+    "tips": [
+      "Without AI: click \"+ Add quote\" and type the supplier and amount yourself (the supplier must exist in \"🏢 Suppliers\").",
+      "The original PDF is kept; click \"📄 PDF\" in the quotes table to open it."
+    ]
+  },
+  "quotes-find": {
+    "title": "Find all quotes for a job (for example pool cleaning)",
+    "summary": "Where the quotes are, how to see them side by side and open the original PDFs.",
+    "keywords": "find see all quotes offers bids prices pool cleaning pool maintenance where are the quotes list tender compare ofertas presupuestos piscina limpieza",
+    "steps": [
+      "Click the tab \"🧾 Tenders & quotes\".",
+      "In \"Search…\" type a word from the job, for example \"pool\".",
+      "Click \"▸ Show details\" on the tender. The table \"Quotes\" lists every quote, cheapest first, with the labels \"lowest\" and \"over budget\".",
+      "Click \"📄 PDF\" next to a quote to open the original document.",
+      "Click \"⇆ Compare conditions\" to see the conditions of the quotes side by side.",
+      "To get an analysis, see \"Compare quotes and get an AI analysis\"."
+    ],
+    "tips": [
+      "You can also ask in \"💬 Ask Memoria\": \"Show me all quotes for pool cleaning\".",
+      "Quotes of older jobs stay in their tenders; use \"Status: All\" to include decided tenders."
+    ]
+  },
+  "quotes-analyse": {
+    "title": "Compare quotes and get an AI analysis",
+    "summary": "With two or more quotes, the AI compares prices per year, risks, missing information and the procedure. It never chooses.",
+    "keywords": "analysis analyse analyze compare quotes which is cheaper best offer comparison ai evaluate risks questions for suppliers price per year",
+    "steps": [
+      "Click the tab \"🧾 Tenders & quotes\", find the tender and click \"▸ Show details\".",
+      "Check the \"Quotes\" table. A warning appears if some prices include VAT and others do not.",
+      "In the box \"🔎 Quote analysis (AI)\", click \"Analyse the quotes (AI)\".",
+      "Wait 20–40 seconds.",
+      "Read \"Summary\", \"Comparable prices\" (price per year with and without VAT), \"Risks\", \"Missing information\", \"Questions for the suppliers\" and \"Procedure\".",
+      "The analysis is saved on the tender, so all board members can read it.",
+      "If a quote changes, click \"Run again\"."
+    ],
+    "tips": [
+      "The AI points out facts, risks and questions. The choice and its reason belong to the board."
+    ]
+  },
+  "tender-choose": {
+    "title": "Choose the supplier and record why",
+    "summary": "After the board decides, mark the chosen quote and write the reason.",
+    "keywords": "choose winner select supplier award decided reason why chosen close tender selection",
+    "steps": [
+      "First record the board's decision in \"⚖️ Decisions\".",
+      "Click the tab \"🧾 Tenders & quotes\", find the tender and click \"▸ Show details\".",
+      "In the \"Quotes\" table, click \"Choose this one\" on the chosen quote.",
+      "A window asks \"Why is this supplier chosen?\". Type the reason and click OK.",
+      "The tender becomes \"Decided\".",
+      "Click \"Edit\" on the tender, choose the decision in \"Approved by decision\" and click \"Save\".",
+      "Then add the contract in \"📑 Contracts\" and choose this tender in \"Tender\"."
+    ],
+    "tips": [
+      "A decided tender without a reason, or with fewer than 2 quotes, appears in \"Needs attention\"."
+    ]
+  },
+  "contract-new": {
+    "title": "Add a contract (the AI can read it)",
+    "summary": "Record a contract with dates, automatic renewal and notice period; Memoria reminds you before the notice deadline.",
+    "keywords": "contract new add upload pdf agreement service contract renewal automatic notice period end date supplier ai read",
+    "steps": [
+      "Click the tab \"📑 Contracts\".",
+      "With the PDF: click \"🤖 Upload contract (AI reads it)\" and choose the file. Wait up to a minute; the form opens already filled in.",
+      "Without the PDF: click \"+ New contract\".",
+      "Check or fill \"Supplier\", \"Subject\", \"Starts\" and \"Ends\".",
+      "If it renews by itself, tick \"Renews automatically\" and type the \"Notice period (days)\".",
+      "Fill \"Amount\", \"Payment\" and \"Signed by\"; choose \"Approved by decision\" and \"Tender\".",
+      "Click \"Save\". When the AI read a file, the file is attached to the contract."
+    ],
+    "tips": [
+      "If the supplier is not in Memoria yet, click \"+ Create supplier\" in the green box."
+    ]
+  },
+  "contract-notice": {
+    "title": "When must we give notice on a contract?",
+    "summary": "Memoria calculates the last day to cancel a contract that renews automatically, and reminds you.",
+    "keywords": "notice cancel terminate contract renewal deadline last day to give notice end contract expire expiring auto renew",
+    "steps": [
+      "Click the tab \"📑 Contracts\".",
+      "Contracts that renew by themselves show \"↻ Renews automatically\".",
+      "When the deadline is less than 60 days away, the card shows a red \"Give notice by\" with the date.",
+      "The same dates appear in \"📅 Calendar\" (\"Last day to give notice\") and in \"Needs attention\" on Today.",
+      "The reminder e-mails arrive 30, 14, 7 and 1 day before."
+    ],
+    "tips": [
+      "The date is only calculated when the contract has an end date, \"Renews automatically\" is ticked and the \"Notice period (days)\" is filled."
+    ]
+  },
+  "invoices-import": {
+    "title": "Import invoices from the administrator's export",
+    "summary": "Upload the administrator's Excel, CSV or PDF list; Memoria matches suppliers and categories; you check and import.",
+    "keywords": "import invoices administrator export excel csv xlsx pdf list monthly upload facturas load spending accounts",
+    "steps": [
+      "Click the tab \"💶 Invoices\".",
+      "Click \"📥 Import from the administrator\".",
+      "Click \"Choose a file\" and choose the administrator's file (Excel, CSV, PDF or photo). You can also paste the table and click \"Read pasted text\".",
+      "For Excel or CSV: check which column is the date, supplier, invoice number and total, look at the \"Preview\" and click \"Continue\".",
+      "In the review table, check the supplier and \"Category\" of each row. Rows already in Memoria are skipped automatically.",
+      "Untick rows that should not be imported.",
+      "Click \"Import … invoices\", then \"OK\"."
+    ],
+    "tips": [
+      "A mistake? Under \"🗂 Previous imports\" click \"Undo import\" and import again.",
+      "The administrator's data usually arrives about one month late."
+    ]
+  },
+  "invoice-single": {
+    "title": "Add one invoice from a photo or PDF",
+    "summary": "The AI reads a single invoice and fills in the form; you check and save.",
+    "keywords": "invoice new add one single photo pdf scan receipt bill factura ai read manual",
+    "steps": [
+      "Click the tab \"💶 Invoices\".",
+      "Click \"🤖 Invoice from photo or PDF\" and choose the file.",
+      "Wait up to a minute; the form \"New invoice\" opens already filled in.",
+      "Check every field: supplier, \"Invoice no.\", \"Invoice date\", amounts, \"Category\" and \"Paid from\".",
+      "Click \"Save\". The file is attached to the invoice.",
+      "Without a file: click \"+ New invoice\" and type the values; only \"Total\" is required."
+    ],
+    "tips": []
+  },
+  "invoice-urgent": {
+    "title": "Urgent unbudgeted expense and its ratification",
+    "summary": "Mark an urgent expense approved by the President and Administrator, and record when the board ratified it.",
+    "keywords": "urgent emergency repair unbudgeted expense ratify ratification article 30 president administrator approve after",
+    "steps": [
+      "Click the tab \"💶 Invoices\" and find the invoice.",
+      "Click \"Edit\" and tick \"Urgent unbudgeted expense\".",
+      "Explain in \"Why it was urgent\" and click \"Save\". The invoice shows \"Urgent · Not yet ratified\" and is suggested for the next meeting's agenda.",
+      "After the board ratifies it (record the decision), click \"Edit\" again on the invoice.",
+      "In \"Ratified by decision\" choose that decision and click \"Save\". The badge becomes \"Urgent · ✓\"."
+    ],
+    "tips": [
+      "Tick \"Only unratified urgent expenses\" above the list to see what is still waiting."
+    ]
+  },
+  "invoice-find": {
+    "title": "Find invoices and see totals",
+    "summary": "Filter invoices by year, category, supplier or payment status; the total of the list is shown.",
+    "keywords": "find invoices search filter year category supplier paid unpaid pending total how much did we spend cost spending",
+    "steps": [
+      "Click the tab \"💶 Invoices\".",
+      "Type a supplier, number or word in \"Search…\".",
+      "Use \"Year: All\", \"Category: All\", \"Payment status: All\" and \"Paid from: All\" to narrow the list.",
+      "Above the list, \"Total of the invoices shown\" gives the sum.",
+      "Click \"▸ Show details\" on an invoice to see its contract, tender and attachments."
+    ],
+    "tips": [
+      "For costs over several years, ask \"💬 Ask Memoria\" or use \"📊 Overview\"."
+    ]
+  },
+  "budget-setup": {
+    "title": "Record the budget and follow spending by category",
+    "summary": "Enter the approved budget and its lines; Memoria compares them with the invoices.",
+    "keywords": "budget annual approved presupuesto category lines planned actual over budget spending forecast pace",
+    "steps": [
+      "Click the tab \"💰 Budget & reserve\" and choose the \"Year\".",
+      "Click \"+ Record the budget\".",
+      "Fill \"Name\", \"Approved total (EUR)\", \"Approved on\" and \"Approved by decision\", then click \"Save\".",
+      "For each category: choose it in \"Add category…\", type the amount and click \"+ Add\".",
+      "The table \"By category\" now shows budget, invoiced, full-year pace and a status: \"On track\", \"May exceed\" or \"Over budget\".",
+      "To change a line, click its amount, type the new one and click ✓."
+    ],
+    "tips": [
+      "Only invoices paid from the \"Ordinary budget\" count here."
+    ]
+  },
+  "reserve": {
+    "title": "Follow the reserve fund",
+    "summary": "Record the opening balance and movements; Memoria compares the balance with the legal minimum.",
+    "keywords": "reserve fund fondo de reserva balance minimum legal 10 percent contribution withdrawal opening balance",
+    "steps": [
+      "Click the tab \"💰 Budget & reserve\" and scroll to \"🏦 Reserve fund\".",
+      "Click \"+ Add movement\".",
+      "For the start, choose \"Type\" = \"Opening balance\", the \"Date\" and the \"Amount (EUR)\" given by the administrator. Click \"Save\".",
+      "Later, add \"Contribution\", \"Interest\" or \"Withdrawal\" movements that have no invoice.",
+      "Invoices marked \"Paid from\" = \"Reserve fund\" are subtracted automatically.",
+      "The badge shows \"Below the minimum\" or \"Above the minimum\"."
+    ],
+    "tips": []
+  },
+  "overview": {
+    "title": "Overview report for one category (for example gardening)",
+    "summary": "Which companies worked for us, their contracts, whether quotes were compared, why each was chosen and what is missing.",
+    "keywords": "overview report category period gardening pools history companies contracts quotes compared why chosen missing information print csv",
+    "steps": [
+      "Click the tab \"📊 Overview\".",
+      "Choose the \"Category\" (for example \"Pools\").",
+      "Set \"From\" and \"To\". The report updates at once.",
+      "Read the cards: each contract with duration, amount, number of quotes and \"Why chosen\".",
+      "The orange card \"Missing information\" lists what is not recorded yet.",
+      "Click \"Print / PDF\" to print it or \"Export CSV\" to open it in Excel."
+    ],
+    "tips": []
+  },
+  "handover": {
+    "title": "Prepare the handover pack for a new board",
+    "summary": "One document with everything a new board needs on day one.",
+    "keywords": "handover new board new president transition summary pack document print pdf continuity",
+    "steps": [
+      "Click \"📦 Prepare handover pack\" on Today, or the tab \"📦 Handover pack\".",
+      "Wait a moment while it is prepared.",
+      "Click \"🖨 Print / PDF\" and choose a printer or \"Save as PDF\".",
+      "Section 10 lists what must be handed over outside the system (keys, bank signatures, original documents)."
+    ],
+    "tips": []
+  },
+  "activity": {
+    "title": "See who changed what",
+    "summary": "Every change in Memoria is logged automatically and cannot be edited or deleted.",
+    "keywords": "activity log history who changed what audit trail deleted edited when changes who changed modified edited contract record person user",
+    "steps": [
+      "Click the tab \"🕒 Activity\".",
+      "Changes are grouped by day: time, name, what was added, updated or deleted.",
+      "For updates, \"Changed:\" lists the fields.",
+      "Click \"Load older\" at the bottom to see earlier changes."
+    ],
+    "tips": []
+  },
+  "export": {
+    "title": "Download everything (backup)",
+    "summary": "One ZIP with all records in Excel and all attached documents, independent of the app.",
+    "keywords": "export download backup copy zip excel all data documents archive save everything",
+    "steps": [
+      "Click the tab \"💾 Export\".",
+      "Click \"💾 Download everything (ZIP)\".",
+      "Wait while it is prepared; with many documents it can take a few minutes.",
+      "Save the ZIP in a safe place, for example the community's own drive."
+    ],
+    "tips": [
+      "The ZIP contains memoria.xlsx (one sheet per table), memoria.json, all documents and a README."
+    ]
+  },
+  "attachments": {
+    "title": "Attach a document to any record",
+    "summary": "Add a PDF, photo or link to a task, meeting, decision, supplier, tender, contract or invoice.",
+    "keywords": "attach attachment document file upload pdf photo link add document store save file",
+    "steps": [
+      "Open the record (for example a contract) and click \"▸ Show details\".",
+      "Under \"📎 Attachments\", click \"+ Add attachment\".",
+      "Click \"File (max 25 MB)\" and choose the file, or paste a web address in \"…or link\".",
+      "Optionally type a \"Title\", choose the \"Type\" and the \"Document date\".",
+      "Click \"Save\".",
+      "To open it later, click its name in \"📎 Attachments\"."
+    ],
+    "tips": [
+      "Files are stored privately; only the board can open them."
+    ]
+  }
+}
