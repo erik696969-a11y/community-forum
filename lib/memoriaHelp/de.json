@@ -528,6 +528,24 @@
       "Für Kosten über mehrere Jahre fragen Sie \"💬 Memoria fragen\" oder nutzen Sie \"📊 Übersicht\"."
     ]
   },
+  "list-export": {
+    "title": "Rechnungen, Lieferanten oder Angebote filtern und nach Excel exportieren",
+    "summary": "Zeigen Sie nur das an, was Sie brauchen (z. B. alle Pool-Rechnungen 2026 eines Lieferanten), und laden Sie genau diese Liste als Excel-Datei herunter.",
+    "keywords": "exportieren excel herunterladen filtern gefilterte liste xlsx tabelle rechnungen lieferanten angebote ausschreibungen vertraege bericht csv speichern kopie",
+    "steps": [
+      "Öffnen Sie die gewünschte Liste: \"💶 Rechnungen\", \"🏢 Lieferanten\", \"🧾 Ausschreibungen\" oder \"📑 Verträge\".",
+      "Stellen Sie die Filter über der Liste ein, z. B. \"Jahr: Alle\" → 2026, \"Lieferant: Alle\" → den Lieferanten, \"Kategorie: Alle\" → Pools. Sie können auch ein Wort in \"Suchen…\" eingeben. Um alles zu exportieren (z. B. alle Lieferanten), lassen Sie alle Filter auf \"Alle\" und die Suche leer.",
+      "Prüfen Sie, ob die Liste zeigt, was Sie möchten. Die Schaltfläche \"⬇ Excel\" zeigt, wie viele Einträge exportiert werden, z. B. \"⬇ Excel (12)\".",
+      "Klicken Sie auf \"⬇ Excel\". Die Datei wird auf Ihren Computer heruntergeladen (meist in den Ordner Downloads).",
+      "Öffnen Sie die Datei in Excel, Numbers oder Google Sheets. Das erste Blatt \"Info\" zeigt, wann exportiert wurde, welche Filter galten, wie viele Einträge enthalten sind und bei Rechnungen die Summe.",
+      "Bei Ausschreibungen hat die Datei zwei Blätter: die Ausschreibungen und alle ihre Angebote (Lieferant, Betrag, MwSt., gültig bis, gewählt oder nicht). Wenn Sie unter \"Lieferant: Alle\" einen Lieferanten wählen, werden nur dessen Angebote exportiert."
+    ],
+    "tips": [
+      "Beträge bleiben Zahlen und Daten werden als JJJJ-MM-TT geschrieben, sodass Sie sie in Excel sortieren und addieren können.",
+      "Zeilen mit DEMO = ja sind Beispieldaten.",
+      "Für eine Kopie von allem in Memoria verwenden Sie stattdessen \"💾 Export\"."
+    ]
+  },
   "budget-setup": {
     "title": "Budget erfassen und Ausgaben nach Kategorie verfolgen",
     "summary": "Geben Sie das genehmigte Budget und seine Positionen ein; Memoria vergleicht sie mit den Rechnungen.",
@@ -595,6 +613,23 @@
       "Klicken Sie unten auf \"Ältere laden\", um frühere Änderungen zu sehen."
     ],
     "tips": []
+  },
+  "usage": {
+    "title": "Sehen, wie viel jedes Vorstandsmitglied Memoria genutzt hat",
+    "summary": "Besuche, Tage, Zeit, angelegte oder geänderte Einträge und KI-Anfragen je Vorstandsmitglied, für jeden Zeitraum – und alles als Excel.",
+    "keywords": "nutzung statistik wer hat gearbeitet wie viel zeit stunden besuche anmeldungen aktivitaet pro person mitglied testphase bewertung bericht exportieren excel protokoll wer hat eintraege",
+    "steps": [
+      "Klicken Sie auf den Reiter \"📈 Nutzung\" (Gruppe \"Berichte\").",
+      "Wählen Sie den Zeitraum: \"Test Okt.–Dez. 2026\", \"Dieser Monat\", \"Letzte 30 Tage\", \"Seit Beginn\", oder geben Sie \"Von\" und \"Bis\" ein.",
+      "Die Tabelle zeigt je Vorstandsmitglied: \"Besuche\", \"Nutzungstage\", \"Zeit (h:mm)\", Einträge \"Angelegt\", \"Geändert\" und \"Gelöscht\", \"KI-Anfragen\" und den \"Letzter Besuch\". Die letzte Zeile ist die Summe.",
+      "Klicken Sie auf \"⬇ Excel: Übersicht, Besuche und alle Änderungen\", um alles für diesen Zeitraum herunterzuladen.",
+      "Die Excel-Datei hat vier Blätter: \"Info\" (Zeitraum), \"Übersicht\" (die Tabelle), \"Besuche\" (jeder Besuch mit Beginn, letzter Aktivität, Minuten und genutzten Bildschirmen) und \"Änderungen\" (jeder angelegte, geänderte oder gelöschte Eintrag: wann, wer, was)."
+    ],
+    "tips": [
+      "Die Zeit zählt nur, solange Memoria geöffnet ist und jemand arbeitet; nach 10 Minuten ohne Aktivität endet der Besuch.",
+      "Alle Vorstandsmitglieder sehen dieselben Zahlen; niemand kann sie ändern oder löschen.",
+      "DEMO-Einträge werden nicht gezählt. Die Zeit wird ab dieser Version gemessen; frühere Arbeit erscheint bei den Änderungen."
+    ]
   },
   "export": {
     "title": "Alles herunterladen (Sicherung)",

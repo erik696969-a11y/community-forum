@@ -528,6 +528,24 @@
       "Pour les coûts sur plusieurs années, demandez à \"💬 Demander à Memoria\" ou utilisez \"📊 Synthèse\"."
     ]
   },
+  "list-export": {
+    "title": "Filtrer factures, fournisseurs ou devis et les exporter vers Excel",
+    "summary": "N’affichez que ce dont vous avez besoin (par exemple toutes les factures piscine 2026 d’un fournisseur) et téléchargez exactement cette liste en fichier Excel.",
+    "keywords": "exporter excel telecharger filtrer liste filtree xlsx tableur factures fournisseurs devis appels d offres contrats rapport tableau csv sauvegarder copie",
+    "steps": [
+      "Ouvrez la liste souhaitée : \"💶 Factures\", \"🏢 Fournisseurs\", \"🧾 Appels d’offres\" ou \"📑 Contrats\".",
+      "Réglez les filtres au-dessus de la liste, par exemple \"Année: Tous\" → 2026, \"Fournisseur: Tous\" → le fournisseur, \"Catégorie: Tous\" → Piscines. Vous pouvez aussi taper un mot dans \"Rechercher…\". Pour tout exporter (par exemple tous les fournisseurs), laissez tous les filtres sur \"Tous\" et la recherche vide.",
+      "Vérifiez que la liste montre ce que vous voulez. Le bouton \"⬇ Excel\" indique combien d’enregistrements seront exportés, par exemple \"⬇ Excel (12)\".",
+      "Cliquez sur \"⬇ Excel\". Le fichier est téléchargé sur votre ordinateur (en général dans le dossier Téléchargements).",
+      "Ouvrez le fichier dans Excel, Numbers ou Google Sheets. La première feuille \"Info\" indique la date de l’export, les filtres utilisés, le nombre d’enregistrements et, pour les factures, le total.",
+      "Pour les appels d’offres, le fichier a deux feuilles : les appels d’offres et tous leurs devis (fournisseur, montant, TVA, validité, retenu ou non). Si vous choisissez un fournisseur dans \"Fournisseur: Tous\", seuls ses devis sont exportés."
+    ],
+    "tips": [
+      "Les montants restent des nombres et les dates sont écrites AAAA-MM-JJ, vous pouvez donc les trier et les additionner dans Excel.",
+      "Les lignes avec DEMO = oui sont des données d’exemple.",
+      "Pour une copie de tout Memoria, utilisez plutôt \"💾 Exporter\"."
+    ]
+  },
   "budget-setup": {
     "title": "Enregistrer le budget et suivre les dépenses par catégorie",
     "summary": "Saisissez le budget approuvé et ses lignes ; Memoria les compare aux factures.",
@@ -595,6 +613,23 @@
       "Cliquez sur \"Charger plus ancien\" en bas pour voir les modifications antérieures."
     ],
     "tips": []
+  },
+  "usage": {
+    "title": "Voir dans quelle mesure chaque membre du conseil a utilisé Memoria",
+    "summary": "Visites, jours, temps, enregistrements ajoutés ou modifiés et requêtes IA par membre du conseil, pour toute période, et le tout en Excel.",
+    "keywords": "utilisation statistiques qui a travaille combien de temps heures visites connexions activite par personne membre essai evaluation rapport exporter excel journal qui a cree",
+    "steps": [
+      "Cliquez sur l’onglet \"📈 Utilisation\" (groupe \"Rapports\").",
+      "Choisissez la période : \"Essai oct.–déc. 2026\", \"Ce mois-ci\", \"30 derniers jours\", \"Depuis le début\", ou saisissez \"Du\" et \"Au\".",
+      "Le tableau montre pour chaque membre du conseil : \"Visites\", \"Jours d’utilisation\", \"Temps (h:mm)\", enregistrements \"Ajoutés\", \"Modifiés\" et \"Supprimés\", \"Requêtes IA\" et la \"Dernière visite\". La dernière ligne est le total.",
+      "Cliquez sur \"⬇ Excel : synthèse, visites et toutes les modifications\" pour tout télécharger pour cette période.",
+      "Le fichier Excel a quatre feuilles : \"Info\" (période), \"Synthèse\" (le tableau), \"Visites\" (chaque visite avec début, dernière activité, minutes et écrans utilisés) et \"Modifications\" (chaque enregistrement ajouté, modifié ou supprimé : quand, qui, quoi)."
+    ],
+    "tips": [
+      "Le temps ne compte que lorsque Memoria est ouverte et que quelqu’un travaille ; après 10 minutes sans activité la visite se termine.",
+      "Tous les membres du conseil voient les mêmes chiffres ; personne ne peut les modifier ni les supprimer.",
+      "Les enregistrements DÉMO ne sont pas comptés. Le temps est mesuré à partir de cette version ; le travail antérieur apparaît dans les modifications."
+    ]
   },
   "export": {
     "title": "Tout télécharger (sauvegarde)",

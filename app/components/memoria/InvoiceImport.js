@@ -142,7 +142,7 @@ export default function InvoiceImport({ lang, onClose, onImported }) {
     const kind = fileKind(file.name);
     if (kind === 'xls') return setError(mt(lang, 'importXls'));
     if (!kind) return setError(mt(lang, 'importUnsupported'));
-    if (file.size > MAX_FILE) return setError(mt(lang, 'fileTooLarge'));
+    if (file.size > MAX_FILE) return setError(mt(lang, 'fileTooLargeMb', { mb: 10 }));
     setStage('working');
     setBusyText(mt(lang, 'importReading'));
     try {

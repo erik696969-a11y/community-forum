@@ -36,6 +36,7 @@ export const EXPORT_TABLES = [
   'memoria_case_updates',
   'memoria_documents',
   'memoria_activity',
+  'memoria_usage_sessions',
 ];
 
 async function fetchAll(table) {

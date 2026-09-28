@@ -7,7 +7,8 @@ import {
   mt, cleanFormValues, formatMoney, todayIso,
   PAYMENT_STATUSES, FUNDING_SOURCES, INVOICE_CATEGORIES,
 } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill, ExportListButton } from './MemoriaUi';
+import { invoiceSheets, infoSheet, downloadXlsx, exportFileName } from '../../../lib/memoriaListExport';
 import Attachments, { removeEntityExtras } from './Attachments';
 import InvoiceImport from './InvoiceImport';
 import DocumentReader, { ReadNotice, createSupplierFromRead, attachReadFile } from './DocumentReader';
@@ -67,6 +68,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('');
   const [fundingFilter, setFundingFilter] = useState('');
+  const [supplierFilter, setSupplierFilter] = useState('');
   const [onlyUnratified, setOnlyUnratified] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [read, setRead] = useState(null);
@@ -81,7 +83,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
   async function load() {
     const [iRes, sRes, cRes, tRes, dRes] = await Promise.all([
       supabase.from('memoria_invoices').select('*').order('invoice_date', { ascending: false, nullsFirst: false }).order('created_at', { ascending: false }),
-      supabase.from('memoria_suppliers').select('id, name').order('name', { ascending: true }),
+      supabase.from('memoria_suppliers').select('id, name, tax_id').order('name', { ascending: true }),
       supabase.from('memoria_contracts').select('id, subject, supplier_id').order('subject', { ascending: true }),
       supabase.from('memoria_tenders').select('id, title').order('created_at', { ascending: false }),
       supabase.from('memoria_decisions').select('id, title, decided_on').order('decided_on', { ascending: false }),
@@ -120,6 +122,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
     if (categoryFilter && inv.category !== categoryFilter) return false;
     if (paymentFilter && inv.payment_status !== paymentFilter) return false;
     if (fundingFilter && inv.funding_source !== fundingFilter) return false;
+    if (supplierFilter && inv.supplier_id !== supplierFilter) return false;
     if (onlyUnratified && !(inv.is_urgent_unbudgeted && !inv.ratified_by_decision_id)) return false;
     if (query) {
       const q = query.toLowerCase();
@@ -135,6 +138,29 @@ export default function InvoicesPanel({ lang, onChanged }) {
     for (const inv of visible) map[inv.currency || 'EUR'] = (map[inv.currency || 'EUR'] || 0) + Number(inv.total_amount || 0);
     return Object.entries(map);
   }, [visible]);
+
+  // Dodávatelia, ktorí majú aspoň jednu faktúru (pre filter).
+  const invoiceSuppliers = useMemo(() => {
+    const ids = new Set(invoices.map((i) => i.supplier_id).filter(Boolean));
+    return suppliers.filter((s) => ids.has(s.id));
+  }, [invoices, suppliers]);
+
+  async function exportVisible() {
+    const f = [];
+    if (query) f.push(`${mt(lang, 'search')} "${query}"`);
+    if (yearFilter) f.push(`${mt(lang, 'periodYear')}: ${yearFilter}`);
+    if (supplierFilter) f.push(`${mt(lang, 'supplierFilter')}: ${supplierName[supplierFilter] || ''}`);
+    if (categoryFilter) f.push(`${mt(lang, 'category')}: ${mt(lang, `invcat_${categoryFilter}`)}`);
+    if (paymentFilter) f.push(`${mt(lang, 'paymentStatus')}: ${mt(lang, `payment_${paymentFilter}`)}`);
+    if (fundingFilter) f.push(`${mt(lang, 'fundingSource')}: ${mt(lang, `fund_${fundingFilter}`)}`);
+    if (onlyUnratified) f.push(mt(lang, 'onlyUnratified'));
+    const total = Math.round(visible.reduce((a, i) => a + Number(i.total_amount || 0), 0) * 100) / 100;
+    const supplierById = Object.fromEntries(suppliers.map((s) => [s.id, s]));
+    await downloadXlsx(exportFileName(mt(lang, 'xSheetInvoices')), [
+      infoSheet(lang, { listKey: 'xSheetInvoices', filters: f, count: visible.length, total }),
+      ...invoiceSheets(lang, visible, { supplierById, contractById, tenderTitle, decisionById }),
+    ]);
+  }
 
   function openNew() {
     const today = todayIso();
@@ -406,6 +432,12 @@ export default function InvoicesPanel({ lang, onChanged }) {
             <option key={y} value={String(y)}>{y}</option>
           ))}
         </select>
+        <select className="input-field !w-auto max-w-[16rem]" value={supplierFilter} onChange={(e) => setSupplierFilter(e.target.value)}>
+          <option value="">{mt(lang, 'supplierFilter')}: {mt(lang, 'all')}</option>
+          {invoiceSuppliers.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
         <select className="input-field !w-auto" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
           <option value="">{mt(lang, 'category')}: {mt(lang, 'all')}</option>
           {INVOICE_CATEGORIES.map((c) => (
@@ -435,6 +467,7 @@ export default function InvoicesPanel({ lang, onChanged }) {
             {!importOpen && (
               <button className="btn-secondary text-sm" onClick={() => setImportOpen(true)}>📥 {mt(lang, 'importOpen')}</button>
             )}
+            <ExportListButton label={mt(lang, 'exportList', { n: visible.length })} hint={mt(lang, 'exportListHint')} count={visible.length} onExport={exportVisible} />
             <DocumentReader lang={lang} kind="invoice" label={mt(lang, 'docReadInvoice')} onRead={applyRead} />
             <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newInvoice')}</button>
           </div>

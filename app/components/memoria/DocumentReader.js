@@ -6,7 +6,7 @@
 
 import { useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
-import { mt, MAX_UPLOAD_BYTES } from '../../../lib/memoriaI18n';
+import { mt, AI_READ_MAX_BYTES } from '../../../lib/memoriaI18n';
 import { matchSupplier } from '../../../lib/importParse';
 
 function safeName(name) {
@@ -22,7 +22,7 @@ export default function DocumentReader({ lang, kind, label, onRead }) {
   async function handle(file) {
     if (!file) return;
     setError('');
-    if (file.size > MAX_UPLOAD_BYTES) return setError(mt(lang, 'fileTooLarge'));
+    if (file.size > AI_READ_MAX_BYTES) return setError(mt(lang, 'fileTooLargeMb', { mb: 10 }));
     if (!/\.(pdf|png|jpe?g|webp)$/i.test(file.name)) return setError(mt(lang, 'importUnsupported'));
     try {
       setBusy(mt(lang, 'uploading'));

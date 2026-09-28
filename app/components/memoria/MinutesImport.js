@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
-import { mt, MAX_UPLOAD_BYTES, EXECUTOR_ROLES, MEETING_BODIES } from '../../../lib/memoriaI18n';
+import { mt, MINUTES_MAX_BYTES, EXECUTOR_ROLES, MEETING_BODIES } from '../../../lib/memoriaI18n';
 import { matchMeeting, buildImportPayload, MAX_TEXT_CHARS, TASK_STATUSES } from '../../../lib/memoriaMinutes';
 import { Field, Pill, ErrorBox } from './MemoriaUi';
 
@@ -64,7 +64,7 @@ export default function MinutesImport({ lang, meetings, presetMeetingId, onClose
     try {
       let body;
       if (fileObj) {
-        if (fileObj.size > MAX_UPLOAD_BYTES) return setError(mt(lang, 'fileTooLarge'));
+        if (fileObj.size > MINUTES_MAX_BYTES) return setError(mt(lang, 'fileTooLargeMb', { mb: 15 }));
         if (!/\.(pdf|png|jpe?g|webp|docx|txt)$/i.test(fileObj.name)) return setError(mt(lang, 'importUnsupported'));
         setStage('reading');
         const path = `inbox/${crypto.randomUUID()}/${safeName(fileObj.name)}`;

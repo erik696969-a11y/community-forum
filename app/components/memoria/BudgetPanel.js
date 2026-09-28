@@ -124,7 +124,7 @@ export default function BudgetPanel({ lang, onChanged }) {
 
   async function deleteLine(category) {
     const existing = budgetLines.find((l) => l.category === category);
-    if (!existing || !window.confirm(mt(lang, 'confirmDelete'))) return;
+    if (!existing || !window.confirm(mt(lang, 'confirmDelete', { name: mt(lang, `invcat_${category}`) }))) return;
     await supabase.from('memoria_budget_lines').delete().eq('id', existing.id);
     await load();
     onChanged?.();
@@ -145,7 +145,9 @@ export default function BudgetPanel({ lang, onChanged }) {
   }
 
   async function deleteMovement(id) {
-    if (!window.confirm(mt(lang, 'confirmDelete'))) return;
+    const mv = (movements || []).find((x) => x.id === id);
+    const label = mv ? [formatDate(mv.moved_on, lang), mt(lang, `mv_${mv.kind}`), mv.description].filter(Boolean).join(' · ') : '';
+    if (!window.confirm(mt(lang, 'confirmDelete', { name: label }))) return;
     await supabase.from('memoria_reserve_movements').delete().eq('id', id);
     await load();
     onChanged?.();

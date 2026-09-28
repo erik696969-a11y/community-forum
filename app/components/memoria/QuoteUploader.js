@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
-import { mt, formatMoney, todayIso, SUPPLIER_CATEGORIES, MAX_UPLOAD_BYTES } from '../../../lib/memoriaI18n';
+import { mt, formatMoney, todayIso, SUPPLIER_CATEGORIES, AI_READ_MAX_BYTES } from '../../../lib/memoriaI18n';
 import { Field, ErrorBox } from './MemoriaUi';
 
 const MAX_FILES = 5;
@@ -72,9 +72,9 @@ export default function QuoteUploader({ lang, tender, onDone, onCancel, onClose 
       setError(mt(lang, 'aiTooMany'));
       return;
     }
-    const tooBig = files.find((f) => f.size > MAX_UPLOAD_BYTES);
+    const tooBig = files.find((f) => f.size > AI_READ_MAX_BYTES);
     if (tooBig) {
-      setError(`${tooBig.name}: > 25 MB`);
+      setError(`${tooBig.name}: ${mt(lang, 'fileTooLargeMb', { mb: 10 })}`);
       return;
     }
     setError('');

@@ -528,6 +528,24 @@
       "Para costes de varios años, pregunte en \"💬 Pregunte a Memoria\" o use \"📊 Resumen\"."
     ]
   },
+  "list-export": {
+    "title": "Filtrar facturas, proveedores u ofertas y exportarlos a Excel",
+    "summary": "Muestre solo lo que necesita (por ejemplo todas las facturas de piscinas de 2026 de un proveedor) y descargue exactamente esa lista como archivo Excel.",
+    "keywords": "exportar excel descargar filtrar lista filtrada xlsx hoja de calculo facturas proveedores ofertas presupuestos licitaciones contratos informe tabla csv guardar copia",
+    "steps": [
+      "Abra la lista que necesita: \"💶 Facturas\", \"🏢 Proveedores\", \"🧾 Licitaciones y ofertas\" o \"📑 Contratos\".",
+      "Ajuste los filtros encima de la lista, por ejemplo \"Año: Todos\" → 2026, \"Proveedor: Todos\" → el proveedor, \"Categoría: Todos\" → Piscinas. También puede escribir una palabra en \"Buscar…\". Para exportarlo todo (por ejemplo todos los proveedores), deje todos los filtros en \"Todos\" y la búsqueda vacía.",
+      "Compruebe que la lista muestra lo que quiere. El botón \"⬇ Excel\" indica cuántos registros se exportarán, por ejemplo \"⬇ Excel (12)\".",
+      "Pulse \"⬇ Excel\". El archivo se descarga en su ordenador (normalmente en la carpeta Descargas).",
+      "Abra el archivo en Excel, Numbers o Google Sheets. La primera hoja \"Info\" indica cuándo se exportó, qué filtros se usaron, cuántos registros contiene y, en las facturas, el total.",
+      "En las licitaciones el archivo tiene dos hojas: las licitaciones y todas sus ofertas (proveedor, importe, IVA, validez, elegida o no). Si en \"Proveedor: Todos\" elige un proveedor, solo se exportan sus ofertas."
+    ],
+    "tips": [
+      "Los importes siguen siendo números y las fechas se escriben AAAA-MM-DD, así puede ordenarlos y sumarlos en Excel.",
+      "Las filas con DEMO = sí son datos de ejemplo.",
+      "Para una copia de todo lo que hay en Memoria, use \"💾 Exportar\"."
+    ]
+  },
   "budget-setup": {
     "title": "Registrar el presupuesto y seguir el gasto por categoría",
     "summary": "Introduzca el presupuesto aprobado y sus partidas; Memoria las compara con las facturas.",
@@ -595,6 +613,23 @@
       "Haga clic en \"Cargar anteriores\" abajo para ver cambios más antiguos."
     ],
     "tips": []
+  },
+  "usage": {
+    "title": "Ver cuánto ha usado Memoria cada miembro de la Junta",
+    "summary": "Visitas, días, tiempo, registros creados o modificados y consultas a la IA por miembro de la Junta, en cualquier periodo, y todo en Excel.",
+    "keywords": "uso estadisticas quien trabajo cuanto tiempo horas visitas accesos actividad por persona miembro prueba evaluacion informe exportar excel registro quien hizo registros",
+    "steps": [
+      "Pulse la pestaña \"📈 Uso\" (grupo \"Informes\").",
+      "Elija el periodo: \"Prueba oct–dic 2026\", \"Este mes\", \"Últimos 30 días\", \"Desde el inicio\", o indique \"Desde\" y \"Hasta\".",
+      "La tabla muestra para cada miembro de la Junta: \"Visitas\", \"Días de uso\", \"Tiempo (h:mm)\", registros \"Creados\", \"Modificados\" y \"Eliminados\", \"Consultas IA\" y la \"Última visita\". La última fila es el total.",
+      "Pulse \"⬇ Excel: resumen, visitas y todos los cambios\" para descargar todo lo de ese periodo.",
+      "El archivo Excel tiene cuatro hojas: \"Info\" (periodo), \"Resumen\" (la tabla), \"Visitas\" (cada visita con inicio, última actividad, minutos y pantallas usadas) y \"Cambios\" (cada registro creado, modificado o eliminado: cuándo, quién, qué)."
+    ],
+    "tips": [
+      "El tiempo solo cuenta mientras Memoria está abierta y alguien trabaja; tras 10 minutos sin actividad la visita termina.",
+      "Todos los miembros de la Junta ven las mismas cifras; nadie puede modificarlas ni borrarlas.",
+      "Los registros DEMO no se cuentan. El tiempo se mide desde esta versión; el trabajo anterior aparece en los cambios."
+    ]
   },
   "export": {
     "title": "Descargar todo (copia de seguridad)",

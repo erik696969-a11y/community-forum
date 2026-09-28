@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, cleanFormValues, todayIso, SUPPLIER_CATEGORIES, SUPPLIER_STATUSES } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow, Stars, DemoPill } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, Stars, DemoPill, ExportListButton } from './MemoriaUi';
+import { supplierSheets, infoSheet, downloadXlsx, exportFileName } from '../../../lib/memoriaListExport';
 import Attachments, { removeEntityExtras } from './Attachments';
 
 const EMPTY_FORM = {
@@ -115,6 +116,17 @@ export default function SuppliersPanel({ lang, onChanged }) {
     }
     return true;
   });
+
+  async function exportVisible() {
+    const f = [];
+    if (query) f.push(`${mt(lang, 'search')} "${query}"`);
+    if (categoryFilter) f.push(`${mt(lang, 'category')}: ${mt(lang, `cat_${categoryFilter}`)}`);
+    if (statusFilter) f.push(`${mt(lang, 'status')}: ${mt(lang, `supplierStatus_${statusFilter}`)}`);
+    await downloadXlsx(exportFileName(mt(lang, 'xSheetSuppliers')), [
+      infoSheet(lang, { listKey: 'xSheetSuppliers', filters: f, count: visible.length }),
+      ...supplierSheets(lang, visible, { ratingsBySupplier }),
+    ]);
+  }
 
   function openNew() {
     setForm(EMPTY_FORM);
@@ -301,6 +313,7 @@ export default function SuppliersPanel({ lang, onChanged }) {
             <option key={s} value={s}>{mt(lang, `supplierStatus_${s}`)}</option>
           ))}
         </select>
+        <ExportListButton label={mt(lang, 'exportList', { n: visible.length })} hint={mt(lang, 'exportListHint')} count={visible.length} onExport={exportVisible} />
         {editingId === null && (
           <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newSupplier')}</button>
         )}

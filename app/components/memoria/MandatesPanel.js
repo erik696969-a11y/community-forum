@@ -127,7 +127,7 @@ export default function MandatesPanel({ lang, profile, onChanged }) {
   }
 
   async function handleDelete(m) {
-    if (!window.confirm(mt(lang, 'confirmDelete'))) return;
+    if (!window.confirm(mt(lang, 'confirmDelete', { name: m.person_name || '' }))) return;
     await removeEntityExtras('mandate', m.id);
     const { error } = await supabase.from('memoria_mandates').delete().eq('id', m.id);
     if (error) {

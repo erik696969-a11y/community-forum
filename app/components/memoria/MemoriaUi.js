@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 // Drobné spoločné prvky pre obrazovky Memorie.
 
 export function Field({ label, required, hint, children, className = '' }) {
@@ -86,5 +88,28 @@ export function StatTile({ label, value, tone = 'neutral', active, onClick }) {
       <p className={`text-2xl font-display ${tones[tone] || tones.neutral}`}>{value}</p>
       <p className="text-xs text-ink/60">{label}</p>
     </Tag>
+  );
+}
+
+// Stiahne práve zobrazený (vyfiltrovaný) zoznam ako Excel.
+export function ExportListButton({ label, hint, count, onExport }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      className="btn-secondary text-sm whitespace-nowrap"
+      title={hint}
+      disabled={busy || count === 0}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          await onExport();
+        } finally {
+          setBusy(false);
+        }
+      }}
+    >
+      {label}
+    </button>
   );
 }

@@ -30,6 +30,8 @@ import ExportPanel from '../../components/memoria/ExportPanel';
 import BudgetPanel from '../../components/memoria/BudgetPanel';
 import CasesPanel from '../../components/memoria/CasesPanel';
 import HelpPanel from '../../components/memoria/HelpPanel';
+import UsagePanel from '../../components/memoria/UsagePanel';
+import { useUsageTracking } from '../../../lib/memoriaUsage';
 import { HELP_IDS, MEMORIA_TABS } from '../../../lib/memoriaHelp';
 import { supabase } from '../../../lib/supabaseClient';
 
@@ -65,6 +67,7 @@ const TAB_GROUPS = [
       { key: 'report', label: 'tabReport', icon: '📊' },
       { key: 'handover', label: 'tabHandover', icon: '📦' },
       { key: 'activity', label: 'tabActivity', icon: '🕒' },
+      { key: 'usage', label: 'tabUsage', icon: '📈' },
       { key: 'export', label: 'tabExport', icon: '💾' },
     ],
   },
@@ -105,6 +108,7 @@ export default function MemoriaPage() {
   }
 
   const isBoard = profile?.role === 'board' && profile?.status === 'approved';
+  useUsageTracking(tab, isBoard);
 
   // Upozornenie, že v Memorii sú ukážkové dáta (DEMO).
   useEffect(() => {
@@ -203,6 +207,7 @@ export default function MemoriaPage() {
         {tab === 'invoices' && <InvoicesPanel lang={lang} onChanged={bump} />}
         {tab === 'report' && <ReportPanel lang={lang} />}
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
+        {tab === 'usage' && <UsagePanel lang={lang} />}
         {tab === 'mandates' && <MandatesPanel lang={lang} profile={profile} onChanged={bump} />}
         {tab === 'export' && <ExportPanel lang={lang} profile={profile} />}
         {tab === 'budget' && <BudgetPanel lang={lang} onChanged={bump} />}

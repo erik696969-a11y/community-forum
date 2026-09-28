@@ -528,6 +528,24 @@
       "For costs over several years, ask \"💬 Ask Memoria\" or use \"📊 Overview\"."
     ]
   },
+  "list-export": {
+    "title": "Filter invoices, suppliers or quotes and export them to Excel",
+    "summary": "Show only what you need (for example all 2026 pool invoices of one supplier) and download exactly that list as an Excel file.",
+    "keywords": "export excel download filter filtered list xlsx spreadsheet invoices suppliers quotes tenders contracts report table csv print save copy",
+    "steps": [
+      "Open the list you need: \"💶 Invoices\", \"🏢 Suppliers\", \"🧾 Tenders & quotes\" or \"📑 Contracts\".",
+      "Set the filters above the list, for example \"Year: All\" → 2026, \"Supplier: All\" → the supplier, \"Category: All\" → Pools. You can also type a word in \"Search…\". To export everything (for example all suppliers), leave every filter on \"All\" and the search empty.",
+      "Check that the list shows what you want. The button \"⬇ Excel\" shows how many records will be exported, for example \"⬇ Excel (12)\".",
+      "Click \"⬇ Excel\". The file is downloaded to your computer (usually into the Downloads folder).",
+      "Open the file in Excel, Numbers or Google Sheets. The first sheet \"Info\" says when it was exported, which filters were used, how many records it contains and, for invoices, the total.",
+      "For tenders the file has two sheets: the tenders and all their quotes (supplier, amount, VAT, valid until, chosen or not). With \"Supplier: All\" set to one supplier, only that supplier's quotes are exported."
+    ],
+    "tips": [
+      "Amounts stay numbers and dates are written as YYYY-MM-DD, so you can sort and add them up in Excel.",
+      "Rows marked DEMO = yes are sample data.",
+      "For a copy of everything in Memoria, use \"💾 Export\" instead."
+    ]
+  },
   "budget-setup": {
     "title": "Record the budget and follow spending by category",
     "summary": "Enter the approved budget and its lines; Memoria compares them with the invoices.",
@@ -595,6 +613,23 @@
       "Click \"Load older\" at the bottom to see earlier changes."
     ],
     "tips": []
+  },
+  "usage": {
+    "title": "See how much each board member used Memoria",
+    "summary": "Visits, days, time, records added or changed and AI requests per board member, for any period – and everything as Excel.",
+    "keywords": "usage use statistics who worked how much time hours visits logins activity per person member trial evaluation report export excel log who made records",
+    "steps": [
+      "Click the tab \"📈 Usage\" (group \"Reports\").",
+      "Choose the period: \"Trial Oct–Dec 2026\", \"This month\", \"Last 30 days\", \"Since the start\", or set \"From\" and \"To\" yourself.",
+      "The table shows for each board member: \"Visits\", \"Days used\", \"Time (h:mm)\", records \"Added\", \"Changed\" and \"Deleted\", \"AI requests\" and the \"Last visit\". The last row is the total.",
+      "Click \"⬇ Excel: summary, visits and all changes\" to download everything for that period.",
+      "The Excel file has four sheets: \"Info\" (period), \"Summary\" (the table), \"Visits\" (every visit with start, last activity, minutes and screens used) and \"Changes\" (every record added, changed or deleted: when, who, what)."
+    ],
+    "tips": [
+      "Time counts only while Memoria is open and someone is working; after 10 minutes without activity the visit ends.",
+      "All board members see the same figures; nobody can change or delete them.",
+      "Records marked DEMO are not counted. Time is measured from this version on; earlier work appears in the changes."
+    ]
   },
   "export": {
     "title": "Download everything (backup)",

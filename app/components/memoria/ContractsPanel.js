@@ -7,7 +7,8 @@ import {
   mt, cleanFormValues, formatMoney, todayIso, addDaysIso,
   CONTRACT_STATUSES, PAYMENT_FREQUENCIES,
 } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill, ExportListButton } from './MemoriaUi';
+import { contractSheets, infoSheet, downloadXlsx, exportFileName } from '../../../lib/memoriaListExport';
 import Attachments, { removeEntityExtras } from './Attachments';
 import DocumentReader, { ReadNotice, createSupplierFromRead, attachReadFile } from './DocumentReader';
 
@@ -105,6 +106,16 @@ export default function ContractsPanel({ lang, onChanged }) {
     }
     return true;
   });
+
+  async function exportVisible() {
+    const f = [];
+    if (query) f.push(`${mt(lang, 'search')} "${query}"`);
+    if (statusFilter) f.push(`${mt(lang, 'status')}: ${mt(lang, `contractStatus_${statusFilter}`)}`);
+    await downloadXlsx(exportFileName(mt(lang, 'xSheetContracts')), [
+      infoSheet(lang, { listKey: 'xSheetContracts', filters: f, count: visible.length }),
+      ...contractSheets(lang, visible, { supplierName, tenderTitle, decisionById }),
+    ]);
+  }
 
   function openNew() {
     setForm(EMPTY_FORM);
@@ -317,6 +328,7 @@ export default function ContractsPanel({ lang, onChanged }) {
         </select>
         {editingId === null && (
           <span className="flex gap-2 flex-wrap items-start">
+            <ExportListButton label={mt(lang, 'exportList', { n: visible.length })} hint={mt(lang, 'exportListHint')} count={visible.length} onExport={exportVisible} />
             <DocumentReader lang={lang} kind="contract" label={mt(lang, 'docReadContract')} onRead={applyRead} />
             <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newContract')}</button>
           </span>

@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabaseClient';
 import { formatDate } from '../../../lib/formatDate';
 import { mt, cleanFormValues, formatMoney, todayIso, TENDER_STATUSES } from '../../../lib/memoriaI18n';
-import { Field, Pill, ErrorBox, DetailRow, DemoPill } from './MemoriaUi';
+import { Field, Pill, ErrorBox, DetailRow, DemoPill, ExportListButton } from './MemoriaUi';
+import { tenderSheets, infoSheet, downloadXlsx, exportFileName } from '../../../lib/memoriaListExport';
 import Attachments, { removeEntityExtras } from './Attachments';
 import QuoteUploader from './QuoteUploader';
 import TenderAnalysis from './TenderAnalysis';
@@ -44,6 +45,7 @@ export default function TendersPanel({ lang, onChanged }) {
 
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [supplierFilter, setSupplierFilter] = useState('');
   const [expanded, setExpanded] = useState({});
 
   const [editingId, setEditingId] = useState(null);
@@ -91,8 +93,15 @@ export default function TendersPanel({ lang, onChanged }) {
     return map;
   }, [quotes]);
 
+  // Dodávatelia, ktorí poslali aspoň jednu ponuku (pre filter).
+  const quotingSuppliers = useMemo(() => {
+    const ids = new Set(quotes.map((q) => q.supplier_id));
+    return suppliers.filter((s) => ids.has(s.id));
+  }, [quotes, suppliers]);
+
   const visible = tenders.filter((t) => {
     if (statusFilter && t.status !== statusFilter) return false;
+    if (supplierFilter && t.selected_supplier_id !== supplierFilter && !(quotesByTender[t.id] || []).some((q) => q.supplier_id === supplierFilter)) return false;
     if (query) {
       const q = query.toLowerCase();
       const haystack = [t.title, t.description, t.category, supplierName[t.selected_supplier_id]].join(' ').toLowerCase();
@@ -100,6 +109,17 @@ export default function TendersPanel({ lang, onChanged }) {
     }
     return true;
   });
+
+  async function exportVisible() {
+    const f = [];
+    if (query) f.push(`${mt(lang, 'search')} "${query}"`);
+    if (statusFilter) f.push(`${mt(lang, 'status')}: ${mt(lang, `tenderStatus_${statusFilter}`)}`);
+    if (supplierFilter) f.push(`${mt(lang, 'supplierFilter')}: ${supplierName[supplierFilter] || ''}`);
+    await downloadXlsx(exportFileName(mt(lang, 'xSheetTenders')), [
+      infoSheet(lang, { listKey: 'xSheetTenders', filters: f, count: visible.length }),
+      ...tenderSheets(lang, visible, { quotesByTender, supplierName, decisionById, supplierFilter }),
+    ]);
+  }
 
   function openNew() {
     setForm({ ...EMPTY_FORM, opened_on: todayIso() });
@@ -281,6 +301,13 @@ export default function TendersPanel({ lang, onChanged }) {
             <option key={s} value={s}>{mt(lang, `tenderStatus_${s}`)}</option>
           ))}
         </select>
+        <select className="input-field !w-auto max-w-[16rem]" value={supplierFilter} onChange={(e) => setSupplierFilter(e.target.value)}>
+          <option value="">{mt(lang, 'supplierFilter')}: {mt(lang, 'all')}</option>
+          {quotingSuppliers.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
+        <ExportListButton label={mt(lang, 'exportList', { n: visible.length })} hint={mt(lang, 'exportListHint')} count={visible.length} onExport={exportVisible} />
         {editingId === null && (
           <button className="btn-primary text-sm" onClick={openNew}>+ {mt(lang, 'newTender')}</button>
         )}
