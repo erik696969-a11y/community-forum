@@ -576,6 +576,24 @@
     ],
     "tips": []
   },
+  "board-report": {
+    "title": "Prepare the report for the next board meeting",
+    "summary": "One click: what happened since the last meeting – decisions, tasks, invoices and payments, budget, new suppliers, tenders, contracts, claims and what comes next.",
+    "keywords": "report meeting board preparation summary last month since last meeting monthly what happened overview briefing agenda documents paid invoices budget new suppliers decisions print pdf email",
+    "steps": [
+      "Click the tab \"🗒️ Meeting report\" (group \"Reports\").",
+      "Memoria selects the period since the last board meeting. You can also click \"Last month\" or \"Last 30 days\", or set \"From\" and \"To\".",
+      "Read the report: the key figures at the top, then 1. Decisions, 2. Follow-up of tasks, 3. Invoices and payments, 4. Budget and reserve fund, 5. New suppliers, 6. Tenders and quotes, 7. Contracts, 8. Claims and disputes, 9. Meetings and what comes next.",
+      "Click \"🖨 Print / PDF\" to print it or save it as PDF for the meeting.",
+      "Or click \"📋 Copy as text\" and paste it into an e-mail to the board.",
+      "Or click \"⬇ Excel\" to get the same report as a spreadsheet."
+    ],
+    "tips": [
+      "Nothing has to be filtered or copied by hand; the report always uses the current records.",
+      "Red lines need attention (overdue, over budget, not ratified); orange lines are coming up.",
+      "The report shows facts only. Decisions stay with the board."
+    ]
+  },
   "overview": {
     "title": "Overview report for one category (for example gardening)",
     "summary": "Which companies worked for us, their contracts, whether quotes were compared, why each was chosen and what is missing.",

@@ -576,6 +576,24 @@
     ],
     "tips": []
   },
+  "board-report": {
+    "title": "Preparar el informe para la próxima reunión de la Junta",
+    "summary": "Con un clic: lo ocurrido desde la última reunión – acuerdos, tareas, facturas y pagos, presupuesto, nuevos proveedores, licitaciones, contratos, siniestros y lo que viene.",
+    "keywords": "informe reunion junta preparar resumen mes pasado desde la ultima reunion mensual que paso orden del dia documentacion facturas pagadas presupuesto nuevos proveedores acuerdos imprimir pdf correo",
+    "steps": [
+      "Pulse la pestaña \"🗒️ Informe para la reunión\" (grupo \"Informes\").",
+      "Memoria elige el periodo desde la última reunión de la Junta. También puede pulsar \"Mes pasado\" o \"Últimos 30 días\", o indicar \"Desde\" y \"Hasta\".",
+      "Lea el informe: arriba las cifras clave y después 1. Acuerdos, 2. Seguimiento de tareas, 3. Facturas y pagos, 4. Presupuesto y fondo de reserva, 5. Nuevos proveedores, 6. Licitaciones y ofertas, 7. Contratos, 8. Siniestros y disputas, 9. Reuniones y próximos pasos.",
+      "Pulse \"🖨 Imprimir / PDF\" para imprimirlo o guardarlo en PDF para la reunión.",
+      "O pulse \"📋 Copiar como texto\" y péguelo en un correo a la Junta.",
+      "O pulse \"⬇ Excel\" para obtener el mismo informe como hoja de cálculo."
+    ],
+    "tips": [
+      "No hay que filtrar ni copiar nada a mano; el informe usa siempre los registros actuales.",
+      "Las líneas rojas requieren atención (vencido, presupuesto superado, sin ratificar); las naranjas se acercan.",
+      "El informe solo muestra hechos. Las decisiones corresponden a la Junta."
+    ]
+  },
   "overview": {
     "title": "Informe resumen de una categoría (por ejemplo, jardinería)",
     "summary": "Qué empresas trabajaron para nosotros, sus contratos, si se compararon ofertas, por qué se eligió cada una y qué falta.",

@@ -576,6 +576,24 @@
     ],
     "tips": []
   },
+  "board-report": {
+    "title": "Bericht für die nächste Vorstandssitzung vorbereiten",
+    "summary": "Mit einem Klick: was seit der letzten Sitzung passiert ist – Beschlüsse, Aufgaben, Rechnungen und Zahlungen, Budget, neue Lieferanten, Ausschreibungen, Verträge, Schadensfälle und was ansteht.",
+    "keywords": "bericht sitzung vorstand vorbereitung zusammenfassung letzter monat seit der letzten sitzung monatlich was ist passiert tagesordnung unterlagen bezahlte rechnungen budget neue lieferanten beschluesse drucken pdf e-mail",
+    "steps": [
+      "Klicken Sie auf den Reiter \"🗒️ Sitzungsbericht\" (Gruppe \"Berichte\").",
+      "Memoria wählt den Zeitraum seit der letzten Vorstandssitzung. Sie können auch \"Letzter Monat\" oder \"Letzte 30 Tage\" anklicken oder \"Von\" und \"Bis\" eingeben.",
+      "Lesen Sie den Bericht: oben die Kennzahlen, dann 1. Beschlüsse, 2. Umsetzung der Aufgaben, 3. Rechnungen und Zahlungen, 4. Budget und Rücklage, 5. Neue Lieferanten, 6. Ausschreibungen und Angebote, 7. Verträge, 8. Schadensfälle und Streitigkeiten, 9. Sitzungen und was ansteht.",
+      "Klicken Sie auf \"🖨 Drucken / PDF\", um ihn zu drucken oder als PDF für die Sitzung zu speichern.",
+      "Oder klicken Sie auf \"📋 Als Text kopieren\" und fügen Sie ihn in eine E-Mail an den Vorstand ein.",
+      "Oder klicken Sie auf \"⬇ Excel\", um denselben Bericht als Tabelle zu erhalten."
+    ],
+    "tips": [
+      "Nichts muss von Hand gefiltert oder kopiert werden; der Bericht nutzt immer die aktuellen Einträge.",
+      "Rote Zeilen brauchen Aufmerksamkeit (überfällig, Budget überschritten, nicht ratifiziert); orange Zeilen stehen bevor.",
+      "Der Bericht zeigt nur Fakten. Entscheidungen liegen beim Vorstand."
+    ]
+  },
   "overview": {
     "title": "Übersichtsbericht für eine Kategorie (zum Beispiel Gartenpflege)",
     "summary": "Welche Firmen für uns gearbeitet haben, ihre Verträge, ob Angebote verglichen wurden, warum jede gewählt wurde und was fehlt.",

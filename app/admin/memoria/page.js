@@ -31,6 +31,7 @@ import BudgetPanel from '../../components/memoria/BudgetPanel';
 import CasesPanel from '../../components/memoria/CasesPanel';
 import HelpPanel from '../../components/memoria/HelpPanel';
 import UsagePanel from '../../components/memoria/UsagePanel';
+import BoardReportPanel from '../../components/memoria/BoardReportPanel';
 import { useUsageTracking } from '../../../lib/memoriaUsage';
 import { HELP_IDS, MEMORIA_TABS } from '../../../lib/memoriaHelp';
 import { supabase } from '../../../lib/supabaseClient';
@@ -64,6 +65,7 @@ const TAB_GROUPS = [
     tabs: [
       { key: 'ask', label: 'tabAsk', icon: '💬' },
       { key: 'help', label: 'tabHelp', icon: '❓' },
+      { key: 'boardreport', label: 'tabBoardReport', icon: '🗒️' },
       { key: 'report', label: 'tabReport', icon: '📊' },
       { key: 'handover', label: 'tabHandover', icon: '📦' },
       { key: 'activity', label: 'tabActivity', icon: '🕒' },
@@ -154,7 +156,7 @@ export default function MemoriaPage() {
           <Link href="/admin" className="text-sm text-harbor/70 hover:text-harbor">← {t(lang, 'managementTitle')}</Link>
         </div>
         <div className="flex items-start justify-between gap-3 mt-2">
-          <h1 className={`font-display text-2xl text-harbor flex items-center gap-2 ${tab === 'meetings' || tab === 'handover' || tab === 'help' ? 'print:hidden' : ''}`}><img src="/memoria-icon.png" alt="" className="h-9 w-9 rounded-[22%]" />{mt(lang, 'memoriaTitle')}</h1>
+          <h1 className={`font-display text-2xl text-harbor flex items-center gap-2 ${tab === 'meetings' || tab === 'handover' || tab === 'help' || tab === 'boardreport' ? 'print:hidden' : ''}`}><img src="/memoria-icon.png" alt="" className="h-9 w-9 rounded-[22%]" />{mt(lang, 'memoriaTitle')}</h1>
           {tab !== 'help' && (
             <button type="button" onClick={() => openHelp(null)} className="btn-secondary text-sm whitespace-nowrap print:hidden">{mt(lang, 'helpButton')}</button>
           )}
@@ -208,6 +210,7 @@ export default function MemoriaPage() {
         {tab === 'report' && <ReportPanel lang={lang} />}
         {tab === 'activity' && <ActivityFeed lang={lang} refreshKey={refreshKey} />}
         {tab === 'usage' && <UsagePanel lang={lang} />}
+        {tab === 'boardreport' && <BoardReportPanel lang={lang} />}
         {tab === 'mandates' && <MandatesPanel lang={lang} profile={profile} onChanged={bump} />}
         {tab === 'export' && <ExportPanel lang={lang} profile={profile} />}
         {tab === 'budget' && <BudgetPanel lang={lang} onChanged={bump} />}

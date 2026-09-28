@@ -576,6 +576,24 @@
     ],
     "tips": []
   },
+  "board-report": {
+    "title": "Préparer le rapport pour la prochaine réunion du conseil",
+    "summary": "En un clic : ce qui s’est passé depuis la dernière réunion – décisions, tâches, factures et paiements, budget, nouveaux fournisseurs, appels d’offres, contrats, sinistres et ce qui arrive.",
+    "keywords": "rapport reunion conseil preparation resume mois dernier depuis la derniere reunion mensuel ce qui s est passe ordre du jour documents factures payees budget nouveaux fournisseurs decisions imprimer pdf e-mail",
+    "steps": [
+      "Cliquez sur l’onglet \"🗒️ Rapport de réunion\" (groupe \"Rapports\").",
+      "Memoria choisit la période depuis la dernière réunion du conseil. Vous pouvez aussi cliquer sur \"Mois dernier\" ou \"30 derniers jours\", ou saisir \"Du\" et \"Au\".",
+      "Lisez le rapport : les chiffres clés en haut, puis 1. Décisions, 2. Suivi des tâches, 3. Factures et paiements, 4. Budget et fonds de réserve, 5. Nouveaux fournisseurs, 6. Appels d’offres et devis, 7. Contrats, 8. Sinistres et litiges, 9. Réunions et suite.",
+      "Cliquez sur \"🖨 Imprimer / PDF\" pour l’imprimer ou l’enregistrer en PDF pour la réunion.",
+      "Ou cliquez sur \"📋 Copier en texte\" et collez-le dans un e-mail au conseil.",
+      "Ou cliquez sur \"⬇ Excel\" pour obtenir le même rapport en tableur."
+    ],
+    "tips": [
+      "Rien à filtrer ni à copier à la main ; le rapport utilise toujours les enregistrements actuels.",
+      "Les lignes rouges demandent attention (en retard, budget dépassé, non ratifié) ; les orange approchent.",
+      "Le rapport ne montre que des faits. Les décisions restent au conseil."
+    ]
+  },
   "overview": {
     "title": "Rapport de synthèse pour une catégorie (par exemple le jardinage)",
     "summary": "Quelles entreprises ont travaillé pour nous, leurs contrats, si les devis ont été comparés, pourquoi chacune a été retenue et ce qui manque.",
