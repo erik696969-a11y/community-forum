@@ -1,9 +1,11 @@
 'use client'
 
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 const TEXT = {
   en: {
+    back: '← Back to the app',
     title: 'Community map',
     intro: 'Plan of Hacienda del Señorío de Cifuentes: blocks 01–28, pools, gatehouse and both entrances.',
     zoomIn: 'Zoom in',
@@ -13,6 +15,7 @@ const TEXT = {
     alt: 'Plan of the Hacienda del Señorío de Cifuentes community',
   },
   es: {
+    back: '← Volver a la aplicación',
     title: 'Plano de la comunidad',
     intro: 'Plano de Hacienda del Señorío de Cifuentes: bloques 01–28, piscinas, garita y ambas entradas.',
     zoomIn: 'Acercar',
@@ -22,6 +25,7 @@ const TEXT = {
     alt: 'Plano de la comunidad Hacienda del Señorío de Cifuentes',
   },
   fr: {
+    back: '← Retour à l’application',
     title: 'Plan de la résidence',
     intro: 'Plan de Hacienda del Señorío de Cifuentes : blocs 01–28, piscines, poste d’accueil et les deux entrées.',
     zoomIn: 'Agrandir',
@@ -31,6 +35,7 @@ const TEXT = {
     alt: 'Plan de la résidence Hacienda del Señorío de Cifuentes',
   },
   de: {
+    back: '← Zurück zur App',
     title: 'Lageplan der Anlage',
     intro: 'Plan der Hacienda del Señorío de Cifuentes: Blöcke 01–28, Pools, Pförtnerhaus und beide Zufahrten.',
     zoomIn: 'Vergrößern',
@@ -55,7 +60,7 @@ export default function CommunityMapPage() {
     if (TEXT[browserLang]) setLang(browserLang)
 
     // The frame always fits on the screen, so the whole plan is visible at zoom 1.
-    const updateHeight = () => setFrameHeight(Math.max(380, window.innerHeight - 270))
+    const updateHeight = () => setFrameHeight(Math.max(380, window.innerHeight - 300))
     updateHeight()
     window.addEventListener('resize', updateHeight)
     return () => window.removeEventListener('resize', updateHeight)
@@ -74,6 +79,22 @@ export default function CommunityMapPage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '16px' }}>
+      <Link
+        href="/dashboard"
+        style={{
+          display: 'inline-block',
+          marginBottom: 12,
+          padding: '8px 14px',
+          borderRadius: 8,
+          background: '#1f3a4d',
+          color: '#fff',
+          textDecoration: 'none',
+          fontSize: 14,
+        }}
+      >
+        {t.back}
+      </Link>
+
       <h1 style={{ fontSize: 24, marginBottom: 6 }}>{t.title}</h1>
       <p style={{ marginTop: 0, color: '#555' }}>{t.intro}</p>
 
