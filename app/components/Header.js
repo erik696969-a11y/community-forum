@@ -42,6 +42,9 @@ export default function Header({ profile, lang, onLanguageChange }) {
           <Link href="/dashboard/contacts" className="hover:text-ochre whitespace-nowrap">
             {t(lang, 'contacts')}
           </Link>
+          <Link href="/dashboard/map" className="hover:text-ochre whitespace-nowrap">
+            {{ en: 'Map', es: 'Plano', fr: 'Plan', de: 'Lageplan' }[lang] || 'Map'}
+          </Link>
           <Link href="/dashboard/messages" className="hover:text-ochre whitespace-nowrap relative">
             {t(lang, 'messages')}
             {count > 0 && (
