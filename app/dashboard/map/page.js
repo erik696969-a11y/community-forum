@@ -8,9 +8,8 @@ const TEXT = {
     intro: 'Plan of Hacienda del Señorío de Cifuentes: blocks 01–28, pools, gatehouse and both entrances.',
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
-    reset: 'Fit to screen',
-    open: 'Open full size',
-    hint: 'Scroll or drag the map to move around. On a phone you can also pinch to zoom.',
+    reset: 'Whole plan',
+    hint: 'Use the buttons to zoom. When zoomed in, drag the map to move around. On a phone you can also pinch.',
     alt: 'Plan of the Hacienda del Señorío de Cifuentes community',
   },
   es: {
@@ -18,9 +17,8 @@ const TEXT = {
     intro: 'Plano de Hacienda del Señorío de Cifuentes: bloques 01–28, piscinas, garita y ambas entradas.',
     zoomIn: 'Acercar',
     zoomOut: 'Alejar',
-    reset: 'Ajustar a la pantalla',
-    open: 'Abrir a tamaño completo',
-    hint: 'Desplácese o arrastre el plano para moverse. En el móvil también puede pellizcar para ampliar.',
+    reset: 'Plano completo',
+    hint: 'Use los botones para ampliar. Con el plano ampliado, arrástrelo para moverse. En el móvil también puede pellizcar.',
     alt: 'Plano de la comunidad Hacienda del Señorío de Cifuentes',
   },
   fr: {
@@ -28,9 +26,8 @@ const TEXT = {
     intro: 'Plan de Hacienda del Señorío de Cifuentes : blocs 01–28, piscines, poste d’accueil et les deux entrées.',
     zoomIn: 'Agrandir',
     zoomOut: 'Réduire',
-    reset: 'Ajuster à l’écran',
-    open: 'Ouvrir en taille réelle',
-    hint: 'Faites défiler ou faites glisser le plan pour vous déplacer. Sur téléphone, vous pouvez aussi pincer pour zoomer.',
+    reset: 'Plan complet',
+    hint: 'Utilisez les boutons pour zoomer. Une fois agrandi, faites glisser le plan pour vous déplacer. Sur téléphone, vous pouvez aussi pincer.',
     alt: 'Plan de la résidence Hacienda del Señorío de Cifuentes',
   },
   de: {
@@ -38,9 +35,8 @@ const TEXT = {
     intro: 'Plan der Hacienda del Señorío de Cifuentes: Blöcke 01–28, Pools, Pförtnerhaus und beide Zufahrten.',
     zoomIn: 'Vergrößern',
     zoomOut: 'Verkleinern',
-    reset: 'An Bildschirm anpassen',
-    open: 'In voller Größe öffnen',
-    hint: 'Zum Bewegen den Plan scrollen oder ziehen. Auf dem Handy können Sie auch mit zwei Fingern zoomen.',
+    reset: 'Ganzer Plan',
+    hint: 'Mit den Schaltflächen zoomen. Im vergrößerten Zustand den Plan ziehen, um sich zu bewegen. Auf dem Handy geht auch Zwei-Finger-Zoom.',
     alt: 'Lageplan der Anlage Hacienda del Señorío de Cifuentes',
   },
 }
@@ -52,10 +48,17 @@ const STEP = 0.5
 export default function CommunityMapPage() {
   const [lang, setLang] = useState('en')
   const [zoom, setZoom] = useState(1)
+  const [frameHeight, setFrameHeight] = useState(560)
 
   useEffect(() => {
     const browserLang = (navigator.language || 'en').slice(0, 2).toLowerCase()
     if (TEXT[browserLang]) setLang(browserLang)
+
+    // The frame always fits on the screen, so the whole plan is visible at zoom 1.
+    const updateHeight = () => setFrameHeight(Math.max(380, window.innerHeight - 270))
+    updateHeight()
+    window.addEventListener('resize', updateHeight)
+    return () => window.removeEventListener('resize', updateHeight)
   }, [])
 
   const t = TEXT[lang]
@@ -94,30 +97,29 @@ export default function CommunityMapPage() {
         <button type="button" style={buttonStyle} onClick={() => setZoom(1)}>
           {t.reset}
         </button>
-        <a
-          href="/community-map.jpg"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ ...buttonStyle, textDecoration: 'none', display: 'inline-block' }}
-        >
-          {t.open}
-        </a>
       </div>
 
       <div
         style={{
           overflow: 'auto',
-          maxHeight: '75vh',
+          height: frameHeight,
+          boxSizing: 'border-box',
           border: '1px solid #ddd',
           borderRadius: 10,
-          background: '#fff',
+          background: '#f4f1ea',
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/community-map.jpg"
           alt={t.alt}
-          style={{ display: 'block', width: `${zoom * 100}%`, maxWidth: 'none', height: 'auto' }}
+          style={{
+            display: 'block',
+            margin: '0 auto',
+            height: (frameHeight - 2) * zoom,
+            width: 'auto',
+            maxWidth: 'none',
+          }}
         />
       </div>
 
